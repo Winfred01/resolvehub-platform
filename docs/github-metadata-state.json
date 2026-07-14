@@ -1,0 +1,1098 @@
+{
+    "repository":  {
+                       "full_name":  "Winfred01/resolvehub-platform",
+                       "url":  "https://github.com/Winfred01/resolvehub-platform",
+                       "visibility":  "public",
+                       "default_branch":  "main"
+                   },
+    "branch":  "product/prd-foundation",
+    "base_branch":  "main",
+    "starting_commit":  "a5c3bb9",
+    "labels":  {
+                   "target_count":  16,
+                   "existing_before":  [
+                                           "bug",
+                                           "documentation",
+                                           "duplicate",
+                                           "enhancement",
+                                           "good first issue",
+                                           "help wanted",
+                                           "invalid",
+                                           "question",
+                                           "wontfix"
+                                       ],
+                   "target":  [
+                                  "type:feature",
+                                  "type:documentation",
+                                  "type:infrastructure",
+                                  "type:test",
+                                  "type:security",
+                                  "area:frontend",
+                                  "area:backend",
+                                  "area:analytics",
+                                  "area:database",
+                                  "area:infrastructure",
+                                  "area:docs",
+                                  "priority:p0",
+                                  "priority:p1",
+                                  "priority:p2",
+                                  "status:blocked",
+                                  "good first issue"
+                              ],
+                   "created":  [
+                                   "type:feature",
+                                   "type:documentation",
+                                   "type:infrastructure",
+                                   "type:test",
+                                   "type:security",
+                                   "area:frontend",
+                                   "area:backend",
+                                   "area:analytics",
+                                   "area:database",
+                                   "area:infrastructure",
+                                   "area:docs",
+                                   "priority:p0",
+                                   "priority:p1",
+                                   "priority:p2",
+                                   "status:blocked"
+                               ],
+                   "created_count":  15,
+                   "final_target_count":  16,
+                   "final_repo_label_count":  24,
+                   "final_labels":  [
+                                        "area:analytics",
+                                        "area:backend",
+                                        "area:database",
+                                        "area:docs",
+                                        "area:frontend",
+                                        "area:infrastructure",
+                                        "bug",
+                                        "documentation",
+                                        "duplicate",
+                                        "enhancement",
+                                        "good first issue",
+                                        "help wanted",
+                                        "invalid",
+                                        "priority:p0",
+                                        "priority:p1",
+                                        "priority:p2",
+                                        "question",
+                                        "status:blocked",
+                                        "type:documentation",
+                                        "type:feature",
+                                        "type:infrastructure",
+                                        "type:security",
+                                        "type:test",
+                                        "wontfix"
+                                    ],
+                   "missing":  [
+
+                               ],
+                   "status":  "Complete"
+               },
+    "milestones":  {
+                       "target_count":  4,
+                       "existing_before":  [
+
+                                           ],
+                       "created":  [
+                                       {
+                                           "number":  1,
+                                           "title":  "v0.1 Foundation and Architecture",
+                                           "state":  "open",
+                                           "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/1"
+                                       },
+                                       {
+                                           "number":  2,
+                                           "title":  "v0.1 Core Ticket Workflow",
+                                           "state":  "open",
+                                           "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/2"
+                                       },
+                                       {
+                                           "number":  3,
+                                           "title":  "v0.1 Analytics and Dashboard",
+                                           "state":  "open",
+                                           "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/3"
+                                       },
+                                       {
+                                           "number":  4,
+                                           "title":  "v0.1 Quality, Deployment and Portfolio",
+                                           "state":  "open",
+                                           "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/4"
+                                       }
+                                   ],
+                       "created_count":  4,
+                       "final_count":  4,
+                       "missing":  [
+
+                                   ],
+                       "status":  "Complete"
+                   },
+    "draft_pr":  {
+                     "exists":  true,
+                     "number":  1,
+                     "url":  "https://github.com/Winfred01/resolvehub-platform/pull/1",
+                     "state":  "open draft",
+                     "base":  "main",
+                     "head":  "product/prd-foundation",
+                     "merged":  false,
+                     "status":  "Complete"
+                 },
+    "issues":  {
+                   "target_count":  26,
+                   "planned_count":  26,
+                   "created_count":  26,
+                   "remaining_count":  0,
+                   "current_batch":  "Analytics, Dashboard, Quality, Deployment and Portfolio",
+                   "status":  "Complete",
+                   "foundation_milestone":  {
+                                                "number":  1,
+                                                "title":  "v0.1 Foundation and Architecture",
+                                                "state":  "open"
+                                            },
+                   "created":  [
+                                   {
+                                       "plan":  1,
+                                       "number":  2,
+                                       "title":  "Validate repository foundation and development conventions",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:documentation",
+                                                      "area:docs",
+                                                      "priority:p0",
+                                                      "good first issue"
+                                                  ],
+                                       "type":  [
+                                                    "type:documentation"
+                                                ],
+                                       "area":  [
+                                                    "area:docs"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "product/prd",
+                                       "dependencies":  [
+
+                                                        ],
+                                       "blocks":  [
+                                                      3,
+                                                      4,
+                                                      5,
+                                                      6
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/2",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  2,
+                                       "number":  3,
+                                       "title":  "Scaffold React and TypeScript frontend",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:frontend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:frontend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "frontend/core-ui",
+                                       "dependencies":  [
+                                                            2
+                                                        ],
+                                       "blocks":  [
+                                                      7,
+                                                      8
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/3",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  3,
+                                       "number":  4,
+                                       "title":  "Scaffold Spring Boot backend",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            2
+                                                        ],
+                                       "blocks":  [
+                                                      7,
+                                                      8
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/4",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  4,
+                                       "number":  5,
+                                       "title":  "Scaffold FastAPI analytics service",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:analytics",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:analytics"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "analytics/service",
+                                       "dependencies":  [
+                                                            2
+                                                        ],
+                                       "blocks":  [
+                                                      7,
+                                                      8
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/5",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  5,
+                                       "number":  6,
+                                       "title":  "Define PostgreSQL migrations and local database foundation",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:database",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:database"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "database/schema",
+                                       "dependencies":  [
+                                                            2
+                                                        ],
+                                       "blocks":  [
+                                                      7
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/6",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  6,
+                                       "number":  7,
+                                       "title":  "Add Docker Compose development topology",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:infrastructure",
+                                                      "area:infrastructure",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:infrastructure"
+                                                ],
+                                       "area":  [
+                                                    "area:infrastructure"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "infrastructure/deployment",
+                                       "dependencies":  [
+                                                            3,
+                                                            4,
+                                                            5,
+                                                            6
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/7",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  7,
+                                       "number":  8,
+                                       "title":  "Add initial GitHub Actions CI workflow",
+                                       "milestone":  "v0.1 Foundation and Architecture",
+                                       "milestone_number":  1,
+                                       "labels":  [
+                                                      "type:infrastructure",
+                                                      "type:test",
+                                                      "area:infrastructure",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:infrastructure",
+                                                    "type:test"
+                                                ],
+                                       "area":  [
+                                                    "area:infrastructure"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "infrastructure/deployment",
+                                       "dependencies":  [
+                                                            3,
+                                                            4,
+                                                            5
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/8",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  8,
+                                       "number":  9,
+                                       "title":  "Implement user registration",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            4,
+                                                            6
+                                                        ],
+                                       "blocks":  [
+                                                      10,
+                                                      11,
+                                                      12
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/9",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  9,
+                                       "number":  10,
+                                       "title":  "Implement login and logout",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "type:security",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature",
+                                                    "type:security"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            9
+                                                        ],
+                                       "blocks":  [
+                                                      11,
+                                                      12
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/10",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  10,
+                                       "number":  11,
+                                       "title":  "Implement role-based authorization",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "type:security",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature",
+                                                    "type:security"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            10
+                                                        ],
+                                       "blocks":  [
+                                                      12,
+                                                      13,
+                                                      16,
+                                                      17
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/11",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  11,
+                                       "number":  12,
+                                       "title":  "Add authentication and authorization security tests",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:test",
+                                                      "type:security",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:test",
+                                                    "type:security"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "qa/test-suite",
+                                       "dependencies":  [
+                                                            9,
+                                                            10,
+                                                            11
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/12",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  12,
+                                       "number":  13,
+                                       "title":  "Implement ticket create and detail APIs",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            11,
+                                                            6
+                                                        ],
+                                       "blocks":  [
+                                                      14,
+                                                      15,
+                                                      16,
+                                                      17,
+                                                      18,
+                                                      19
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/13",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  13,
+                                       "number":  14,
+                                       "title":  "Implement ticket update, status and priority workflow",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            13
+                                                        ],
+                                       "blocks":  [
+                                                      15,
+                                                      18,
+                                                      19,
+                                                      20
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/14",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  14,
+                                       "number":  15,
+                                       "title":  "Implement ticket search and filters",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            13,
+                                                            14
+                                                        ],
+                                       "blocks":  [
+                                                      19
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/15",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  15,
+                                       "number":  16,
+                                       "title":  "Implement ticket categories and assignments",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "area:database",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend",
+                                                    "area:database"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            11,
+                                                            13
+                                                        ],
+                                       "blocks":  [
+                                                      18
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/16",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  16,
+                                       "number":  17,
+                                       "title":  "Implement ticket comments",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            13,
+                                                            11
+                                                        ],
+                                       "blocks":  [
+                                                      18
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/17",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  17,
+                                       "number":  18,
+                                       "title":  "Implement ticket activity and audit history",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "type:security",
+                                                      "area:backend",
+                                                      "area:database",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature",
+                                                    "type:security"
+                                                ],
+                                       "area":  [
+                                                    "area:backend",
+                                                    "area:database"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            13,
+                                                            14,
+                                                            16,
+                                                            17
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/18",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  18,
+                                       "number":  19,
+                                       "title":  "Build ticket list, detail and form UI",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:frontend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:frontend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "frontend/core-ui",
+                                       "dependencies":  [
+                                                            3,
+                                                            13,
+                                                            14,
+                                                            15
+                                                        ],
+                                       "blocks":  [
+                                                      20
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/19",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  19,
+                                       "number":  20,
+                                       "title":  "Build responsive Kanban workflow",
+                                       "milestone":  "v0.1 Core Ticket Workflow",
+                                       "milestone_number":  2,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:frontend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:frontend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "frontend/core-ui",
+                                       "dependencies":  [
+                                                            19,
+                                                            14
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/20",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  20,
+                                       "number":  21,
+                                       "title":  "Implement dashboard summary and trend APIs",
+                                       "milestone":  "v0.1 Analytics and Dashboard",
+                                       "milestone_number":  3,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:backend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:backend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "backend/core-api",
+                                       "dependencies":  [
+                                                            15,
+                                                            18
+                                                        ],
+                                       "blocks":  [
+                                                      22
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/21",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  21,
+                                       "number":  22,
+                                       "title":  "Build responsive dashboard charts",
+                                       "milestone":  "v0.1 Analytics and Dashboard",
+                                       "milestone_number":  3,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:frontend",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:frontend"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "frontend/core-ui",
+                                       "dependencies":  [
+                                                            3,
+                                                            21
+                                                        ],
+                                       "blocks":  [
+                                                      26,
+                                                      27
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/22",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  22,
+                                       "number":  23,
+                                       "title":  "Implement category and priority suggestion service",
+                                       "milestone":  "v0.1 Analytics and Dashboard",
+                                       "milestone_number":  3,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:analytics",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:analytics"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "analytics/service",
+                                       "dependencies":  [
+                                                            5,
+                                                            13
+                                                        ],
+                                       "blocks":  [
+                                                      25
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/23",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  23,
+                                       "number":  24,
+                                       "title":  "Implement duplicate ticket suggestion",
+                                       "milestone":  "v0.1 Analytics and Dashboard",
+                                       "milestone_number":  3,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:analytics",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:analytics"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "analytics/service",
+                                       "dependencies":  [
+                                                            5,
+                                                            15
+                                                        ],
+                                       "blocks":  [
+                                                      25
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/24",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  24,
+                                       "number":  25,
+                                       "title":  "Integrate analytics suggestions with ticket workflow",
+                                       "milestone":  "v0.1 Analytics and Dashboard",
+                                       "milestone_number":  3,
+                                       "labels":  [
+                                                      "type:feature",
+                                                      "area:frontend",
+                                                      "area:backend",
+                                                      "area:analytics",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:feature"
+                                                ],
+                                       "area":  [
+                                                    "area:frontend",
+                                                    "area:backend",
+                                                    "area:analytics"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "analytics/service",
+                                       "dependencies":  [
+                                                            23,
+                                                            24,
+                                                            13,
+                                                            19
+                                                        ],
+                                       "blocks":  [
+                                                      26,
+                                                      27
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/25",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  25,
+                                       "number":  26,
+                                       "title":  "Add integrated quality, accessibility, security and E2E gates",
+                                       "milestone":  "v0.1 Quality, Deployment and Portfolio",
+                                       "milestone_number":  4,
+                                       "labels":  [
+                                                      "type:test",
+                                                      "type:security",
+                                                      "area:infrastructure",
+                                                      "priority:p0"
+                                                  ],
+                                       "type":  [
+                                                    "type:test",
+                                                    "type:security"
+                                                ],
+                                       "area":  [
+                                                    "area:infrastructure"
+                                                ],
+                                       "priority":  "priority:p0",
+                                       "workstream":  "qa/test-suite",
+                                       "dependencies":  [
+                                                            8,
+                                                            12,
+                                                            20,
+                                                            25,
+                                                            22
+                                                        ],
+                                       "blocks":  [
+                                                      27
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/26",
+                                       "status":  "open-created"
+                                   },
+                                   {
+                                       "plan":  26,
+                                       "number":  27,
+                                       "title":  "Complete Docker demo deployment, seeded data and v0.1 portfolio release",
+                                       "milestone":  "v0.1 Quality, Deployment and Portfolio",
+                                       "milestone_number":  4,
+                                       "labels":  [
+                                                      "type:infrastructure",
+                                                      "type:documentation",
+                                                      "area:infrastructure",
+                                                      "area:docs",
+                                                      "priority:p1"
+                                                  ],
+                                       "type":  [
+                                                    "type:infrastructure",
+                                                    "type:documentation"
+                                                ],
+                                       "area":  [
+                                                    "area:infrastructure",
+                                                    "area:docs"
+                                                ],
+                                       "priority":  "priority:p1",
+                                       "workstream":  "infrastructure/deployment",
+                                       "dependencies":  [
+                                                            7,
+                                                            8,
+                                                            26,
+                                                            22,
+                                                            25
+                                                        ],
+                                       "blocks":  [
+
+                                                  ],
+                                       "url":  "https://github.com/Winfred01/resolvehub-platform/issues/27",
+                                       "status":  "open-created"
+                                   }
+                               ],
+                   "deferred_count":  0,
+                   "map_path":  "docs/github-issue-map.md",
+                   "foundation_created_count":  7,
+                   "core_created_count":  12,
+                   "analytics_quality_remaining_count":  0,
+                   "duplicate_issues":  0,
+                   "remaining":  [
+
+                                 ],
+                   "core_milestone":  {
+                                          "number":  2,
+                                          "title":  "v0.1 Core Ticket Workflow",
+                                          "state":  "open"
+                                      },
+                   "milestone_assignments":  {
+                                                 "foundation":  7,
+                                                 "core_ticket_workflow":  12,
+                                                 "analytics_dashboard":  5,
+                                                 "quality_deployment_portfolio":  2,
+                                                 "remaining_uncreated":  0,
+                                                 "all_issues_assigned":  true
+                                             },
+                   "label_validation":  {
+                                            "all_issues_checked":  26,
+                                            "type_labels":  true,
+                                            "area_labels":  true,
+                                            "priority_labels":  true,
+                                            "missing":  [
+
+                                                        ]
+                                        },
+                   "dependency_validation":  {
+                                                 "uses_real_issue_numbers":  true,
+                                                 "cycles_detected":  false,
+                                                 "placeholder_dependencies_found":  false,
+                                                 "graph_complete":  true
+                                             },
+                   "analytics_dashboard_created_count":  5,
+                   "quality_deployment_portfolio_created_count":  2
+               },
+    "browser_write_operations":  {
+                                     "backend":  "Chrome extension",
+                                     "claimed_tab":  "1586542497",
+                                     "target_repository":  "Winfred01/resolvehub-platform",
+                                     "pages_opened":  [
+                                                          "/labels",
+                                                          "/milestones",
+                                                          "/milestones/new",
+                                                          "/pulls",
+                                                          "/compare/main...product/prd-foundation?expand=1",
+                                                          "/pull/1"
+                                                      ],
+                                     "labels_created":  [
+                                                            "type:feature",
+                                                            "type:documentation",
+                                                            "type:infrastructure",
+                                                            "type:test",
+                                                            "type:security",
+                                                            "area:frontend",
+                                                            "area:backend",
+                                                            "area:analytics",
+                                                            "area:database",
+                                                            "area:infrastructure",
+                                                            "area:docs",
+                                                            "priority:p0",
+                                                            "priority:p1",
+                                                            "priority:p2",
+                                                            "status:blocked"
+                                                        ],
+                                     "milestones_created":  [
+                                                                {
+                                                                    "number":  1,
+                                                                    "title":  "v0.1 Foundation and Architecture",
+                                                                    "state":  "open",
+                                                                    "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/1"
+                                                                },
+                                                                {
+                                                                    "number":  2,
+                                                                    "title":  "v0.1 Core Ticket Workflow",
+                                                                    "state":  "open",
+                                                                    "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/2"
+                                                                },
+                                                                {
+                                                                    "number":  3,
+                                                                    "title":  "v0.1 Analytics and Dashboard",
+                                                                    "state":  "open",
+                                                                    "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/3"
+                                                                },
+                                                                {
+                                                                    "number":  4,
+                                                                    "title":  "v0.1 Quality, Deployment and Portfolio",
+                                                                    "state":  "open",
+                                                                    "url":  "https://github.com/Winfred01/resolvehub-platform/milestone/4"
+                                                                }
+                                                            ],
+                                     "draft_pr_created":  "https://github.com/Winfred01/resolvehub-platform/pull/1",
+                                     "failed_operations":  [
+
+                                                           ],
+                                     "tabs_released":  "released by browser.tabs.finalize at Prompt 8A-R2-3 closeout",
+                                     "core_issues_created":  12,
+                                     "core_issue_bodies_updated":  12,
+                                     "core_labels_or_milestones_created":  0,
+                                     "failed_operations_r2_2":  [
+                                                                    "GitHub integration issue create returned 403; used Chrome web UI fallback"
+                                                                ],
+                                     "final_issues_created":  7,
+                                     "final_issue_bodies_updated":  7,
+                                     "final_labels_or_milestones_created":  0
+                                 },
+    "generated_at":  "2026-07-14T10:19:27Z",
+    "creation_method":  {
+                            "read_audit":  "public GitHub REST API plus Chrome page verification",
+                            "write":  "GitHub web UI through Codex Chrome extension",
+                            "local_commit":  "created in this commit",
+                            "github_metadata_write":  "all 26 planned issues created; final analytics, dashboard, quality, deployment and portfolio issues completed"
+                        },
+    "validation_status":  {
+                              "complete":  true,
+                              "blocked":  false,
+                              "blockers":  [
+
+                                           ],
+                              "issues_deferred":  false,
+                              "foundation_issues_created":  true,
+                              "core_issues_created":  true,
+                              "remaining_planned_issues":  0,
+                              "final_issues_created":  true
+                          },
+    "privacy":  {
+                    "job_automation_data_found":  false,
+                    "secrets_found":  false,
+                    "pii_found":  false
+                }
+}

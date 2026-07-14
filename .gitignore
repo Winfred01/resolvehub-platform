@@ -1,0 +1,52 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# JavaScript / frontend
+node_modules/
+dist/
+build/
+coverage/
+
+# Java / backend
+target/
+.gradle/
+
+# Python / analytics
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and local runtime
+*.log
+docker-data/
+postgres-data/
+
+# Local private data that must never enter ResolveHub
+application_tracker.csv
+application_answer_policy.csv
+pending_application_questions.csv
+linkedin_outreach_tracker.csv
+reporting/
+resume_packets/
+gmail-output/
+browser-profile/
+browser-data/
+application-answers/
+tokens/
+cookies/
+sessions/
