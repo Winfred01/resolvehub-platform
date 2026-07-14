@@ -1,0 +1,128 @@
+{
+    "repository":  {
+                       "full_name":  "Winfred01/resolvehub-platform",
+                       "url":  "https://github.com/Winfred01/resolvehub-platform",
+                       "visibility":  "public",
+                       "default_branch":  "main"
+                   },
+    "branch":  "product/prd-foundation",
+    "base_branch":  "main",
+    "starting_commit":  "c563a81",
+    "labels":  {
+                   "existing_before":  [
+                                           "bug",
+                                           "documentation",
+                                           "duplicate",
+                                           "enhancement",
+                                           "good first issue",
+                                           "help wanted",
+                                           "invalid",
+                                           "question",
+                                           "wontfix"
+                                       ],
+                   "target":  [
+                                  "type:feature",
+                                  "type:documentation",
+                                  "type:infrastructure",
+                                  "type:test",
+                                  "type:security",
+                                  "area:frontend",
+                                  "area:backend",
+                                  "area:analytics",
+                                  "area:database",
+                                  "area:infrastructure",
+                                  "area:docs",
+                                  "priority:p0",
+                                  "priority:p1",
+                                  "priority:p2",
+                                  "status:blocked",
+                                  "good first issue"
+                              ],
+                   "created":  [
+
+                               ],
+                   "final_count":  9,
+                   "missing":  [
+                                   "type:feature",
+                                   "type:documentation",
+                                   "type:infrastructure",
+                                   "type:test",
+                                   "type:security",
+                                   "area:frontend",
+                                   "area:backend",
+                                   "area:analytics",
+                                   "area:database",
+                                   "area:infrastructure",
+                                   "area:docs",
+                                   "priority:p0",
+                                   "priority:p1",
+                                   "priority:p2",
+                                   "status:blocked"
+                               ]
+               },
+    "milestones":  {
+                       "existing_before":  [
+
+                                           ],
+                       "target":  [
+                                      "v0.1 Foundation and Architecture",
+                                      "v0.1 Core Ticket Workflow",
+                                      "v0.1 Analytics and Dashboard",
+                                      "v0.1 Quality, Deployment and Portfolio"
+                                  ],
+                       "created":  [
+
+                                   ],
+                       "final_count":  0,
+                       "missing":  [
+                                       "v0.1 Foundation and Architecture",
+                                       "v0.1 Core Ticket Workflow",
+                                       "v0.1 Analytics and Dashboard",
+                                       "v0.1 Quality, Deployment and Portfolio"
+                                   ]
+                   },
+    "issues":  {
+                   "existing_before":  [
+
+                                       ],
+                   "planned_count":  26,
+                   "created":  [
+
+                               ],
+                   "final_count":  0,
+                   "duplicate_titles_detected":  [
+
+                                                 ],
+                   "map_path":  "docs/github-issue-map.md"
+               },
+    "draft_pr":  {
+                     "exists":  false,
+                     "url":  "https://github.com/Winfred01/resolvehub-platform/pull/new/product/prd-foundation",
+                     "state":  "blocked",
+                     "merged":  false,
+                     "blocker":  "GitHub integration returned 403 Resource not accessible by integration; gh CLI unavailable"
+                 },
+    "generated_at":  "2026-07-14T04:47:43Z",
+    "creation_method":  {
+                            "read_audit":  "public GitHub REST API plus local Git",
+                            "attempted_write":  "GitHub integration for draft PR",
+                            "local_commit":  "created in this commit",
+                            "github_metadata_write":  "blocked"
+                        },
+    "validation_status":  {
+                              "complete":  false,
+                              "blocked":  true,
+                              "blockers":  [
+                                               "gh CLI unavailable",
+                                               "GitHub integration cannot create draft PR",
+                                               "No exposed integration tool to create labels",
+                                               "No exposed integration tool to create milestones",
+                                               "Issues intentionally not created because required labels and milestones do not exist"
+                                           ]
+                          },
+    "privacy":  {
+                    "job_automation_data_found":  false,
+                    "secrets_found":  false,
+                    "pii_found":  false
+                }
+}
