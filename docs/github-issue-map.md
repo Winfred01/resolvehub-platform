@@ -1,34 +1,34 @@
 # GitHub Issue Map
 
-Generated at: 2026-07-14T08:32:52Z
+Generated at: 2026-07-14T10:01:11Z
 
-Status: Prompt 8A-R2-1 created the first 7 Foundation and Architecture issues. The remaining 19 planned issues are intentionally uncreated and have no fabricated numbers or URLs.
+Status: Prompt 8A-R2-2 created the 12 Core Ticket Workflow issues. The remaining 7 planned Analytics, Dashboard, Quality, Deployment, and Portfolio issues are intentionally uncreated and have no fabricated numbers or URLs.
 
-| Plan # | GitHub # | Title | Milestone | Priority | Workstream | Dependencies | Blocks | GitHub URL | Status |
-|---:|---:|---|---|---|---|---|---|---|---|
-| 1 | #2 | Validate repository foundation and development conventions | v0.1 Foundation and Architecture | priority:p0 | product/prd | none | #3, #4, #5, #6 | https://github.com/Winfred01/resolvehub-platform/issues/2 | open-created |
-| 2 | #3 | Scaffold React and TypeScript frontend | v0.1 Foundation and Architecture | priority:p0 | frontend/core-ui | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/3 | open-created |
-| 3 | #4 | Scaffold Spring Boot backend | v0.1 Foundation and Architecture | priority:p0 | backend/core-api | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/4 | open-created |
-| 4 | #5 | Scaffold FastAPI analytics service | v0.1 Foundation and Architecture | priority:p1 | analytics/service | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/5 | open-created |
-| 5 | #6 | Define PostgreSQL migrations and local database foundation | v0.1 Foundation and Architecture | priority:p0 | database/schema | #2 | #7 | https://github.com/Winfred01/resolvehub-platform/issues/6 | open-created |
-| 6 | #7 | Add Docker Compose development topology | v0.1 Foundation and Architecture | priority:p1 | infrastructure/deployment | #3, #4, #5, #6 | none | https://github.com/Winfred01/resolvehub-platform/issues/7 | open-created |
-| 7 | #8 | Add initial GitHub Actions CI workflow | v0.1 Foundation and Architecture | priority:p1 | infrastructure/deployment | #3, #4, #5 | none | https://github.com/Winfred01/resolvehub-platform/issues/8 | open-created |
-| 8 |  | Docker Compose foundation | v0.1 Quality, Deployment and Portfolio | priority:p1 | infrastructure/deployment | pending | pending |  | deferred |
-| 9 |  | CI foundation | v0.1 Quality, Deployment and Portfolio | priority:p1 | infrastructure/deployment | pending | pending |  | deferred |
-| 10 |  | User registration | v0.1 Core Ticket Workflow | priority:p0 | backend/core-api | pending | pending |  | deferred |
-| 11 |  | Login and logout | v0.1 Core Ticket Workflow | priority:p0 | backend/core-api | pending | pending |  | deferred |
-| 12 |  | Role authorization | v0.1 Core Ticket Workflow | priority:p0 | backend/core-api | pending | pending |  | deferred |
-| 13 |  | Ticket create/view/edit APIs | v0.1 Core Ticket Workflow | priority:p0 | backend/core-api | pending | pending |  | deferred |
-| 14 |  | Ticket filters and search | v0.1 Core Ticket Workflow | priority:p1 | backend/core-api | pending | pending |  | deferred |
-| 15 |  | Categories, priority, assignments | v0.1 Core Ticket Workflow | priority:p1 | backend/core-api | pending | pending |  | deferred |
-| 16 |  | Comments and activity history | v0.1 Core Ticket Workflow | priority:p0 | backend/core-api | pending | pending |  | deferred |
-| 17 |  | Kanban workflow UI | v0.1 Core Ticket Workflow | priority:p1 | frontend/core-ui | pending | pending |  | deferred |
-| 18 |  | Dashboard summary metrics | v0.1 Analytics and Dashboard | priority:p1 | frontend/core-ui | pending | pending |  | deferred |
-| 19 |  | Analytics category suggestion | v0.1 Analytics and Dashboard | priority:p1 | analytics/service | pending | pending |  | deferred |
-| 20 |  | Analytics priority recommendation | v0.1 Analytics and Dashboard | priority:p1 | analytics/service | pending | pending |  | deferred |
-| 21 |  | Analytics duplicate suggestion | v0.1 Analytics and Dashboard | priority:p2 | analytics/service | pending | pending |  | deferred |
-| 22 |  | E2E and accessibility test suite | v0.1 Quality, Deployment and Portfolio | priority:p1 | qa/test-suite | pending | pending |  | deferred |
-| 23 |  | Security hardening and audit logging | v0.1 Quality, Deployment and Portfolio | priority:p0 | qa/test-suite | pending | pending |  | deferred |
-| 24 |  | Demo data, screenshots, and script | v0.1 Quality, Deployment and Portfolio | priority:p1 | docs/portfolio | pending | pending |  | deferred |
-| 25 |  | Deployment plan and smoke checks | v0.1 Quality, Deployment and Portfolio | priority:p1 | infrastructure/deployment | pending | pending |  | deferred |
-| 26 |  | v0.1 release notes and portfolio review | v0.1 Quality, Deployment and Portfolio | priority:p1 | docs/portfolio | pending | pending |  | deferred |
+| Plan # | GitHub # | Title | Milestone | Type | Area | Priority | Workstream | Dependencies | Blocks | GitHub URL | Status |
+|---:|---:|---|---|---|---|---|---|---|---|---|---|
+| 1 | #2 | Validate repository foundation and development conventions | v0.1 Foundation and Architecture | type:documentation | area:docs | priority:p0 | product/prd | none | #3, #4, #5, #6 | https://github.com/Winfred01/resolvehub-platform/issues/2 | open-created |
+| 2 | #3 | Scaffold React and TypeScript frontend | v0.1 Foundation and Architecture | type:feature | area:frontend | priority:p0 | frontend/core-ui | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/3 | open-created |
+| 3 | #4 | Scaffold Spring Boot backend | v0.1 Foundation and Architecture | type:feature | area:backend | priority:p0 | backend/core-api | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/4 | open-created |
+| 4 | #5 | Scaffold FastAPI analytics service | v0.1 Foundation and Architecture | type:feature | area:analytics | priority:p1 | analytics/service | #2 | #7, #8 | https://github.com/Winfred01/resolvehub-platform/issues/5 | open-created |
+| 5 | #6 | Define PostgreSQL migrations and local database foundation | v0.1 Foundation and Architecture | type:feature | area:database | priority:p0 | database/schema | #2 | #7 | https://github.com/Winfred01/resolvehub-platform/issues/6 | open-created |
+| 6 | #7 | Add Docker Compose development topology | v0.1 Foundation and Architecture | type:infrastructure | area:infrastructure | priority:p1 | infrastructure/deployment | #3, #4, #5, #6 | none | https://github.com/Winfred01/resolvehub-platform/issues/7 | open-created |
+| 7 | #8 | Add initial GitHub Actions CI workflow | v0.1 Foundation and Architecture | type:infrastructure, type:test | area:infrastructure | priority:p1 | infrastructure/deployment | #3, #4, #5 | none | https://github.com/Winfred01/resolvehub-platform/issues/8 | open-created |
+| 8 | #9 | Implement user registration | v0.1 Core Ticket Workflow | type:feature | area:backend | priority:p0 | backend/core-api | #4, #6 | #10, #11, #12 | https://github.com/Winfred01/resolvehub-platform/issues/9 | open-created |
+| 9 | #10 | Implement login and logout | v0.1 Core Ticket Workflow | type:feature, type:security | area:backend | priority:p0 | backend/core-api | #9 | #11, #12 | https://github.com/Winfred01/resolvehub-platform/issues/10 | open-created |
+| 10 | #11 | Implement role-based authorization | v0.1 Core Ticket Workflow | type:feature, type:security | area:backend | priority:p0 | backend/core-api | #10 | #12, #13, #16, #17 | https://github.com/Winfred01/resolvehub-platform/issues/11 | open-created |
+| 11 | #12 | Add authentication and authorization security tests | v0.1 Core Ticket Workflow | type:test, type:security | area:backend | priority:p0 | qa/test-suite | #9, #10, #11 | none | https://github.com/Winfred01/resolvehub-platform/issues/12 | open-created |
+| 12 | #13 | Implement ticket create and detail APIs | v0.1 Core Ticket Workflow | type:feature | area:backend | priority:p0 | backend/core-api | #11, #6 | #14, #15, #16, #17, #18, #19 | https://github.com/Winfred01/resolvehub-platform/issues/13 | open-created |
+| 13 | #14 | Implement ticket update, status and priority workflow | v0.1 Core Ticket Workflow | type:feature | area:backend | priority:p1 | backend/core-api | #13 | #15, #18, #19, #20 | https://github.com/Winfred01/resolvehub-platform/issues/14 | open-created |
+| 14 | #15 | Implement ticket search and filters | v0.1 Core Ticket Workflow | type:feature | area:backend | priority:p1 | backend/core-api | #13, #14 | #19 | https://github.com/Winfred01/resolvehub-platform/issues/15 | open-created |
+| 15 | #16 | Implement ticket categories and assignments | v0.1 Core Ticket Workflow | type:feature | area:backend, area:database | priority:p1 | backend/core-api | #11, #13 | #18 | https://github.com/Winfred01/resolvehub-platform/issues/16 | open-created |
+| 16 | #17 | Implement ticket comments | v0.1 Core Ticket Workflow | type:feature | area:backend | priority:p1 | backend/core-api | #13, #11 | #18 | https://github.com/Winfred01/resolvehub-platform/issues/17 | open-created |
+| 17 | #18 | Implement ticket activity and audit history | v0.1 Core Ticket Workflow | type:feature, type:security | area:backend, area:database | priority:p1 | backend/core-api | #13, #14, #16, #17 | none | https://github.com/Winfred01/resolvehub-platform/issues/18 | open-created |
+| 18 | #19 | Build ticket list, detail and form UI | v0.1 Core Ticket Workflow | type:feature | area:frontend | priority:p1 | frontend/core-ui | #3, #13, #14, #15 | #20 | https://github.com/Winfred01/resolvehub-platform/issues/19 | open-created |
+| 19 | #20 | Build responsive Kanban workflow | v0.1 Core Ticket Workflow | type:feature | area:frontend | priority:p1 | frontend/core-ui | #19, #14 | none | https://github.com/Winfred01/resolvehub-platform/issues/20 | open-created |
+| 20 |  | Build dashboard summary metrics | v0.1 Analytics and Dashboard | type:feature | area:frontend | priority:p1 | frontend/core-ui | Planned - not created | Planned - not created |  | Planned - not created |
+| 21 |  | Implement analytics category suggestion | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | Planned - not created | Planned - not created |  | Planned - not created |
+| 22 |  | Implement analytics priority recommendation | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | Planned - not created | Planned - not created |  | Planned - not created |
+| 23 |  | Implement analytics duplicate suggestion | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p2 | analytics/service | Planned - not created | Planned - not created |  | Planned - not created |
+| 24 |  | Add E2E and accessibility test suite | v0.1 Quality, Deployment and Portfolio | type:test | area:frontend | priority:p1 | qa/test-suite | Planned - not created | Planned - not created |  | Planned - not created |
+| 25 |  | Add security hardening and audit logging | v0.1 Quality, Deployment and Portfolio | type:security | area:backend | priority:p0 | qa/test-suite | Planned - not created | Planned - not created |  | Planned - not created |
+| 26 |  | Prepare demo, deployment and portfolio release package | v0.1 Quality, Deployment and Portfolio | type:documentation, type:infrastructure | area:docs, area:infrastructure | priority:p1 | docs/portfolio | Planned - not created | Planned - not created |  | Planned - not created |

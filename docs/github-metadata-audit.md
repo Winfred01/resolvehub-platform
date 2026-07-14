@@ -68,3 +68,19 @@ No labels, milestones, issues, branches, visibility, security settings, or PRs w
 - Remaining planned issues: 19, deferred to Prompt 8A-R2-2 and later.
 - Draft PR #1 remains open draft, base main, head product/prd-foundation, not merged.
 - No business code, migrations, Docker implementation, CI workflow implementation, daily automation, or job-application repository changes were made.
+
+## Prompt 8A-R2-2 Core Ticket Workflow Issues
+
+- Updated at: 2026-07-14T10:01:11Z
+- Existing non-PR issues before R2-2: 7
+- Issues created in R2-2: 12
+- Final non-PR issue count: 19
+- Core milestone: #2 v0.1 Core Ticket Workflow
+- All 12 Core issues are open and assigned to the Core milestone.
+- All 12 Core issues have at least one type label, one area label, and one priority label.
+- Dependencies and Blocks were updated with real issue numbers.
+- Duplicate issues found: 0.
+- Remaining planned issues: 7, deferred to Prompt 8A-R2-3 and later.
+- Draft PR #1 remains open draft, base main, head product/prd-foundation, not merged.
+- Browser writes: 12 issues created, 12 issue bodies updated, 0 labels or milestones created.
+- No business code, migrations, Docker implementation, CI workflow implementation, daily automation, or job-application repository changes were made.
