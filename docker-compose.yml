@@ -1,0 +1,7 @@
+# Planning placeholder only.
+# Prompt 7 does not start services or define production deployment.
+# Future local demo services may include:
+# - frontend
+# - backend
+# - analytics-service
+# - postgres
