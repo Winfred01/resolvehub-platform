@@ -2,9 +2,9 @@
 
 ResolveHub is a planned full-stack technical support and issue management platform for demonstrating practical support workflow design, ticket operations, analytics-assisted triage, and portfolio-ready engineering documentation.
 
-Current status: **Planning and repository foundation**.
+Current status: **Planning foundation with initial frontend scaffold**.
 
-This repository does not yet contain a working React application, Spring Boot API, FastAPI analytics service, PostgreSQL production database, deployed demo, or complete test suite.
+This repository now contains an initial React TypeScript frontend scaffold. It does not yet contain a Spring Boot API, FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
 
 ## Problem
 
@@ -48,7 +48,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Repository Structure
 
-- `frontend/`: planned React TypeScript client.
+- `frontend/`: initial React TypeScript client scaffold with placeholder routes.
 - `backend/`: planned Java Spring Boot API.
 - `analytics-service/`: planned Python FastAPI analytics service.
 - `database/`: planned schema and migration notes.
@@ -58,14 +58,24 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 - `scripts/`: repository validation helpers.
 - `.github/`: issue templates and future workflow definitions.
 
-## Planned Local Setup
+## Local Setup
 
-Local setup will be defined after scaffolding starts. The planned developer workflow is:
+The frontend scaffold has its own local commands under `frontend/`. Other workstreams remain planned. The developer workflow is:
 
 1. Clone this repository.
 2. Create a feature branch for one GitHub issue.
 3. Install only the dependencies required by that workstream.
 4. Run the relevant tests and validation before opening a PR.
+
+For the current frontend scaffold:
+
+```powershell
+cd frontend
+npm install
+npm run lint
+npm run test:run
+npm run build
+```
 
 ## Planned Docker Setup
 
@@ -99,7 +109,7 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Not Yet Completed
 
-- Application scaffolds.
+- Backend, analytics, database, Docker, and CI implementation scaffolds.
 - Authentication implementation.
 - Ticket APIs.
 - Database migrations.
