@@ -102,9 +102,11 @@
 
 ## GitHub And Automation
 
-- Commit: `PENDING_COMMIT_HASH`
-- Draft PR: `PENDING_DRAFT_PR`
-- Issue #3 comment: `PENDING_ISSUE_COMMENT`
+- Feature commit: `7372d8d55a12cc598f824eb2c7037bfbd52a1332`
+- Draft PR: `#28` at `https://github.com/Winfred01/resolvehub-platform/pull/28`
+- Draft PR state: open draft, not merged.
+- Issue #3 comment: posted with run ID, branch, Draft PR, validation, security/privacy result, and out-of-scope notes.
+- Issue #3 final state: open pending Draft PR review and merge.
 - Next eligible issue after successful closeout: `#4 Scaffold Spring Boot backend`
-- Automation gate result if all closeout steps pass: `bootstrap_review_required=false`, `allow_new_issue_selection=true`, `allow_auto_merge=false`
-- Final state: `PENDING_FINAL_STATE`
+- Automation gate result: `bootstrap_review_required=false`, `allow_new_issue_selection=true`, `allow_auto_merge=false`
+- Final state: `CLOSED`
