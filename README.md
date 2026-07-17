@@ -2,9 +2,9 @@
 
 ResolveHub is a planned full-stack technical support and issue management platform for demonstrating practical support workflow design, ticket operations, analytics-assisted triage, and portfolio-ready engineering documentation.
 
-Current status: **Planning foundation with initial frontend scaffold**.
+Current status: **Planning foundation with initial frontend and backend scaffolds**.
 
-This repository now contains an initial React TypeScript frontend scaffold. It does not yet contain a Spring Boot API, FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
+This repository now contains an initial React TypeScript frontend scaffold and a Spring Boot backend scaffold with a health endpoint. It does not yet contain a FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
 
 ## Problem
 
@@ -49,7 +49,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Repository Structure
 
 - `frontend/`: initial React TypeScript client scaffold with placeholder routes.
-- `backend/`: planned Java Spring Boot API.
+- `backend/`: Spring Boot API scaffold with a health endpoint and package boundaries.
 - `analytics-service/`: planned Python FastAPI analytics service.
 - `database/`: planned schema and migration notes.
 - `infrastructure/`: planned Docker and deployment notes.
@@ -75,6 +75,14 @@ npm install
 npm run lint
 npm run test:run
 npm run build
+```
+
+For the current backend scaffold:
+
+```powershell
+cd backend
+mvn test
+mvn spring-boot:run
 ```
 
 ## Planned Docker Setup
@@ -109,7 +117,7 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Not Yet Completed
 
-- Backend, analytics, database, Docker, and CI implementation scaffolds.
+- Analytics, database, Docker, and CI implementation scaffolds.
 - Authentication implementation.
 - Ticket APIs.
 - Database migrations.

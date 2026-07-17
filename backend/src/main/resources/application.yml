@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: resolvehub-backend
+
+server:
+  port: 8080
+
+resolvehub:
+  backend:
+    service-name: resolvehub-backend
