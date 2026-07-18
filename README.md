@@ -2,9 +2,9 @@
 
 ResolveHub is a planned full-stack technical support and issue management platform for demonstrating practical support workflow design, ticket operations, analytics-assisted triage, and portfolio-ready engineering documentation.
 
-Current status: **Planning foundation with initial frontend and backend scaffolds**.
+Current status: **Planning foundation with initial frontend/backend scaffolds and database migration foundation**.
 
-This repository now contains an initial React TypeScript frontend scaffold and a Spring Boot backend scaffold with a health endpoint. It does not yet contain a FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
+This repository now contains an initial React TypeScript frontend scaffold, a Spring Boot backend scaffold with a health endpoint, and documented PostgreSQL/Flyway migration foundations. It does not yet contain a FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
 
 ## Problem
 
@@ -51,7 +51,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 - `frontend/`: initial React TypeScript client scaffold with placeholder routes.
 - `backend/`: Spring Boot API scaffold with a health endpoint and package boundaries.
 - `analytics-service/`: planned Python FastAPI analytics service.
-- `database/`: planned schema and migration notes.
+- `database/`: PostgreSQL schema planning and migration foundation notes.
 - `infrastructure/`: planned Docker and deployment notes.
 - `docs/`: product, API, security, testing, demo, and planning documents.
 - `tests/`: planned cross-service and end-to-end test assets.
@@ -60,7 +60,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Local Setup
 
-The frontend scaffold has its own local commands under `frontend/`. Other workstreams remain planned. The developer workflow is:
+The frontend scaffold has its own local commands under `frontend/`, the backend
+scaffold has commands under `backend/`, and the database foundation has a
+validation script under `scripts/`. Other workstreams remain planned. The
+developer workflow is:
 
 1. Clone this repository.
 2. Create a feature branch for one GitHub issue.
@@ -83,6 +86,12 @@ For the current backend scaffold:
 cd backend
 mvn test
 mvn spring-boot:run
+```
+
+For the current database foundation:
+
+```powershell
+node scripts/validate-database-foundation.js
 ```
 
 ## Planned Docker Setup
@@ -117,7 +126,7 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Not Yet Completed
 
-- Analytics, database, Docker, and CI implementation scaffolds.
+- Analytics, Docker, and CI implementation scaffolds.
 - Authentication implementation.
 - Ticket APIs.
 - Database migrations.
