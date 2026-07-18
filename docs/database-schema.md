@@ -88,3 +88,15 @@ Database: PostgreSQL. ID strategy: UUID primary keys. All core tables include `c
 ## Migration Tool Candidate
 
 Flyway is the initial candidate for Spring Boot/PostgreSQL migrations. Liquibase remains an alternative if richer rollback metadata becomes necessary.
+
+## Migration Readiness
+
+Issue #6 selects Flyway as the initial migration approach and keeps the current
+schema plan as migration-ready documentation, not applied database state. See
+`docs/database-migration-strategy.md` for ownership boundaries, naming rules,
+environment expectations, and the initial migration work-item order.
+
+Future migrations should be introduced by scoped backend/database issues under
+`backend/src/main/resources/db/migration/` after PostgreSQL test behavior is in
+place. This stage intentionally avoids SQL migration files, production database
+provisioning, and seeded data.
