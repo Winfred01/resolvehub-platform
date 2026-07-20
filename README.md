@@ -2,9 +2,9 @@
 
 ResolveHub is a planned full-stack technical support and issue management platform for demonstrating practical support workflow design, ticket operations, analytics-assisted triage, and portfolio-ready engineering documentation.
 
-Current status: **Planning foundation with initial frontend/backend scaffolds and database migration foundation**.
+Current status: **Planning foundation with initial frontend/backend scaffolds, database migration foundation, and backend registration slice**.
 
-This repository now contains an initial React TypeScript frontend scaffold, a Spring Boot backend scaffold with a health endpoint, and documented PostgreSQL/Flyway migration foundations. It does not yet contain a FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
+This repository now contains an initial React TypeScript frontend scaffold, a Spring Boot backend scaffold with health and registration endpoints, and documented PostgreSQL/Flyway migration foundations. It does not yet contain login/session handling, ticket APIs, a FastAPI analytics service, PostgreSQL production database, deployed demo, or complete cross-service test suite.
 
 ## Problem
 
@@ -49,7 +49,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Repository Structure
 
 - `frontend/`: initial React TypeScript client scaffold with placeholder routes.
-- `backend/`: Spring Boot API scaffold with a health endpoint and package boundaries.
+- `backend/`: Spring Boot API scaffold with health and registration endpoints plus package boundaries.
 - `analytics-service/`: planned Python FastAPI analytics service.
 - `database/`: PostgreSQL schema planning and migration foundation notes.
 - `infrastructure/`: planned Docker and deployment notes.
@@ -87,6 +87,10 @@ cd backend
 mvn test
 mvn spring-boot:run
 ```
+
+The backend currently exposes `GET /api/health` and `POST /api/auth/register`.
+Registration stores BCrypt password hashes only and uses local in-memory H2
+persistence until the production PostgreSQL migration work is implemented.
 
 For the current database foundation:
 
@@ -127,7 +131,7 @@ MIT License. See [LICENSE](LICENSE).
 ## Not Yet Completed
 
 - Analytics, Docker, and CI implementation scaffolds.
-- Authentication implementation.
+- Login, logout, sessions, and authorization implementation.
 - Ticket APIs.
 - Database migrations.
 - Analytics implementation.
