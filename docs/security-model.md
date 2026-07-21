@@ -18,7 +18,11 @@ Use email/password for MVP. Passwords must be hashed with a modern adaptive pass
 
 ## Token Or Session Handling
 
-The final implementation must choose either secure HTTP-only cookie sessions or a token strategy with short-lived access tokens and revocable refresh tokens. Tokens must be stored safely and never logged.
+The MVP backend uses opaque bearer session tokens. The raw token is returned once
+at login, only a SHA-256 token hash is stored server-side, and logout revokes the
+active session record. Tokens must be short-lived, stored safely by clients, and
+never logged. A future browser-facing release can replace this with secure
+HTTP-only cookie sessions plus CSRF protection.
 
 ## CSRF And CORS
 
