@@ -13,6 +13,12 @@ All protected endpoints require authentication. Pagination uses `page`, `size`, 
 | `POST /api/auth/logout` | End session/token | Required | all | none | success | 401 | active credential | safe to repeat |
 | `GET /api/auth/me` | Current user | Required | all | none | user summary | 401 | active credential | read-only |
 
+Current MVP backend implementation uses opaque bearer session tokens. Login
+returns the raw token once, while the backend stores only a SHA-256 token hash
+with a two-hour expiry and a revocation timestamp. Logout revokes the matching
+active session. Rate limiting is planned for the CI/security-test follow-up and
+is not yet enforced in-process.
+
 ## Tickets
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |

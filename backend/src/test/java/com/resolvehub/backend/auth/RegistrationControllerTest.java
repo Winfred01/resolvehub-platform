@@ -29,10 +29,14 @@ class RegistrationControllerTest {
     private UserAccountRepository userAccountRepository;
 
     @Autowired
+    private AuthSessionRepository authSessionRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void resetAccounts() {
+        authSessionRepository.deleteAll();
         userAccountRepository.deleteAll();
     }
 

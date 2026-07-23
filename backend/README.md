@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, and initial user registration. It does not implement login, ticket CRUD, comments, role authorization, analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, and local MVP login/logout sessions. It does not implement ticket CRUD, comments, role authorization, analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
@@ -41,6 +41,33 @@ Registration uses validation, BCrypt password hashing, a unique email constraint
 and an in-memory H2 database for this local MVP slice. It returns a safe user
 summary without password or password hash fields. PostgreSQL migrations and
 production database credentials remain out of scope.
+
+Login with the registered account:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"requester@example.test","password":"StrongPass123"}'
+```
+
+Login returns an opaque bearer token, an expiry timestamp, and a safe user
+summary. The raw token is returned only in the login response; the backend stores
+only a SHA-256 token hash in the local H2 session table. Tokens expire after two
+hours in this MVP slice.
+
+Read the current user:
+
+```bash
+curl http://localhost:8080/api/auth/me \
+  -H "Authorization: Bearer <token-from-login>"
+```
+
+Logout revokes the active local session:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/logout \
+  -H "Authorization: Bearer <token-from-login>"
+```
 
 After startup, verify the health endpoint:
 

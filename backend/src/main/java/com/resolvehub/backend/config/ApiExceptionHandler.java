@@ -1,6 +1,8 @@
 package com.resolvehub.backend.config;
 
+import com.resolvehub.backend.auth.AuthenticationRequiredException;
 import com.resolvehub.backend.auth.DuplicateEmailException;
+import com.resolvehub.backend.auth.InvalidCredentialsException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,6 +33,20 @@ class ApiExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ApiErrorResponse.of(HttpStatus.CONFLICT, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse.of(HttpStatus.UNAUTHORIZED, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(AuthenticationRequiredException.class)
+    ResponseEntity<ApiErrorResponse> handleAuthenticationRequired(AuthenticationRequiredException exception) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse.of(HttpStatus.UNAUTHORIZED, exception.getMessage(), Map.of()));
     }
 
     record ApiErrorResponse(
