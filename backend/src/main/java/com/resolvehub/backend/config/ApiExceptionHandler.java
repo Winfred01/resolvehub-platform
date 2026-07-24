@@ -2,7 +2,9 @@ package com.resolvehub.backend.config;
 
 import com.resolvehub.backend.auth.AuthenticationRequiredException;
 import com.resolvehub.backend.auth.DuplicateEmailException;
+import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.InvalidCredentialsException;
+import com.resolvehub.backend.auth.UserNotFoundException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,6 +49,20 @@ class ApiExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiErrorResponse.of(HttpStatus.UNAUTHORIZED, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    ResponseEntity<ApiErrorResponse> handleForbidden(ForbiddenException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.of(HttpStatus.FORBIDDEN, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<ApiErrorResponse> handleUserNotFound(UserNotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiErrorResponse.of(HttpStatus.NOT_FOUND, exception.getMessage(), Map.of()));
     }
 
     record ApiErrorResponse(

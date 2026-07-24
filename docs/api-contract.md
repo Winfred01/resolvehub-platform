@@ -50,6 +50,11 @@ is not yet enforced in-process.
 | `GET /api/users` | List assignable users | Required | agent, lead, admin | role filter | users | 401,403 | filter enum | read-only |
 | `PATCH /api/users/{id}/role` | Change role | Required | admin | role | user | 400,401,403,404 | role enum | audit logged |
 
+Role changes use one MVP role value from `REQUESTER`, `AGENT`, `TEAM_LEAD`, or
+`ADMIN`. Missing or invalid bearer credentials return 401 before authorization
+checks. Authenticated non-admins receive 403 for role changes. Unknown target
+users return 404 without exposing sensitive fields.
+
 ## Dashboard
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |

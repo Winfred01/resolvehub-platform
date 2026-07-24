@@ -59,14 +59,19 @@ class AuthService {
 
     @Transactional(readOnly = true)
     UserSummaryResponse currentUser(String authorizationHeader) {
-        return UserSummaryResponse.from(activeSession(authorizationHeader).userAccount());
+        return UserSummaryResponse.from(currentAccount(authorizationHeader));
+    }
+
+    @Transactional(readOnly = true)
+    UserAccount currentAccount(String authorizationHeader) {
+        return activeSession(authorizationHeader).userAccount();
     }
 
     private AuthSession activeSession(String authorizationHeader) {
         String token = parseBearerToken(authorizationHeader);
         Instant now = Instant.now();
         AuthSession session = authSessionRepository
-                .findByTokenHashAndRevokedAtIsNull(hashToken(token))
+                .findActiveByTokenHash(hashToken(token))
                 .orElseThrow(() -> new AuthenticationRequiredException("Authentication required."));
         if (session.expired(now) || !session.userAccount().active()) {
             throw new AuthenticationRequiredException("Authentication required.");
