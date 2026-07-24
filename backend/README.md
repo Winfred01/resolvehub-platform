@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, and local MVP login/logout sessions. It does not implement ticket CRUD, comments, role authorization, analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, and the first role-based authorization boundary. It does not implement ticket CRUD, comments, analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
@@ -68,6 +68,20 @@ Logout revokes the active local session:
 curl -X POST http://localhost:8080/api/auth/logout \
   -H "Authorization: Bearer <token-from-login>"
 ```
+
+Administrators can change a user's single MVP role:
+
+```bash
+curl -X PATCH http://localhost:8080/api/users/<user-id>/role \
+  -H "Authorization: Bearer <admin-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"role":"AGENT"}'
+```
+
+Supported roles are `REQUESTER`, `AGENT`, `TEAM_LEAD`, and `ADMIN`. The
+authorization matrix defaults unmapped protected actions to deny, returns 401
+for missing or invalid bearer tokens, and returns 403 for authenticated users
+without the required role. Only `ADMIN` can change roles in this MVP slice.
 
 After startup, verify the health endpoint:
 
