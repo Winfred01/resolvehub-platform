@@ -1,0 +1,22 @@
+# Scheduled Issue #11 PR #33 Reconciliation Closeout
+
+- Timestamp: 2026-07-27 16:18:38 -04:00
+- Run ID: scheduled-20260727-issue11-pr33-reconciliation-001
+- Trigger type: scheduled_daily_mvp_development
+- Repository: Winfred01/resolvehub-platform
+- Selected issue: #11 Implement role-based authorization
+- Active branch: backend/issue-11-role-authorization
+- Active worktree: C:/Users/winfred/Documents/Codex/worktrees/resolvehub-issue-11
+- Active Draft PR: #33 https://github.com/Winfred01/resolvehub-platform/pull/33
+- PR state after refresh: open, draft, unmerged, mergeable true, head 7c41fa5d954d0e1216f4be0ee95d27a849a0cef8 before this docs-only log commit
+- Issue #11 state after refresh: open with active Draft PR #33 through closing keyword
+- Open review state: no PR comments, no review submissions, and no review threads
+- Workflow/status state: combined commit status for 7c41fa5d954d0e1216f4be0ee95d27a849a0cef8 returned no status entries; local gh CLI is unavailable in this shell
+- Issue selection decision: no new issue selected because Issue #11 has an active open PR; Issue #12 remains blocked until Issue #11 closes
+- Reconciled implementation scope: role permission matrix for REQUESTER, AGENT, TEAM_LEAD, and ADMIN; reusable authorization service; default-deny protected permissions; 401-before-403 behavior; admin-only PATCH /api/users/{id}/role; safe user summary responses; backend authorization tests; README/API/security docs
+- Validation: backend Maven test passed 19 tests using IntelliJ bundled Maven and local OpenJDK 21; backend Maven package -DskipTests passed after the full test run; frontend npm.cmd run lint passed; frontend npm.cmd run test:run -- --reporter=verbose passed 6 tests; frontend npm.cmd run build passed; planning validator passed; database validator passed; metadata/privacy validator passed with privacy_findings=0; git diff --check passed
+- Security/privacy: high-confidence tracked-file token/private-key scan returned no matches; no real users, credentials, Gmail data, browser sessions, job-search data, application answers, private addresses, phone numbers, cookies, production tokens, production secrets, or resume data were added; Canada job-search assets were not read or modified
+- GitHub writes this reconciliation: docs-only run-log commit on the existing Issue #11 branch; no ready-for-review transition, no merge, no approval, no auto-merge, no issue closure, and no label mutation
+- Next eligible issue: #12 if Issue #11 closes before the next scheduled run; otherwise #5 remains the next possible eligible issue while Issue #11 has an active open PR
+- Current run time: 2026-07-27 16:18:38 -04:00
+- Final state: CLOSED
