@@ -114,4 +114,8 @@ class UserAccount {
     Set<AccountRole> roles() {
         return Set.copyOf(roles);
     }
+
+    void replaceRole(AccountRole role) {
+        roles = EnumSet.of(role);
+    }
 }

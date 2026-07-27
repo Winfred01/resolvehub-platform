@@ -16,6 +16,13 @@ Use email/password for MVP. Passwords must be hashed with a modern adaptive pass
 | Change roles | no | no | no | yes |
 | View dashboard | no | limited | yes | yes |
 
+The backend authorization foundation represents these role boundaries in code
+through the `REQUESTER`, `AGENT`, `TEAM_LEAD`, and `ADMIN` roles. Protected
+actions require a valid bearer session before role checks run. Missing or
+invalid credentials return 401; authenticated users without the required role
+return 403. New protected permissions default to deny until explicitly mapped.
+The MVP role-change endpoint is admin-only.
+
 ## Token Or Session Handling
 
 The MVP backend uses opaque bearer session tokens. The raw token is returned once
