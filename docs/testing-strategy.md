@@ -48,6 +48,12 @@
 - Dependency scan.
 - Basic static analysis.
 - Role authorization regression tests.
+- Authentication and authorization security regressions covering password hash
+  storage, session token hash storage, logout revocation, expired sessions,
+  uniform login failures, malformed bearer headers, role escalation attempts,
+  and sensitive-field response scans.
+- Login and registration rate-limit regression tests should be added when the
+  backend introduces enforceable rate-limiting middleware.
 
 ## CI Gates
 
