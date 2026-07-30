@@ -1,0 +1,21 @@
+# Scheduled Issue #13 Ticket Create/Detail Closeout
+
+- Timestamp: 2026-07-29 20:15:43 -04:00
+- Run ID: scheduled-20260729-2000-issue13-ticket-create-detail-001
+- Trigger type: scheduled_daily_mvp_development
+- Repository: Winfred01/resolvehub-platform
+- Starting state: PR #34 for Issue #12 was merged at 2026-07-29T04:44:46Z, closing Issue #12 and advancing `origin/main` to `6003c55e19e57a1a2038d59ad3c16b9366bb8584`.
+- Selected issue: #13 Implement ticket create and detail APIs.
+- Selection evidence: #13 was open, `priority:p0`, depended on closed #11 and closed #6, had no open PR, and had no existing issue-13 branch or worktree.
+- Branch/worktree: `backend/issue-13-ticket-create-detail` at `C:/Users/winfred/Documents/Codex/worktrees/resolvehub-issue-13`.
+- Implementation commit: `7b0afb61c3647a4bc0144ed40ca88305d81cc852`.
+- Implemented: `POST /api/tickets` with validated title, description, categoryId, and priority; `GET /api/tickets/{id}` with requester-owner visibility and support-role view-all checks; persisted ticket entity with `OPEN` initial status, requester id, created timestamp, and updated timestamp; safe ticket DTOs; ticket 404 handling; API contract notes for implemented fields and Issue #18 audit/activity handoff.
+- Tests added: `TicketControllerTest` covers authenticated create/detail, auth-required create, request validation, requester-forbidden detail, and not-found detail.
+- Validation: backend Maven test passed 31 tests; backend Maven package -DskipTests passed; frontend `npm.cmd ci` passed with 0 vulnerabilities and the known `react-router@8.3.0` Node engine warning for local Node `22.20.0`; frontend lint passed; frontend test:run passed 6 tests; frontend build passed; `npm.cmd audit --audit-level=high` passed with 0 vulnerabilities; planning/database/metadata validators passed with `privacy_findings=0`; `git diff --check` and `git diff --cached --check` passed; staged high-confidence token/private-key scan returned no matches.
+- GitHub writes: GitHub connector Draft PR creation returned `403 Resource not accessible by integration`; signed-in Chrome extension fallback opened Draft PR #35 from `backend/issue-13-ticket-create-detail` to `main`.
+- PR #35 state: open, draft, mergeable, unmerged, no comments, no reviews, no review threads, no workflow runs at closeout check.
+- Labels: repository labels do not include `codex` or `codex-automation`; no labels were changed.
+- Security/privacy: no real users, credentials, Gmail data, browser sessions, job-search data, application answers, private addresses, phone numbers, production secrets, or resume data were added. Test identities use fictional `example.test` data only.
+- Actions not taken: no merge, auto-merge, approval, ready-for-review transition, issue closure, milestone mutation, or unrelated issue selection.
+- State machine path: CREATED -> MEMORY_LOADED -> REPOSITORY_CHECKED -> ISSUES_READ -> ISSUE_SELECTED -> WORKTREE_PREPARED -> GAP_ANALYSIS_COMPLETED -> CHANGES_IMPLEMENTED -> TESTS_COMPLETED -> SECURITY_CHECKED -> GITHUB_UPDATED -> RUN_LOG_WRITTEN -> MEMORY_UPDATED -> CLOSE_OUT_STARTED -> CLOSED.
+- Final state: CLOSED
