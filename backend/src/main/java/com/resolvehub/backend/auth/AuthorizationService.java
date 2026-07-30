@@ -3,7 +3,7 @@ package com.resolvehub.backend.auth;
 import org.springframework.stereotype.Service;
 
 @Service
-class AuthorizationService {
+public class AuthorizationService {
 
     private final AuthService authService;
 
@@ -11,11 +11,15 @@ class AuthorizationService {
         this.authService = authService;
     }
 
-    UserAccount requirePermission(String authorizationHeader, EndpointPermission permission) {
+    public UserSummaryResponse requirePermission(String authorizationHeader, EndpointPermission permission) {
         UserAccount account = authService.currentAccount(authorizationHeader);
         if (!permission.allows(account.roles())) {
             throw new ForbiddenException("Forbidden.");
         }
-        return account;
+        return UserSummaryResponse.from(account);
+    }
+
+    public UserSummaryResponse requireAuthenticated(String authorizationHeader) {
+        return UserSummaryResponse.from(authService.currentAccount(authorizationHeader));
     }
 }

@@ -5,6 +5,7 @@ import com.resolvehub.backend.auth.DuplicateEmailException;
 import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.InvalidCredentialsException;
 import com.resolvehub.backend.auth.UserNotFoundException;
+import com.resolvehub.backend.tickets.TicketNotFoundException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.TreeMap;
@@ -60,6 +61,13 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     ResponseEntity<ApiErrorResponse> handleUserNotFound(UserNotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiErrorResponse.of(HttpStatus.NOT_FOUND, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    ResponseEntity<ApiErrorResponse> handleTicketNotFound(TicketNotFoundException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiErrorResponse.of(HttpStatus.NOT_FOUND, exception.getMessage(), Map.of()));

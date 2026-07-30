@@ -30,6 +30,14 @@ is not yet enforced in-process.
 | `DELETE /api/tickets/{id}` | Soft close ticket | Required | lead, admin | reason | closed ticket | 401,403,404 | reason required | safe if already closed |
 | `GET /api/tickets/search` | Search tickets | Required | all | q, filters, page | paged tickets | 401,403 | query length | read-only |
 
+Implemented ticket create/detail fields for the initial Issue #13 slice:
+
+- Request fields: `title` (required, max 120), `description` (required, max 4000), `categoryId` (required, max 80), and `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`).
+- Response fields: `id`, `title`, `description`, `categoryId`, `priority`, `status`, `requesterId`, `createdAt`, and `updatedAt`.
+- New tickets start with status `OPEN`; full workflow status transitions remain out of scope until the ticket update workflow.
+- Ticket detail visibility is owner-limited for requesters and available to support roles allowed to view all tickets.
+- The create timestamp is persisted in the ticket row; full audit/activity rows remain planned for Issue #18.
+
 ## Comments
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |
