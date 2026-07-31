@@ -1,0 +1,20 @@
+[project]
+name = "resolvehub-analytics"
+version = "0.1.0"
+description = "FastAPI analytics service scaffold for ResolveHub."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.135,<1.0",
+  "uvicorn[standard]>=0.38,<1.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "httpx>=0.28,<1.0",
+  "pytest>=9,<10",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
