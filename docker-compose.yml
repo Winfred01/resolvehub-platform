@@ -1,7 +1,82 @@
-# Planning placeholder only.
-# Prompt 7 does not start services or define production deployment.
-# Future local demo services may include:
-# - frontend
-# - backend
-# - analytics-service
-# - postgres
+name: resolvehub-local
+
+services:
+  frontend:
+    image: node:22-bookworm-slim
+    working_dir: /workspace/frontend
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_BACKEND_URL: http://localhost:${BACKEND_PORT:-8080}
+      VITE_ANALYTICS_URL: http://localhost:${ANALYTICS_PORT:-8000}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/workspace/frontend
+      - frontend-node-modules:/workspace/frontend/node_modules
+    depends_on:
+      - backend
+      - analytics
+
+  backend:
+    image: maven:3.9.9-eclipse-temurin-21
+    working_dir: /workspace/backend
+    command: mvn spring-boot:run
+    environment:
+      SERVER_PORT: 8080
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:5173}
+      RESOLVEHUB_ANALYTICS_BASE_URL: http://analytics:${ANALYTICS_PORT:-8000}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - ./backend:/workspace/backend
+      - backend-maven-cache:/root/.m2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/127.0.0.1/8080'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  analytics:
+    image: python:3.12-slim
+    working_dir: /workspace/analytics-service
+    command: sh -c "python -m pip install -e .[test] && python -m uvicorn resolvehub_analytics.main:app --app-dir src --host 0.0.0.0 --port ${ANALYTICS_PORT:-8000}"
+    environment:
+      ANALYTICS_PORT: ${ANALYTICS_PORT:-8000}
+    ports:
+      - "${ANALYTICS_PORT:-8000}:${ANALYTICS_PORT:-8000}"
+    volumes:
+      - ./analytics-service:/workspace/analytics-service
+      - analytics-pip-cache:/root/.cache/pip
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:${ANALYTICS_PORT:-8000}/analytics/health', timeout=5).read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-resolvehub}
+      POSTGRES_USER: ${POSTGRES_USER:-resolvehub_local}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-resolvehub_local_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-resolvehub_local} -d ${POSTGRES_DB:-resolvehub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  frontend-node-modules:
+  backend-maven-cache:
+  analytics-pip-cache:
+  postgres-data:
