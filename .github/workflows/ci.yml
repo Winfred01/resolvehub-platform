@@ -98,6 +98,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: analytics-service/pyproject.toml
 
       - name: Install analytics test dependencies
         run: python -m pip install -e .[test]
