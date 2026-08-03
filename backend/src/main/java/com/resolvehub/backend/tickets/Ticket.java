@@ -9,7 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -45,6 +48,10 @@ class Ticket {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     protected Ticket() {
     }
@@ -107,5 +114,34 @@ class Ticket {
 
     Instant updatedAt() {
         return updatedAt;
+    }
+
+    Long version() {
+        return version;
+    }
+
+    Set<String> apply(UpdateTicketRequest request) {
+        Set<String> changedFields = new LinkedHashSet<>();
+        if (request.title() != null && !request.title().equals(title)) {
+            title = request.title();
+            changedFields.add("title");
+        }
+        if (request.description() != null && !request.description().equals(description)) {
+            description = request.description();
+            changedFields.add("description");
+        }
+        if (request.categoryId() != null && !request.categoryId().equals(categoryId)) {
+            categoryId = request.categoryId();
+            changedFields.add("categoryId");
+        }
+        if (request.priority() != null && request.priority() != priority) {
+            priority = request.priority();
+            changedFields.add("priority");
+        }
+        if (request.status() != null && request.status() != status) {
+            status = request.status();
+            changedFields.add("status");
+        }
+        return changedFields;
     }
 }

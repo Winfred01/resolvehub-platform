@@ -23,6 +23,13 @@ invalid credentials return 401; authenticated users without the required role
 return 403. New protected permissions default to deny until explicitly mapped.
 The MVP role-change endpoint is admin-only.
 
+The ticket update workflow keeps requester updates owner-limited: requesters can
+edit only their own open ticket text/category fields and cannot change priority
+or status. Support roles with ticket workflow permission can update ticket text,
+category, priority, and allowed workflow status transitions. Ticket update
+mutations write minimal changed-field activity rows without exposing them through
+a public activity endpoint until the dedicated activity-history issue.
+
 ## Token Or Session Handling
 
 The MVP backend uses opaque bearer session tokens. The raw token is returned once

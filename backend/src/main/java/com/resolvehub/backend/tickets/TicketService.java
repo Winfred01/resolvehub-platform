@@ -1,9 +1,12 @@
 package com.resolvehub.backend.tickets;
 
+import com.resolvehub.backend.activity.TicketActivity;
+import com.resolvehub.backend.activity.TicketActivityRepository;
 import com.resolvehub.backend.auth.AccountRole;
 import com.resolvehub.backend.auth.EndpointPermission;
 import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.UserSummaryResponse;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -14,11 +17,20 @@ class TicketService {
 
     private static final Set<AccountRole> VIEW_ALL_ROLES =
             Set.of(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN);
+    private static final Map<TicketStatus, Set<TicketStatus>> ALLOWED_STATUS_TRANSITIONS = Map.of(
+            TicketStatus.OPEN, Set.of(TicketStatus.TRIAGED, TicketStatus.IN_PROGRESS, TicketStatus.CLOSED),
+            TicketStatus.TRIAGED, Set.of(TicketStatus.IN_PROGRESS, TicketStatus.WAITING_ON_REQUESTER, TicketStatus.CLOSED),
+            TicketStatus.IN_PROGRESS, Set.of(TicketStatus.WAITING_ON_REQUESTER, TicketStatus.RESOLVED, TicketStatus.CLOSED),
+            TicketStatus.WAITING_ON_REQUESTER, Set.of(TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED, TicketStatus.CLOSED),
+            TicketStatus.RESOLVED, Set.of(TicketStatus.IN_PROGRESS, TicketStatus.CLOSED),
+            TicketStatus.CLOSED, Set.of());
 
     private final TicketRepository ticketRepository;
+    private final TicketActivityRepository ticketActivityRepository;
 
-    TicketService(TicketRepository ticketRepository) {
+    TicketService(TicketRepository ticketRepository, TicketActivityRepository ticketActivityRepository) {
         this.ticketRepository = ticketRepository;
+        this.ticketActivityRepository = ticketActivityRepository;
     }
 
     @Transactional
@@ -38,9 +50,81 @@ class TicketService {
         return TicketResponse.from(ticket);
     }
 
+    @Transactional
+    TicketResponse update(UUID ticketId, UpdateTicketRequest request, UserSummaryResponse currentUser) {
+        validateUpdatePayload(request);
+        Ticket ticket = ticketRepository
+                .findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found."));
+        validateVersion(ticket, request);
+
+        boolean canUpdateWorkflow = EndpointPermission.UPDATE_TICKET_WORKFLOW.allows(currentUser.roles());
+        boolean isOwner = ticket.requesterId().equals(currentUser.id());
+        if (!canUpdateWorkflow && !isOwner) {
+            throw new ForbiddenException("Forbidden.");
+        }
+        if (!canUpdateWorkflow) {
+            validateRequesterLimitedUpdate(ticket, request);
+        }
+        validateStatusTransition(ticket.status(), request.status());
+
+        Set<String> changedFields = ticket.apply(request);
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        if (!changedFields.isEmpty()) {
+            ticketActivityRepository.save(TicketActivity.ticketUpdated(
+                    saved.id(),
+                    currentUser.id(),
+                    String.join(",", changedFields)));
+        }
+        return TicketResponse.from(saved);
+    }
+
     private boolean canView(Ticket ticket, UserSummaryResponse currentUser) {
         return ticket.requesterId().equals(currentUser.id())
                 || currentUser.roles().stream().anyMatch(VIEW_ALL_ROLES::contains)
                 || EndpointPermission.VIEW_ALL_TICKETS.allows(currentUser.roles());
+    }
+
+    private void validateUpdatePayload(UpdateTicketRequest request) {
+        if (request.title() == null
+                && request.description() == null
+                && request.categoryId() == null
+                && request.priority() == null
+                && request.status() == null) {
+            throw new TicketUpdateValidationException("At least one ticket field must be supplied.");
+        }
+        if (request.title() != null && request.title().isBlank()) {
+            throw new TicketUpdateValidationException("Title must not be blank.");
+        }
+        if (request.description() != null && request.description().isBlank()) {
+            throw new TicketUpdateValidationException("Description must not be blank.");
+        }
+        if (request.categoryId() != null && request.categoryId().isBlank()) {
+            throw new TicketUpdateValidationException("Category id must not be blank.");
+        }
+    }
+
+    private void validateVersion(Ticket ticket, UpdateTicketRequest request) {
+        if (request.version() != null && !request.version().equals(ticket.version())) {
+            throw new TicketConflictException("Ticket version conflict.");
+        }
+    }
+
+    private void validateRequesterLimitedUpdate(Ticket ticket, UpdateTicketRequest request) {
+        if (request.priority() != null || request.status() != null) {
+            throw new ForbiddenException("Forbidden.");
+        }
+        if (ticket.status() != TicketStatus.OPEN) {
+            throw new ForbiddenException("Forbidden.");
+        }
+    }
+
+    private void validateStatusTransition(TicketStatus currentStatus, TicketStatus requestedStatus) {
+        if (requestedStatus == null || requestedStatus == currentStatus) {
+            return;
+        }
+        if (!ALLOWED_STATUS_TRANSITIONS.getOrDefault(currentStatus, Set.of()).contains(requestedStatus)) {
+            throw new TicketUpdateValidationException("Invalid status transition.");
+        }
     }
 }

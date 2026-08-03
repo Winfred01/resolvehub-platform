@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, and the first role-based authorization boundary. It does not implement ticket CRUD, comments, analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, and the first ticket update workflow slice. It does not implement ticket comments, assignment APIs, list/search APIs, analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
@@ -82,6 +82,21 @@ Supported roles are `REQUESTER`, `AGENT`, `TEAM_LEAD`, and `ADMIN`. The
 authorization matrix defaults unmapped protected actions to deny, returns 401
 for missing or invalid bearer tokens, and returns 403 for authenticated users
 without the required role. Only `ADMIN` can change roles in this MVP slice.
+
+Update a ticket:
+
+```bash
+curl -X PATCH http://localhost:8080/api/tickets/<ticket-id> \
+  -H "Authorization: Bearer <token-from-login>" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"TRIAGED","priority":"HIGH","version":0}'
+```
+
+Requester accounts may update only their own open ticket text/category fields.
+Support roles may update text fields, category, priority, and allowed workflow
+status transitions. A stale supplied `version` returns 409. Update mutations
+write minimal changed-field activity rows; full activity-history read APIs
+remain planned for the dedicated activity issue.
 
 After startup, verify the health endpoint:
 

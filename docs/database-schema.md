@@ -29,7 +29,7 @@ Database: PostgreSQL. ID strategy: UUID primary keys. All core tables include `c
 ### tickets
 
 - PK: `id uuid`
-- Columns: `title`, `description`, `status`, `priority`, `category_id`, `created_by`, `current_assignee_id`, `created_at`, `updated_at`, `deleted_at`
+- Columns: `title`, `description`, `status`, `priority`, `category_id`, `requester_id`, `current_assignee_id`, `version`, `created_at`, `updated_at`, `deleted_at`
 - FK: category, creator, assignee
 - Indexes: `status`, `priority`, `category_id`, `current_assignee_id`, `created_at`
 - Retention: soft delete only for MVP
@@ -48,6 +48,11 @@ Database: PostgreSQL. ID strategy: UUID primary keys. All core tables include `c
 - FK: ticket and actor
 - Indexes: `ticket_id`, `created_at`
 - Audit: append-only
+
+The current local H2 MVP slice writes `TICKET_UPDATED` activity rows with a
+comma-separated changed-field list when `PATCH /api/tickets/{id}` mutates a
+ticket. Full activity history read APIs and richer changed-field payloads remain
+planned for the dedicated activity issue.
 
 ### categories
 

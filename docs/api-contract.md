@@ -33,10 +33,19 @@ is not yet enforced in-process.
 Implemented ticket create/detail fields for the initial Issue #13 slice:
 
 - Request fields: `title` (required, max 120), `description` (required, max 4000), `categoryId` (required, max 80), and `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`).
-- Response fields: `id`, `title`, `description`, `categoryId`, `priority`, `status`, `requesterId`, `createdAt`, and `updatedAt`.
-- New tickets start with status `OPEN`; full workflow status transitions remain out of scope until the ticket update workflow.
+- Response fields: `id`, `title`, `description`, `categoryId`, `priority`, `status`, `version`, `requesterId`, `createdAt`, and `updatedAt`.
+- New tickets start with status `OPEN`.
 - Ticket detail visibility is owner-limited for requesters and available to support roles allowed to view all tickets.
 - The create timestamp is persisted in the ticket row; full audit/activity rows remain planned for Issue #18.
+
+Implemented ticket update fields for the initial Issue #14 slice:
+
+- `PATCH /api/tickets/{id}` accepts partial `title`, `description`, `categoryId`, `priority`, `status`, and optional `version`.
+- Owner requesters may update `title`, `description`, and `categoryId` only while their ticket is `OPEN`.
+- `AGENT`, `TEAM_LEAD`, and `ADMIN` may update text fields, category, priority, and workflow status.
+- Valid status transitions are `OPEN -> TRIAGED|IN_PROGRESS|CLOSED`, `TRIAGED -> IN_PROGRESS|WAITING_ON_REQUESTER|CLOSED`, `IN_PROGRESS -> WAITING_ON_REQUESTER|RESOLVED|CLOSED`, `WAITING_ON_REQUESTER -> IN_PROGRESS|RESOLVED|CLOSED`, and `RESOLVED -> IN_PROGRESS|CLOSED`; `CLOSED` is terminal.
+- If `version` is supplied and stale, the backend returns 409.
+- Update activity rows are written with the changed field names; full activity read APIs remain planned for Issue #18.
 
 ## Comments
 

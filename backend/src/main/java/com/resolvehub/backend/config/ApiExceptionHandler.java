@@ -5,7 +5,9 @@ import com.resolvehub.backend.auth.DuplicateEmailException;
 import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.InvalidCredentialsException;
 import com.resolvehub.backend.auth.UserNotFoundException;
+import com.resolvehub.backend.tickets.TicketConflictException;
 import com.resolvehub.backend.tickets.TicketNotFoundException;
+import com.resolvehub.backend.tickets.TicketUpdateValidationException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.TreeMap;
@@ -71,6 +73,20 @@ class ApiExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiErrorResponse.of(HttpStatus.NOT_FOUND, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(TicketUpdateValidationException.class)
+    ResponseEntity<ApiErrorResponse> handleTicketUpdateValidation(TicketUpdateValidationException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(TicketConflictException.class)
+    ResponseEntity<ApiErrorResponse> handleTicketConflict(TicketConflictException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiErrorResponse.of(HttpStatus.CONFLICT, exception.getMessage(), Map.of()));
     }
 
     record ApiErrorResponse(
