@@ -10,6 +10,7 @@ public record TicketResponse(
         String categoryId,
         TicketPriority priority,
         TicketStatus status,
+        Long version,
         UUID requesterId,
         Instant createdAt,
         Instant updatedAt
@@ -23,6 +24,7 @@ public record TicketResponse(
                 ticket.categoryId(),
                 ticket.priority(),
                 ticket.status(),
+                ticket.version(),
                 ticket.requesterId(),
                 ticket.createdAt(),
                 ticket.updatedAt());

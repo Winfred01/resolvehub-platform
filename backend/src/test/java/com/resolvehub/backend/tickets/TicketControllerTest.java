@@ -4,20 +4,26 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.resolvehub.backend.auth.AccountRole;
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -30,6 +36,21 @@ class TicketControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void resetState() {
+        jdbcTemplate.update("delete from ticket_activities");
+        jdbcTemplate.update("delete from tickets");
+        jdbcTemplate.update("delete from auth_sessions");
+        jdbcTemplate.update("delete from roles");
+        jdbcTemplate.update("delete from users");
+    }
 
     @Test
     void authenticatedRequesterCanCreateTicketAndViewOwnDetail() throws Exception {
@@ -53,6 +74,7 @@ class TicketControllerTest {
                 .andExpect(jsonPath("$.categoryId").value("account-access"))
                 .andExpect(jsonPath("$.priority").value("HIGH"))
                 .andExpect(jsonPath("$.status").value("OPEN"))
+                .andExpect(jsonPath("$.version", notNullValue()))
                 .andExpect(jsonPath("$.requesterId", notNullValue()))
                 .andExpect(jsonPath("$.createdAt", notNullValue()))
                 .andExpect(jsonPath("$.updatedAt", notNullValue()))
@@ -142,6 +164,161 @@ class TicketControllerTest {
                 .andExpect(jsonPath("$.message").value("Ticket not found."));
     }
 
+    @Test
+    void supportRoleCanUpdateTicketWorkflowPriorityAndFields() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-update-owner@example.test", "Ticket Update Owner");
+        String agentEmail = saveAccount("ticket-update-agent@example.test", AccountRole.AGENT);
+        String agentAuthorization = authorizationHeaderFor(agentEmail);
+
+        MvcResult created = createTicket(ownerAuthorization, "Needs triage", "A fictional workflow issue.", "workflow", "MEDIUM");
+        String ticketId = fieldFrom(created, "id");
+        String version = fieldFrom(created, "version");
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Triaged support workflow",
+                                  "categoryId": "account-access",
+                                  "priority": "URGENT",
+                                  "status": "TRIAGED",
+                                  "version": %s
+                                }
+                                """.formatted(version)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(ticketId))
+                .andExpect(jsonPath("$.title").value("Triaged support workflow"))
+                .andExpect(jsonPath("$.description").value("A fictional workflow issue."))
+                .andExpect(jsonPath("$.categoryId").value("account-access"))
+                .andExpect(jsonPath("$.priority").value("URGENT"))
+                .andExpect(jsonPath("$.status").value("TRIAGED"))
+                .andExpect(jsonPath("$.version", notNullValue()))
+                .andExpect(jsonPath("$", not(hasKey("password"))))
+                .andExpect(jsonPath("$", not(hasKey("passwordHash"))));
+    }
+
+    @Test
+    void requesterCanOnlyUpdateOwnOpenTicketTextFields() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-owner-limited@example.test", "Ticket Owner Limited");
+        String otherAuthorization = registerAndLogin("ticket-other-limited@example.test", "Ticket Other Limited");
+
+        MvcResult created = createTicket(ownerAuthorization, "Original title", "Original description.", "general", "LOW");
+        String ticketId = fieldFrom(created, "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Updated requester title",
+                                  "description": "Updated requester description.",
+                                  "categoryId": "requester-edit"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated requester title"))
+                .andExpect(jsonPath("$.description").value("Updated requester description."))
+                .andExpect(jsonPath("$.categoryId").value("requester-edit"))
+                .andExpect(jsonPath("$.priority").value("LOW"))
+                .andExpect(jsonPath("$.status").value("OPEN"));
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "priority": "HIGH",
+                                  "status": "TRIAGED"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, otherAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Should not update"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+    }
+
+    @Test
+    void invalidStatusTransitionReturnsBadRequest() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-transition-owner@example.test", "Ticket Transition Owner");
+        String agentEmail = saveAccount("ticket-transition-agent@example.test", AccountRole.AGENT);
+
+        String ticketId = fieldFrom(
+                createTicket(ownerAuthorization, "Invalid transition", "Cannot resolve directly from open.", "workflow", "MEDIUM"),
+                "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorizationHeaderFor(agentEmail))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": "RESOLVED"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid status transition."));
+    }
+
+    @Test
+    void staleVersionReturnsConflict() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-conflict-owner@example.test", "Ticket Conflict Owner");
+        String agentEmail = saveAccount("ticket-conflict-agent@example.test", AccountRole.AGENT);
+
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Conflict candidate",
+                "The supplied version should be stale.",
+                "workflow",
+                "MEDIUM"), "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorizationHeaderFor(agentEmail))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Stale update",
+                                  "version": 999
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Ticket version conflict."));
+    }
+
+    @Test
+    void ticketUpdateRequiresAuthenticationAndExistingTicket() throws Exception {
+        mockMvc.perform(patch("/api/tickets/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Unauthenticated update"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Authentication required."));
+
+        String agentEmail = saveAccount("ticket-update-missing-agent@example.test", AccountRole.AGENT);
+
+        mockMvc.perform(patch("/api/tickets/{id}", UUID.randomUUID())
+                        .header(HttpHeaders.AUTHORIZATION, authorizationHeaderFor(agentEmail))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Missing ticket"
+                                }
+                                """))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Ticket not found."));
+    }
+
     private String registerAndLogin(String email, String displayName) throws Exception {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,6 +331,61 @@ class TicketControllerTest {
                                 """.formatted(email, displayName)))
                 .andExpect(status().isCreated());
 
+        MvcResult login = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "%s",
+                                  "password": "StrongPass123"
+                                }
+                                """.formatted(email)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        return "Bearer " + fieldFrom(login, "token");
+    }
+
+    private MvcResult createTicket(
+            String authorization,
+            String title,
+            String description,
+            String categoryId,
+            String priority) throws Exception {
+        return mockMvc.perform(post("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "%s",
+                                  "description": "%s",
+                                  "categoryId": "%s",
+                                  "priority": "%s"
+                                }
+                                """.formatted(title, description, categoryId, priority)))
+                .andExpect(status().isCreated())
+                .andReturn();
+    }
+
+    private String saveAccount(String email, AccountRole role) {
+        UUID userId = UUID.randomUUID();
+        Instant now = Instant.now();
+        jdbcTemplate.update(
+                """
+                insert into users (id, email, password_hash, display_name, active, created_at, updated_at)
+                values (?, ?, ?, ?, ?, ?, ?)
+                """,
+                userId,
+                email,
+                passwordEncoder.encode("StrongPass123"),
+                role.name() + " User",
+                true,
+                now,
+                now);
+        jdbcTemplate.update("insert into roles (user_id, role) values (?, ?)", userId, role.name());
+        return email;
+    }
+
+    private String authorizationHeaderFor(String email) throws Exception {
         MvcResult login = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
