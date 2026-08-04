@@ -9,6 +9,9 @@ import com.resolvehub.backend.auth.UserSummaryResponse;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,17 @@ class TicketService {
         return TicketResponse.from(ticket);
     }
 
+    @Transactional(readOnly = true)
+    TicketPageResponse list(TicketSearchRequest request, UserSummaryResponse currentUser) {
+        PageRequest pageRequest = PageRequest.of(
+                request.page(),
+                request.size(),
+                request.direction(),
+                request.sort());
+        Page<Ticket> tickets = ticketRepository.findAll(searchSpecification(request, currentUser), pageRequest);
+        return TicketPageResponse.from(tickets);
+    }
+
     @Transactional
     TicketResponse update(UUID ticketId, UpdateTicketRequest request, UserSummaryResponse currentUser) {
         validateUpdatePayload(request);
@@ -83,6 +97,34 @@ class TicketService {
         return ticket.requesterId().equals(currentUser.id())
                 || currentUser.roles().stream().anyMatch(VIEW_ALL_ROLES::contains)
                 || EndpointPermission.VIEW_ALL_TICKETS.allows(currentUser.roles());
+    }
+
+    private Specification<Ticket> searchSpecification(TicketSearchRequest request, UserSummaryResponse currentUser) {
+        return (root, query, criteriaBuilder) -> {
+            var predicate = criteriaBuilder.conjunction();
+            if (!EndpointPermission.VIEW_ALL_TICKETS.allows(currentUser.roles())) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("requesterId"), currentUser.id()));
+            }
+            if (request.query() != null) {
+                String pattern = "%" + request.query() + "%";
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), pattern)));
+            }
+            if (request.status() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("status"), request.status()));
+            }
+            if (request.priority() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("priority"), request.priority()));
+            }
+            if (request.categoryId() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("categoryId"), request.categoryId()));
+            }
+            if (request.assigneeId() != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("currentAssigneeId"), request.assigneeId()));
+            }
+            return predicate;
+        };
     }
 
     private void validateUpdatePayload(UpdateTicketRequest request) {

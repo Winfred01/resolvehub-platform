@@ -43,6 +43,9 @@ class Ticket {
     @Column(name = "requester_id", nullable = false)
     private UUID requesterId;
 
+    @Column(name = "current_assignee_id")
+    private UUID currentAssigneeId;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -106,6 +109,10 @@ class Ticket {
 
     UUID requesterId() {
         return requesterId;
+    }
+
+    UUID currentAssigneeId() {
+        return currentAssigneeId;
     }
 
     Instant createdAt() {

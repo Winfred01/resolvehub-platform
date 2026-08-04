@@ -1,6 +1,8 @@
 package com.resolvehub.backend.tickets;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -162,6 +164,120 @@ class TicketControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, authorization))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Ticket not found."));
+    }
+
+    @Test
+    void requesterTicketListIsScopedToOwnedTickets() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-list-owner@example.test", "Ticket List Owner");
+        String otherAuthorization = registerAndLogin("ticket-list-other@example.test", "Ticket List Other");
+
+        createTicket(ownerAuthorization, "Owned search result", "The owner should see this fictional ticket.", "search", "MEDIUM");
+        createTicket(otherAuthorization, "Hidden search result", "Another requester's ticket must not be listed.", "search", "HIGH");
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .param("q", "search")
+                        .param("sort", "title")
+                        .param("direction", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].title").value("Owned search result"))
+                .andExpect(jsonPath("$.content[0].requesterId", notNullValue()))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.empty").value(false))
+                .andExpect(jsonPath("$", not(hasKey("password"))));
+    }
+
+    @Test
+    void supportRoleCanPageSearchFilterAndSortTickets() throws Exception {
+        String firstOwnerAuthorization = registerAndLogin("ticket-search-owner@example.test", "Ticket Search Owner");
+        String secondOwnerAuthorization = registerAndLogin("ticket-search-other@example.test", "Ticket Search Other");
+        String agentEmail = saveAccount("ticket-search-agent@example.test", AccountRole.AGENT);
+        String agentAuthorization = authorizationHeaderFor(agentEmail);
+        UUID agentId = userIdFor(agentEmail);
+
+        createTicket(firstOwnerAuthorization, "Printer offline", "The office printer is offline.", "hardware", "LOW");
+        createTicket(firstOwnerAuthorization, "Billing portal timeout", "The fictional billing page times out.", "account", "MEDIUM");
+        createTicket(secondOwnerAuthorization, "VPN access blocked", "Cannot reach the fictional VPN gateway.", "network", "HIGH");
+        String triagedTicketId = fieldFrom(createTicket(
+                secondOwnerAuthorization,
+                "VPN report export",
+                "The support queue export includes VPN tickets.",
+                "network",
+                "URGENT"), "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}", triagedTicketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "status": "TRIAGED"
+                                }
+                                """))
+                .andExpect(status().isOk());
+        jdbcTemplate.update(
+                "update tickets set current_assignee_id = ? where id = ?",
+                agentId,
+                UUID.fromString(triagedTicketId));
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "title")
+                        .param("direction", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[*].title", contains("Billing portal timeout", "Printer offline")))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(2))
+                .andExpect(jsonPath("$.totalElements").value(4))
+                .andExpect(jsonPath("$.totalPages").value(2));
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .param("q", "vpn")
+                        .param("status", "TRIAGED")
+                        .param("priority", "URGENT")
+                        .param("categoryId", "network")
+                        .param("assigneeId", agentId.toString())
+                        .param("sort", "updatedAt")
+                        .param("direction", "desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(triagedTicketId))
+                .andExpect(jsonPath("$.content[0].title").value("VPN report export"))
+                .andExpect(jsonPath("$.content[0].status").value("TRIAGED"))
+                .andExpect(jsonPath("$.content[0].priority").value("URGENT"))
+                .andExpect(jsonPath("$.content[0].categoryId").value("network"))
+                .andExpect(jsonPath("$.content[0].currentAssigneeId").value(agentId.toString()));
+    }
+
+    @Test
+    void ticketListRequiresAuthenticationAndValidQueryParameters() throws Exception {
+        mockMvc.perform(get("/api/tickets"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Authentication required."));
+
+        String authorization = registerAndLogin("ticket-search-validation@example.test", "Ticket Search Validation");
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .param("sort", "requesterId"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid ticket sort field."));
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .param("priority", "CRITICAL"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid ticket priority filter."));
+
+        mockMvc.perform(get("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .param("size", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Size must be between 1 and 100."));
     }
 
     @Test
@@ -398,6 +514,10 @@ class TicketControllerTest {
                 .andReturn();
 
         return "Bearer " + fieldFrom(login, "token");
+    }
+
+    private UUID userIdFor(String email) {
+        return jdbcTemplate.queryForObject("select id from users where email = ?", UUID.class, email);
     }
 
     private String fieldFrom(MvcResult result, String field) throws Exception {

@@ -12,6 +12,7 @@ public record TicketResponse(
         TicketStatus status,
         Long version,
         UUID requesterId,
+        UUID currentAssigneeId,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -26,6 +27,7 @@ public record TicketResponse(
                 ticket.status(),
                 ticket.version(),
                 ticket.requesterId(),
+                ticket.currentAssigneeId(),
                 ticket.createdAt(),
                 ticket.updatedAt());
     }

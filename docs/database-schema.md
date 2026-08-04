@@ -54,6 +54,11 @@ comma-separated changed-field list when `PATCH /api/tickets/{id}` mutates a
 ticket. Full activity history read APIs and richer changed-field payloads remain
 planned for the dedicated activity issue.
 
+The current local H2 MVP list/search slice also maps nullable
+`current_assignee_id` for filtering assigned queues. No assignment mutation API
+is included in the search slice; assignment workflows remain planned for the
+dedicated assignment issue.
+
 ### categories
 
 - PK: `id uuid`

@@ -47,6 +47,16 @@ Implemented ticket update fields for the initial Issue #14 slice:
 - If `version` is supplied and stale, the backend returns 409.
 - Update activity rows are written with the changed field names; full activity read APIs remain planned for Issue #18.
 
+Implemented ticket list/search fields for the initial Issue #15 slice:
+
+- `GET /api/tickets` accepts `q`, `status`, `priority`, `categoryId`, `assigneeId`, `page`, `size`, `sort`, and `direction`.
+- `q` searches ticket title and description with case-insensitive containment and a 120-character limit.
+- `status` uses `OPEN`, `TRIAGED`, `IN_PROGRESS`, `WAITING_ON_REQUESTER`, `RESOLVED`, or `CLOSED`; `priority` uses `LOW`, `MEDIUM`, `HIGH`, or `URGENT`.
+- `page` is zero-based, `size` defaults to 20 and is capped at 100, and empty results return an empty `content` list with paging metadata.
+- Allowed sort fields are `createdAt`, `updatedAt`, `priority`, `status`, and `title`; `direction` may be `asc` or `desc`.
+- Requesters receive only their own tickets. `AGENT`, `TEAM_LEAD`, and `ADMIN` can list all tickets.
+- `assigneeId` filters the nullable `currentAssigneeId` field only; assignment mutation remains planned for the dedicated assignment issue.
+
 ## Comments
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |
