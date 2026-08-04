@@ -30,6 +30,13 @@ category, priority, and allowed workflow status transitions. Ticket update
 mutations write minimal changed-field activity rows without exposing them through
 a public activity endpoint until the dedicated activity-history issue.
 
+Ticket list/search uses the same visibility boundary as ticket detail:
+requesters receive only tickets where they are the requester, while `AGENT`,
+`TEAM_LEAD`, and `ADMIN` can list all tickets through the explicit
+`VIEW_ALL_TICKETS` permission. Filters use parameterized JPA criteria and do not
+expose passwords, password hashes, tokens, sessions, or activity internals in
+ticket responses.
+
 ## Token Or Session Handling
 
 The MVP backend uses opaque bearer session tokens. The raw token is returned once
