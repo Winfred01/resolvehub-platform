@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -171,8 +172,8 @@ class TicketControllerTest {
         String ownerAuthorization = registerAndLogin("ticket-list-owner@example.test", "Ticket List Owner");
         String otherAuthorization = registerAndLogin("ticket-list-other@example.test", "Ticket List Other");
 
-        createTicket(ownerAuthorization, "Owned search result", "The owner should see this fictional ticket.", "search", "MEDIUM");
-        createTicket(otherAuthorization, "Hidden search result", "Another requester's ticket must not be listed.", "search", "HIGH");
+        createTicket(ownerAuthorization, "Owned search result", "The owner should see this fictional ticket.", "general", "MEDIUM");
+        createTicket(otherAuthorization, "Hidden search result", "Another requester's ticket must not be listed.", "general", "HIGH");
 
         mockMvc.perform(get("/api/tickets")
                         .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
@@ -197,7 +198,7 @@ class TicketControllerTest {
         UUID agentId = userIdFor(agentEmail);
 
         createTicket(firstOwnerAuthorization, "Printer offline", "The office printer is offline.", "hardware", "LOW");
-        createTicket(firstOwnerAuthorization, "Billing portal timeout", "The fictional billing page times out.", "account", "MEDIUM");
+        createTicket(firstOwnerAuthorization, "Billing portal timeout", "The fictional billing page times out.", "account-access", "MEDIUM");
         createTicket(secondOwnerAuthorization, "VPN access blocked", "Cannot reach the fictional VPN gateway.", "network", "HIGH");
         String triagedTicketId = fieldFrom(createTicket(
                 secondOwnerAuthorization,
@@ -281,6 +282,140 @@ class TicketControllerTest {
     }
 
     @Test
+    void authenticatedUsersCanReadTicketCategoriesAndInvalidCategoriesAreRejected() throws Exception {
+        String authorization = registerAndLogin("ticket-category-reader@example.test", "Ticket Category Reader");
+
+        mockMvc.perform(get("/api/ticket-categories")
+                        .header(HttpHeaders.AUTHORIZATION, authorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(7)))
+                .andExpect(jsonPath("$[0].id").value("account-access"))
+                .andExpect(jsonPath("$[0].name").value("Account Access"));
+
+        mockMvc.perform(post("/api/tickets")
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Unknown category",
+                                  "description": "The category should be rejected.",
+                                  "categoryId": "unknown-category",
+                                  "priority": "MEDIUM"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid ticket category."));
+    }
+
+    @Test
+    void agentCanSelfAssignAndLeadCanReassignAndUnassignTicket() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-assignment-owner@example.test", "Ticket Assignment Owner");
+        String agentEmail = saveAccount("ticket-assignment-agent@example.test", AccountRole.AGENT);
+        String leadEmail = saveAccount("ticket-assignment-lead@example.test", AccountRole.TEAM_LEAD);
+        UUID agentId = userIdFor(agentEmail);
+        UUID leadId = userIdFor(leadEmail);
+        String agentAuthorization = authorizationHeaderFor(agentEmail);
+        String leadAuthorization = authorizationHeaderFor(leadEmail);
+
+        MvcResult created = createTicket(
+                ownerAuthorization,
+                "Assignment candidate",
+                "The ticket can be assigned in the fictional support queue.",
+                "workflow",
+                "HIGH");
+        String ticketId = fieldFrom(created, "id");
+        String version = fieldFrom(created, "version");
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s",
+                                  "version": %s
+                                }
+                                """.formatted(agentId, version)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentAssigneeId").value(agentId.toString()));
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, leadAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s"
+                                }
+                                """.formatted(leadId)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentAssigneeId").value(leadId.toString()));
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, leadAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": null
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.currentAssigneeId", nullValue()));
+
+        Integer assignmentActivities = jdbcTemplate.queryForObject(
+                "select count(*) from ticket_activities where ticket_id = ? and action = 'TICKET_ASSIGNED'",
+                Integer.class,
+                UUID.fromString(ticketId));
+        org.assertj.core.api.Assertions.assertThat(assignmentActivities).isEqualTo(3);
+    }
+
+    @Test
+    void ticketAssignmentRejectsRequestersOtherAgentTargetsAndInvalidAssignees() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-assignment-requester@example.test", "Ticket Assignment Requester");
+        String firstAgentEmail = saveAccount("ticket-assignment-first-agent@example.test", AccountRole.AGENT);
+        String secondAgentEmail = saveAccount("ticket-assignment-second-agent@example.test", AccountRole.AGENT);
+        String leadEmail = saveAccount("ticket-assignment-invalid-lead@example.test", AccountRole.TEAM_LEAD);
+        String requesterEmail = saveAccount("ticket-assignment-invalid-requester@example.test", AccountRole.REQUESTER);
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Assignment rejection candidate",
+                "Invalid assignment attempts should be rejected.",
+                "workflow",
+                "MEDIUM"), "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s"
+                                }
+                                """.formatted(userIdFor(firstAgentEmail))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorizationHeaderFor(firstAgentEmail))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s"
+                                }
+                                """.formatted(userIdFor(secondAgentEmail))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorizationHeaderFor(leadEmail))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s"
+                                }
+                                """.formatted(userIdFor(requesterEmail))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Assignee must be an active support user."));
+    }
+
+    @Test
     void supportRoleCanUpdateTicketWorkflowPriorityAndFields() throws Exception {
         String ownerAuthorization = registerAndLogin("ticket-update-owner@example.test", "Ticket Update Owner");
         String agentEmail = saveAccount("ticket-update-agent@example.test", AccountRole.AGENT);
@@ -329,13 +464,13 @@ class TicketControllerTest {
                                 {
                                   "title": "Updated requester title",
                                   "description": "Updated requester description.",
-                                  "categoryId": "requester-edit"
+                                  "categoryId": "workflow"
                                 }
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Updated requester title"))
                 .andExpect(jsonPath("$.description").value("Updated requester description."))
-                .andExpect(jsonPath("$.categoryId").value("requester-edit"))
+                .andExpect(jsonPath("$.categoryId").value("workflow"))
                 .andExpect(jsonPath("$.priority").value("LOW"))
                 .andExpect(jsonPath("$.status").value("OPEN"));
 

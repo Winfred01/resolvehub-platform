@@ -5,7 +5,9 @@ import com.resolvehub.backend.activity.TicketActivityRepository;
 import com.resolvehub.backend.auth.AccountRole;
 import com.resolvehub.backend.auth.EndpointPermission;
 import com.resolvehub.backend.auth.ForbiddenException;
+import com.resolvehub.backend.auth.UserDirectoryService;
 import com.resolvehub.backend.auth.UserSummaryResponse;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -20,6 +22,8 @@ class TicketService {
 
     private static final Set<AccountRole> VIEW_ALL_ROLES =
             Set.of(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN);
+    private static final Set<AccountRole> FULL_ASSIGNMENT_ROLES =
+            EnumSet.of(AccountRole.TEAM_LEAD, AccountRole.ADMIN);
     private static final Map<TicketStatus, Set<TicketStatus>> ALLOWED_STATUS_TRANSITIONS = Map.of(
             TicketStatus.OPEN, Set.of(TicketStatus.TRIAGED, TicketStatus.IN_PROGRESS, TicketStatus.CLOSED),
             TicketStatus.TRIAGED, Set.of(TicketStatus.IN_PROGRESS, TicketStatus.WAITING_ON_REQUESTER, TicketStatus.CLOSED),
@@ -30,14 +34,20 @@ class TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketActivityRepository ticketActivityRepository;
+    private final UserDirectoryService userDirectoryService;
 
-    TicketService(TicketRepository ticketRepository, TicketActivityRepository ticketActivityRepository) {
+    TicketService(
+            TicketRepository ticketRepository,
+            TicketActivityRepository ticketActivityRepository,
+            UserDirectoryService userDirectoryService) {
         this.ticketRepository = ticketRepository;
         this.ticketActivityRepository = ticketActivityRepository;
+        this.userDirectoryService = userDirectoryService;
     }
 
     @Transactional
     TicketResponse create(CreateTicketRequest request, UserSummaryResponse requester) {
+        validateCategory(request.categoryId());
         Ticket ticket = ticketRepository.save(Ticket.create(request, requester.id()));
         return TicketResponse.from(ticket);
     }
@@ -93,6 +103,26 @@ class TicketService {
         return TicketResponse.from(saved);
     }
 
+    @Transactional
+    TicketResponse assign(UUID ticketId, TicketAssignmentRequest request, UserSummaryResponse currentUser) {
+        Ticket ticket = ticketRepository
+                .findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found."));
+        if (!canView(ticket, currentUser)) {
+            throw new ForbiddenException("Forbidden.");
+        }
+        validateAssignmentVersion(ticket, request);
+        validateAssignmentPermission(request.assigneeId(), currentUser);
+        validateAssignee(request.assigneeId());
+
+        boolean changed = ticket.assignTo(request.assigneeId());
+        Ticket saved = ticketRepository.saveAndFlush(ticket);
+        if (changed) {
+            ticketActivityRepository.save(TicketActivity.ticketAssigned(saved.id(), currentUser.id()));
+        }
+        return TicketResponse.from(saved);
+    }
+
     private boolean canView(Ticket ticket, UserSummaryResponse currentUser) {
         return ticket.requesterId().equals(currentUser.id())
                 || currentUser.roles().stream().anyMatch(VIEW_ALL_ROLES::contains)
@@ -118,6 +148,7 @@ class TicketService {
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("priority"), request.priority()));
             }
             if (request.categoryId() != null) {
+                validateCategory(request.categoryId());
                 predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("categoryId"), request.categoryId()));
             }
             if (request.assigneeId() != null) {
@@ -144,9 +175,18 @@ class TicketService {
         if (request.categoryId() != null && request.categoryId().isBlank()) {
             throw new TicketUpdateValidationException("Category id must not be blank.");
         }
+        if (request.categoryId() != null) {
+            validateCategory(request.categoryId());
+        }
     }
 
     private void validateVersion(Ticket ticket, UpdateTicketRequest request) {
+        if (request.version() != null && !request.version().equals(ticket.version())) {
+            throw new TicketConflictException("Ticket version conflict.");
+        }
+    }
+
+    private void validateAssignmentVersion(Ticket ticket, TicketAssignmentRequest request) {
         if (request.version() != null && !request.version().equals(ticket.version())) {
             throw new TicketConflictException("Ticket version conflict.");
         }
@@ -167,6 +207,29 @@ class TicketService {
         }
         if (!ALLOWED_STATUS_TRANSITIONS.getOrDefault(currentStatus, Set.of()).contains(requestedStatus)) {
             throw new TicketUpdateValidationException("Invalid status transition.");
+        }
+    }
+
+    private void validateAssignmentPermission(UUID assigneeId, UserSummaryResponse currentUser) {
+        boolean canAssignAny = currentUser.roles().stream().anyMatch(FULL_ASSIGNMENT_ROLES::contains);
+        if (!canAssignAny && !currentUser.id().equals(assigneeId)) {
+            throw new ForbiddenException("Forbidden.");
+        }
+    }
+
+    private void validateAssignee(UUID assigneeId) {
+        if (assigneeId == null) {
+            return;
+        }
+        UserSummaryResponse assignee = userDirectoryService.requireAssignableUser(assigneeId);
+        if (!userDirectoryService.canBeAssigned(assignee)) {
+            throw new TicketAssignmentValidationException("Assignee must be an active support user.");
+        }
+    }
+
+    private void validateCategory(String categoryId) {
+        if (!TicketCategory.exists(categoryId)) {
+            throw new TicketUpdateValidationException("Invalid ticket category.");
         }
     }
 }

@@ -56,8 +56,7 @@ planned for the dedicated activity issue.
 
 The current local H2 MVP list/search slice also maps nullable
 `current_assignee_id` for filtering assigned queues. No assignment mutation API
-is included in the search slice; assignment workflows remain planned for the
-dedicated assignment issue.
+is included in the search slice.
 
 ### categories
 
@@ -65,12 +64,23 @@ dedicated assignment issue.
 - Columns: `name`, `description`, `active`, `created_at`, `updated_at`
 - Unique: `name`
 
+The local H2 MVP currently uses a fixed in-code category catalog instead of a
+runtime category table. Implemented IDs are `account-access`, `billing`,
+`general`, `hardware`, `network`, `privacy`, and `workflow`. Future PostgreSQL
+migrations should move this catalog into the planned categories table and keep
+ticket `category_id` constrained to valid category rows.
+
 ### ticket_assignments
 
 - PK: `id uuid`
 - Columns: `ticket_id`, `assigned_to`, `assigned_by`, `created_at`, `ended_at`
 - FK: ticket and users
 - Indexes: `ticket_id`, `assigned_to`
+
+The assignment slice updates `tickets.current_assignee_id` directly and records a
+minimal `TICKET_ASSIGNED` row in `ticket_activities`. The planned
+`ticket_assignments` table remains the future normalized history model for
+PostgreSQL migrations and richer assignment lifecycle reporting.
 
 ### analytics_suggestions
 

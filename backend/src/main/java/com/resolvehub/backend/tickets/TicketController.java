@@ -82,4 +82,15 @@ class TicketController {
         UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
         return ticketService.update(id, request, currentUser);
     }
+
+    @PatchMapping("/{id}/assignment")
+    TicketResponse assign(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id,
+            @RequestBody TicketAssignmentRequest request) {
+        UserSummaryResponse currentUser = authorizationService.requirePermission(
+                authorization,
+                EndpointPermission.REASSIGN_TICKET);
+        return ticketService.assign(id, request, currentUser);
+    }
 }

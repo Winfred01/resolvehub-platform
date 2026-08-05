@@ -48,7 +48,7 @@ class AuthorizationServiceTest {
         assertThat(EndpointPermission.VIEW_ALL_TICKETS.allowedRoles())
                 .containsExactlyInAnyOrder(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN);
         assertThat(EndpointPermission.REASSIGN_TICKET.allowedRoles())
-                .containsExactlyInAnyOrder(AccountRole.TEAM_LEAD, AccountRole.ADMIN);
+                .containsExactlyInAnyOrder(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN);
         assertThat(EndpointPermission.CHANGE_ROLES.allowedRoles()).containsExactly(AccountRole.ADMIN);
     }
 
@@ -76,8 +76,8 @@ class AuthorizationServiceTest {
 
         assertThat(authorizationService.requirePermission(authorizationHeaderFor(agent), EndpointPermission.UPDATE_TICKET_WORKFLOW).id())
                 .isEqualTo(agent.id());
-        assertThatThrownBy(() -> authorizationService.requirePermission(authorizationHeaderFor(agent), EndpointPermission.REASSIGN_TICKET))
-                .isInstanceOf(ForbiddenException.class);
+        assertThat(authorizationService.requirePermission(authorizationHeaderFor(agent), EndpointPermission.REASSIGN_TICKET).id())
+                .isEqualTo(agent.id());
         assertThat(authorizationService.requirePermission(authorizationHeaderFor(lead), EndpointPermission.REASSIGN_TICKET).id())
                 .isEqualTo(lead.id());
     }

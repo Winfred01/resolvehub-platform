@@ -37,6 +37,15 @@ requesters receive only tickets where they are the requester, while `AGENT`,
 expose passwords, password hashes, tokens, sessions, or activity internals in
 ticket responses.
 
+Ticket category and assignment workflow uses a fixed MVP category catalog and
+validates category IDs before create, update, or search filters are applied.
+Authenticated users can read the category catalog. `AGENT` users can self-assign
+tickets only, while `TEAM_LEAD` and `ADMIN` can assign tickets to active support
+users or clear the assignment. Requesters cannot assign tickets. Assignment
+mutations write a minimal `TICKET_ASSIGNED` activity row and do not expose
+passwords, password hashes, tokens, sessions, or activity internals in ticket
+responses.
+
 ## Token Or Session Handling
 
 The MVP backend uses opaque bearer session tokens. The raw token is returned once

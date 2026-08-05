@@ -46,6 +46,10 @@ public class TicketActivity {
         return new TicketActivity(ticketId, actorId, "TICKET_UPDATED", changedFields);
     }
 
+    public static TicketActivity ticketAssigned(UUID ticketId, UUID actorId) {
+        return new TicketActivity(ticketId, actorId, "TICKET_ASSIGNED", "currentAssigneeId");
+    }
+
     @PrePersist
     void markCreated() {
         createdAt = Instant.now();

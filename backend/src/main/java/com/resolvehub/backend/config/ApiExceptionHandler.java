@@ -6,6 +6,7 @@ import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.InvalidCredentialsException;
 import com.resolvehub.backend.auth.UserNotFoundException;
 import com.resolvehub.backend.tickets.TicketConflictException;
+import com.resolvehub.backend.tickets.TicketAssignmentValidationException;
 import com.resolvehub.backend.tickets.TicketNotFoundException;
 import com.resolvehub.backend.tickets.TicketSearchValidationException;
 import com.resolvehub.backend.tickets.TicketUpdateValidationException;
@@ -85,6 +86,13 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(TicketSearchValidationException.class)
     ResponseEntity<ApiErrorResponse> handleTicketSearchValidation(TicketSearchValidationException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(TicketAssignmentValidationException.class)
+    ResponseEntity<ApiErrorResponse> handleTicketAssignmentValidation(TicketAssignmentValidationException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage(), Map.of()));

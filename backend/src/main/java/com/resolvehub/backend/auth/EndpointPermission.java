@@ -8,7 +8,7 @@ public enum EndpointPermission {
     CREATE_TICKET(AccountRole.REQUESTER, AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN),
     VIEW_ALL_TICKETS(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN),
     UPDATE_TICKET_WORKFLOW(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN),
-    REASSIGN_TICKET(AccountRole.TEAM_LEAD, AccountRole.ADMIN),
+    REASSIGN_TICKET(AccountRole.AGENT, AccountRole.TEAM_LEAD, AccountRole.ADMIN),
     CHANGE_ROLES(AccountRole.ADMIN),
     VIEW_DASHBOARD(AccountRole.TEAM_LEAD, AccountRole.ADMIN),
     DEFAULT_DENY;
