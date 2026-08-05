@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, and the first ticket update workflow slice. It does not implement ticket comments, assignment APIs, list/search APIs, analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, and the first assignment workflow slice. It does not implement ticket comments, public activity-history reads, analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
@@ -97,6 +97,26 @@ Support roles may update text fields, category, priority, and allowed workflow
 status transitions. A stale supplied `version` returns 409. Update mutations
 write minimal changed-field activity rows; full activity-history read APIs
 remain planned for the dedicated activity issue.
+
+Read the fixed MVP ticket category catalog:
+
+```bash
+curl http://localhost:8080/api/ticket-categories \
+  -H "Authorization: Bearer <token-from-login>"
+```
+
+Assign or unassign a ticket:
+
+```bash
+curl -X PATCH http://localhost:8080/api/tickets/<ticket-id>/assignment \
+  -H "Authorization: Bearer <token-from-login>" \
+  -H "Content-Type: application/json" \
+  -d '{"assigneeId":"<support-user-id>","version":0}'
+```
+
+`AGENT` users can self-assign only. `TEAM_LEAD` and `ADMIN` users can assign to
+active support users or clear the assignment with `"assigneeId": null`.
+Assignment changes write a minimal `TICKET_ASSIGNED` activity row.
 
 After startup, verify the health endpoint:
 

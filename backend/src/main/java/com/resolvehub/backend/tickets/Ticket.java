@@ -115,6 +115,14 @@ class Ticket {
         return currentAssigneeId;
     }
 
+    boolean assignTo(UUID assigneeId) {
+        if (java.util.Objects.equals(currentAssigneeId, assigneeId)) {
+            return false;
+        }
+        currentAssigneeId = assigneeId;
+        return true;
+    }
+
     Instant createdAt() {
         return createdAt;
     }

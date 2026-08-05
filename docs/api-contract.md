@@ -25,14 +25,16 @@ is not yet enforced in-process.
 |---|---|---|---|---|---|---|---|---|
 | `POST /api/tickets` | Create ticket | Required | requester, agent, lead, admin | title, description, categoryId, priority | ticket | 400,401,403 | required fields, enum values | client request id recommended |
 | `GET /api/tickets` | List tickets | Required | all | filters, page, size | paged tickets | 401,403 | allowed filters | read-only |
+| `GET /api/ticket-categories` | List ticket categories | Required | all | none | categories | 401 | fixed MVP catalog | read-only |
 | `GET /api/tickets/{id}` | View ticket | Required | allowed actor | id | ticket detail | 401,403,404 | UUID | read-only |
 | `PATCH /api/tickets/{id}` | Update ticket | Required | agent, lead, admin, owner-limited | patch fields | ticket | 400,401,403,404,409 | allowed status transitions | version check |
+| `PATCH /api/tickets/{id}/assignment` | Assign ticket | Required | agent self-assign, lead, admin | assigneeId, version | ticket | 400,401,403,404,409 | assignable user | version check |
 | `DELETE /api/tickets/{id}` | Soft close ticket | Required | lead, admin | reason | closed ticket | 401,403,404 | reason required | safe if already closed |
 | `GET /api/tickets/search` | Search tickets | Required | all | q, filters, page | paged tickets | 401,403 | query length | read-only |
 
 Implemented ticket create/detail fields for the initial Issue #13 slice:
 
-- Request fields: `title` (required, max 120), `description` (required, max 4000), `categoryId` (required, max 80), and `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`).
+- Request fields: `title` (required, max 120), `description` (required, max 4000), `categoryId` (required, max 80 and present in the fixed MVP category catalog), and `priority` (`LOW`, `MEDIUM`, `HIGH`, `URGENT`).
 - Response fields: `id`, `title`, `description`, `categoryId`, `priority`, `status`, `version`, `requesterId`, `createdAt`, and `updatedAt`.
 - New tickets start with status `OPEN`.
 - Ticket detail visibility is owner-limited for requesters and available to support roles allowed to view all tickets.
@@ -55,7 +57,16 @@ Implemented ticket list/search fields for the initial Issue #15 slice:
 - `page` is zero-based, `size` defaults to 20 and is capped at 100, and empty results return an empty `content` list with paging metadata.
 - Allowed sort fields are `createdAt`, `updatedAt`, `priority`, `status`, and `title`; `direction` may be `asc` or `desc`.
 - Requesters receive only their own tickets. `AGENT`, `TEAM_LEAD`, and `ADMIN` can list all tickets.
-- `assigneeId` filters the nullable `currentAssigneeId` field only; assignment mutation remains planned for the dedicated assignment issue.
+- `assigneeId` filters the nullable `currentAssigneeId` field.
+
+Implemented ticket category and assignment fields for the initial Issue #16 slice:
+
+- `GET /api/ticket-categories` returns the fixed MVP catalog for authenticated users: `account-access`, `billing`, `general`, `hardware`, `network`, `privacy`, and `workflow`.
+- Ticket create/update/search category IDs must match the fixed catalog; unknown category IDs return 400.
+- `PATCH /api/tickets/{id}/assignment` accepts `assigneeId` and optional `version`. `assigneeId: null` clears the current assignment.
+- `AGENT` users may self-assign only. `TEAM_LEAD` and `ADMIN` may assign tickets to active support users or clear assignments.
+- Assignable users must be active and have `AGENT`, `TEAM_LEAD`, or `ADMIN` role. Requesters and unknown users are rejected.
+- Assignment changes update `currentAssigneeId` and write a minimal `TICKET_ASSIGNED` activity row with changed field `currentAssigneeId`.
 
 ## Comments
 
