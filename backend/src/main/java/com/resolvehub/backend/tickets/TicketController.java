@@ -3,6 +3,10 @@ package com.resolvehub.backend.tickets;
 import com.resolvehub.backend.auth.AuthorizationService;
 import com.resolvehub.backend.auth.EndpointPermission;
 import com.resolvehub.backend.auth.UserSummaryResponse;
+import com.resolvehub.backend.comments.CreateTicketCommentRequest;
+import com.resolvehub.backend.comments.TicketCommentPageRequest;
+import com.resolvehub.backend.comments.TicketCommentPageResponse;
+import com.resolvehub.backend.comments.TicketCommentResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
@@ -72,6 +76,25 @@ class TicketController {
                 sort,
                 direction);
         return ticketService.list(request, currentUser);
+    }
+
+    @PostMapping("/{id}/comments")
+    ResponseEntity<TicketCommentResponse> createComment(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id,
+            @Valid @RequestBody CreateTicketCommentRequest request) {
+        UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.createComment(id, request, currentUser));
+    }
+
+    @GetMapping("/{id}/comments")
+    TicketCommentPageResponse comments(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
+        return ticketService.comments(id, TicketCommentPageRequest.from(page, size), currentUser);
     }
 
     @PatchMapping("/{id}")

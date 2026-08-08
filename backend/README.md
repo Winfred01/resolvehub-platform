@@ -4,13 +4,13 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, and the first assignment workflow slice. It does not implement ticket comments, public activity-history reads, analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, the first assignment workflow slice, and ticket comment creation/listing. It does not implement public activity-history reads, analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
 - `com.resolvehub.backend.auth`: registration, future login, logout, and current-user endpoints.
-- `com.resolvehub.backend.tickets`: future ticket creation, search, update, and detail APIs.
-- `com.resolvehub.backend.comments`: future ticket comment creation and listing APIs.
+- `com.resolvehub.backend.tickets`: ticket creation, search, update, assignment, comments endpoint routing, and detail APIs.
+- `com.resolvehub.backend.comments`: ticket comment persistence and response contracts.
 - `com.resolvehub.backend.activity`: future ticket activity and audit-history APIs.
 - `com.resolvehub.backend.health`: scaffold health endpoint.
 - `com.resolvehub.backend.config`: backend configuration properties.
@@ -117,6 +117,28 @@ curl -X PATCH http://localhost:8080/api/tickets/<ticket-id>/assignment \
 `AGENT` users can self-assign only. `TEAM_LEAD` and `ADMIN` users can assign to
 active support users or clear the assignment with `"assigneeId": null`.
 Assignment changes write a minimal `TICKET_ASSIGNED` activity row.
+
+Add a ticket comment:
+
+```bash
+curl -X POST http://localhost:8080/api/tickets/<ticket-id>/comments \
+  -H "Authorization: Bearer <token-from-login>" \
+  -H "Content-Type: application/json" \
+  -d '{"body":"Fictional follow-up context for the support team."}'
+```
+
+List ticket comments:
+
+```bash
+curl 'http://localhost:8080/api/tickets/<ticket-id>/comments?page=0&size=20' \
+  -H "Authorization: Bearer <token-from-login>"
+```
+
+Comment visibility uses the same boundary as ticket detail: requesters can
+comment on and read their own tickets, while support roles can comment on and
+read visible tickets. Empty comments are rejected, comment bodies are capped at
+4000 characters, comments are returned oldest-first, and comment mutations write
+a minimal `TICKET_COMMENTED` activity row.
 
 After startup, verify the health endpoint:
 

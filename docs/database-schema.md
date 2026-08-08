@@ -39,7 +39,12 @@ Database: PostgreSQL. ID strategy: UUID primary keys. All core tables include `c
 - PK: `id uuid`
 - Columns: `ticket_id`, `author_id`, `body`, `created_at`, `updated_at`, `deleted_at`
 - FK: ticket and author
-- Indexes: `ticket_id`, `author_id`
+- Indexes: `ticket_id`, `author_id`, `created_at`
+
+The current local H2 MVP comment slice persists `ticket_id`, `author_id`, trimmed
+`body`, `created_at`, and `updated_at`, then reads comments oldest-first with
+zero-based pagination. Soft delete and PostgreSQL foreign-key migration files
+remain future work.
 
 ### ticket_activities
 
@@ -49,10 +54,10 @@ Database: PostgreSQL. ID strategy: UUID primary keys. All core tables include `c
 - Indexes: `ticket_id`, `created_at`
 - Audit: append-only
 
-The current local H2 MVP slice writes `TICKET_UPDATED` activity rows with a
-comma-separated changed-field list when `PATCH /api/tickets/{id}` mutates a
-ticket. Full activity history read APIs and richer changed-field payloads remain
-planned for the dedicated activity issue.
+The current local H2 MVP slice writes `TICKET_UPDATED`, `TICKET_ASSIGNED`, and
+`TICKET_COMMENTED` activity rows for ticket mutations. Full activity history
+read APIs and richer changed-field payloads remain planned for the dedicated
+activity issue.
 
 The current local H2 MVP list/search slice also maps nullable
 `current_assignee_id` for filtering assigned queues. No assignment mutation API
