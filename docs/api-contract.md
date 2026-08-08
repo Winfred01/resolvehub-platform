@@ -75,6 +75,15 @@ Implemented ticket category and assignment fields for the initial Issue #16 slic
 | `POST /api/tickets/{id}/comments` | Add comment | Required | allowed actor | body | comment | 400,401,403,404 | body length | client request id recommended |
 | `GET /api/tickets/{id}/comments` | List comments | Required | allowed actor | page, size | comments | 401,403,404 | UUID | read-only |
 
+Implemented ticket comment fields for the initial Issue #17 slice:
+
+- `POST /api/tickets/{id}/comments` accepts `body` (required, max 4000). Leading and trailing whitespace is trimmed; blank comments return 400.
+- Response fields are `id`, `ticketId`, `commenterId`, `body`, `createdAt`, and `updatedAt`.
+- Comment visibility uses the same boundary as ticket detail: owner requesters and support roles with all-ticket visibility can read and create comments on the ticket.
+- `GET /api/tickets/{id}/comments` accepts zero-based `page` and `size`; `size` defaults to 20 and is capped at 100.
+- Comments are returned oldest-first with paged `content`, `page`, `size`, `totalElements`, `totalPages`, and `empty` metadata.
+- Comment creation writes a minimal `TICKET_COMMENTED` activity row; full activity-history read APIs remain planned for Issue #18.
+
 ## Activity
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |

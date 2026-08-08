@@ -7,12 +7,19 @@ import com.resolvehub.backend.auth.EndpointPermission;
 import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.UserDirectoryService;
 import com.resolvehub.backend.auth.UserSummaryResponse;
+import com.resolvehub.backend.comments.CreateTicketCommentRequest;
+import com.resolvehub.backend.comments.TicketComment;
+import com.resolvehub.backend.comments.TicketCommentPageRequest;
+import com.resolvehub.backend.comments.TicketCommentPageResponse;
+import com.resolvehub.backend.comments.TicketCommentRepository;
+import com.resolvehub.backend.comments.TicketCommentResponse;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,14 +41,17 @@ class TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketActivityRepository ticketActivityRepository;
+    private final TicketCommentRepository ticketCommentRepository;
     private final UserDirectoryService userDirectoryService;
 
     TicketService(
             TicketRepository ticketRepository,
             TicketActivityRepository ticketActivityRepository,
+            TicketCommentRepository ticketCommentRepository,
             UserDirectoryService userDirectoryService) {
         this.ticketRepository = ticketRepository;
         this.ticketActivityRepository = ticketActivityRepository;
+        this.ticketCommentRepository = ticketCommentRepository;
         this.userDirectoryService = userDirectoryService;
     }
 
@@ -72,6 +82,33 @@ class TicketService {
                 request.sort());
         Page<Ticket> tickets = ticketRepository.findAll(searchSpecification(request, currentUser), pageRequest);
         return TicketPageResponse.from(tickets);
+    }
+
+    @Transactional
+    TicketCommentResponse createComment(
+            UUID ticketId,
+            CreateTicketCommentRequest request,
+            UserSummaryResponse currentUser) {
+        Ticket ticket = requireVisibleTicket(ticketId, currentUser);
+        TicketComment comment = ticketCommentRepository.saveAndFlush(TicketComment.create(
+                ticket.id(),
+                currentUser.id(),
+                request.body()));
+        ticketActivityRepository.save(TicketActivity.ticketCommented(ticket.id(), currentUser.id()));
+        return TicketCommentResponse.from(comment);
+    }
+
+    @Transactional(readOnly = true)
+    TicketCommentPageResponse comments(
+            UUID ticketId,
+            TicketCommentPageRequest request,
+            UserSummaryResponse currentUser) {
+        Ticket ticket = requireVisibleTicket(ticketId, currentUser);
+        PageRequest pageRequest = PageRequest.of(
+                request.page(),
+                request.size(),
+                Sort.by("createdAt").ascending().and(Sort.by("id").ascending()));
+        return TicketCommentPageResponse.from(ticketCommentRepository.findByTicketId(ticket.id(), pageRequest));
     }
 
     @Transactional
@@ -121,6 +158,16 @@ class TicketService {
             ticketActivityRepository.save(TicketActivity.ticketAssigned(saved.id(), currentUser.id()));
         }
         return TicketResponse.from(saved);
+    }
+
+    private Ticket requireVisibleTicket(UUID ticketId, UserSummaryResponse currentUser) {
+        Ticket ticket = ticketRepository
+                .findById(ticketId)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found."));
+        if (!canView(ticket, currentUser)) {
+            throw new ForbiddenException("Forbidden.");
+        }
+        return ticket;
     }
 
     private boolean canView(Ticket ticket, UserSummaryResponse currentUser) {

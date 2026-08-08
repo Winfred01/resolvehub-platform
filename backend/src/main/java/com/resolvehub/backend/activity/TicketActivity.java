@@ -50,6 +50,10 @@ public class TicketActivity {
         return new TicketActivity(ticketId, actorId, "TICKET_ASSIGNED", "currentAssigneeId");
     }
 
+    public static TicketActivity ticketCommented(UUID ticketId, UUID actorId) {
+        return new TicketActivity(ticketId, actorId, "TICKET_COMMENTED", "comment");
+    }
+
     @PrePersist
     void markCreated() {
         createdAt = Instant.now();

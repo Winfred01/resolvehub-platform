@@ -49,6 +49,7 @@ class TicketControllerTest {
     @BeforeEach
     void resetState() {
         jdbcTemplate.update("delete from ticket_activities");
+        jdbcTemplate.update("delete from ticket_comments");
         jdbcTemplate.update("delete from tickets");
         jdbcTemplate.update("delete from auth_sessions");
         jdbcTemplate.update("delete from roles");
@@ -305,6 +306,149 @@ class TicketControllerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid ticket category."));
+    }
+
+    @Test
+    void requesterCanCreateAndListOwnTicketComments() throws Exception {
+        String ownerEmail = "ticket-comment-owner@example.test";
+        String ownerAuthorization = registerAndLogin(ownerEmail, "Ticket Comment Owner");
+        UUID ownerId = userIdFor(ownerEmail);
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Commentable ticket",
+                "The requester can add more fictional context.",
+                "general",
+                "MEDIUM"), "id");
+
+        MvcResult createdComment = mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": "  The fictional issue also affects the demo billing export.  "
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.ticketId").value(ticketId))
+                .andExpect(jsonPath("$.commenterId").value(ownerId.toString()))
+                .andExpect(jsonPath("$.body").value("The fictional issue also affects the demo billing export."))
+                .andExpect(jsonPath("$.createdAt", notNullValue()))
+                .andExpect(jsonPath("$.updatedAt", notNullValue()))
+                .andExpect(jsonPath("$", not(hasKey("password"))))
+                .andExpect(jsonPath("$", not(hasKey("passwordHash"))))
+                .andReturn();
+
+        String commentId = fieldFrom(createdComment, "id");
+
+        mockMvc.perform(get("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(commentId))
+                .andExpect(jsonPath("$.content[0].commenterId").value(ownerId.toString()))
+                .andExpect(jsonPath("$.content[0].body").value("The fictional issue also affects the demo billing export."))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.empty").value(false));
+
+        Integer commentActivities = jdbcTemplate.queryForObject(
+                "select count(*) from ticket_activities where ticket_id = ? and actor_id = ? and action = 'TICKET_COMMENTED'",
+                Integer.class,
+                UUID.fromString(ticketId),
+                ownerId);
+        org.assertj.core.api.Assertions.assertThat(commentActivities).isEqualTo(1);
+    }
+
+    @Test
+    void supportRoleCanReadAndCreateVisibleTicketComments() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-comment-support-owner@example.test", "Ticket Comment Support Owner");
+        String agentEmail = saveAccount("ticket-comment-support-agent@example.test", AccountRole.AGENT);
+        String agentAuthorization = authorizationHeaderFor(agentEmail);
+        UUID agentId = userIdFor(agentEmail);
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Support visible comment ticket",
+                "Support roles can comment on visible fictional tickets.",
+                "workflow",
+                "HIGH"), "id");
+
+        mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": "Agent added triage context for the fictional queue."
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.commenterId").value(agentId.toString()))
+                .andExpect(jsonPath("$.body").value("Agent added triage context for the fictional queue."));
+
+        mockMvc.perform(get("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].commenterId").value(agentId.toString()));
+    }
+
+    @Test
+    void ticketCommentsRequireAuthenticationValidBodyAndVisibleTicket() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-comment-private-owner@example.test", "Ticket Comment Private Owner");
+        String otherAuthorization = registerAndLogin("ticket-comment-private-other@example.test", "Ticket Comment Private Other");
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Private comment ticket",
+                "Only the requester and support roles can comment.",
+                "privacy",
+                "LOW"), "id");
+
+        mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": "Missing auth"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Authentication required."));
+
+        mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": " "
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Request validation failed."))
+                .andExpect(jsonPath("$.fieldErrors.body", notNullValue()));
+
+        mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, otherAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": "Should not be stored."
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+
+        mockMvc.perform(get("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, otherAuthorization))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+
+        mockMvc.perform(get("/api/tickets/{id}/comments", UUID.randomUUID())
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Ticket not found."));
     }
 
     @Test

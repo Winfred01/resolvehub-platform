@@ -46,6 +46,14 @@ mutations write a minimal `TICKET_ASSIGNED` activity row and do not expose
 passwords, password hashes, tokens, sessions, or activity internals in ticket
 responses.
 
+Ticket comments use the same visibility boundary as ticket detail: owner
+requesters can read and create comments on their own tickets, and support roles
+with all-ticket visibility can read and create comments on visible tickets.
+Comment responses expose commenter UUIDs and timestamps only, never password,
+password hash, token, or session fields. Comment creation writes a minimal
+`TICKET_COMMENTED` activity row without exposing activity internals through the
+comment API.
+
 ## Token Or Session Handling
 
 The MVP backend uses opaque bearer session tokens. The raw token is returned once
