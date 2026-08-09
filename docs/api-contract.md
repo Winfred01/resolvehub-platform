@@ -38,7 +38,7 @@ Implemented ticket create/detail fields for the initial Issue #13 slice:
 - Response fields: `id`, `title`, `description`, `categoryId`, `priority`, `status`, `version`, `requesterId`, `createdAt`, and `updatedAt`.
 - New tickets start with status `OPEN`.
 - Ticket detail visibility is owner-limited for requesters and available to support roles allowed to view all tickets.
-- The create timestamp is persisted in the ticket row; full audit/activity rows remain planned for Issue #18.
+- Ticket creation writes a minimal `TICKET_CREATED` activity row with field-name summaries only.
 
 Implemented ticket update fields for the initial Issue #14 slice:
 
@@ -47,7 +47,7 @@ Implemented ticket update fields for the initial Issue #14 slice:
 - `AGENT`, `TEAM_LEAD`, and `ADMIN` may update text fields, category, priority, and workflow status.
 - Valid status transitions are `OPEN -> TRIAGED|IN_PROGRESS|CLOSED`, `TRIAGED -> IN_PROGRESS|WAITING_ON_REQUESTER|CLOSED`, `IN_PROGRESS -> WAITING_ON_REQUESTER|RESOLVED|CLOSED`, `WAITING_ON_REQUESTER -> IN_PROGRESS|RESOLVED|CLOSED`, and `RESOLVED -> IN_PROGRESS|CLOSED`; `CLOSED` is terminal.
 - If `version` is supplied and stale, the backend returns 409.
-- Update activity rows are written with the changed field names; full activity read APIs remain planned for Issue #18.
+- Update activity rows are written with changed field names only; field values are not copied into audit records.
 
 Implemented ticket list/search fields for the initial Issue #15 slice:
 
@@ -82,13 +82,23 @@ Implemented ticket comment fields for the initial Issue #17 slice:
 - Comment visibility uses the same boundary as ticket detail: owner requesters and support roles with all-ticket visibility can read and create comments on the ticket.
 - `GET /api/tickets/{id}/comments` accepts zero-based `page` and `size`; `size` defaults to 20 and is capped at 100.
 - Comments are returned oldest-first with paged `content`, `page`, `size`, `totalElements`, `totalPages`, and `empty` metadata.
-- Comment creation writes a minimal `TICKET_COMMENTED` activity row; full activity-history read APIs remain planned for Issue #18.
+- Comment creation writes a minimal `TICKET_COMMENTED` activity row with changed field `comment`; comment body text is not copied into audit records.
 
 ## Activity
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |
 |---|---|---|---|---|---|---|---|---|
 | `GET /api/tickets/{id}/activities` | View audit history | Required | agent, lead, admin, owner-limited | page, size | activity records | 401,403,404 | UUID | read-only |
+
+Implemented activity-history fields for the initial Issue #18 slice:
+
+- `GET /api/tickets/{id}/activities` accepts zero-based `page` and `size`; `size` defaults to 20 and is capped at 100.
+- Activity visibility uses the same boundary as ticket detail: owner requesters and support roles with all-ticket visibility can read activity for the ticket.
+- Response records expose `id`, `ticketId`, `actorId`, `action`, `changedFields`, and `createdAt`.
+- Activities are returned oldest-first with paged `content`, `page`, `size`, `totalElements`, `totalPages`, and `empty` metadata.
+- Core mutation events are `TICKET_CREATED`, `TICKET_UPDATED`, `TICKET_ASSIGNED`, and `TICKET_COMMENTED`.
+- `changedFields` contains safe field names only, never ticket descriptions, comment bodies, credentials, tokens, sessions, passwords, or password hashes.
+- No public create, update, or delete activity endpoint exists; activity rows are appended only by ticket workflows.
 
 ## Users
 

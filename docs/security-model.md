@@ -27,8 +27,8 @@ The ticket update workflow keeps requester updates owner-limited: requesters can
 edit only their own open ticket text/category fields and cannot change priority
 or status. Support roles with ticket workflow permission can update ticket text,
 category, priority, and allowed workflow status transitions. Ticket update
-mutations write minimal changed-field activity rows without exposing them through
-a public activity endpoint until the dedicated activity-history issue.
+mutations write minimal changed-field activity rows with field-name summaries
+only.
 
 Ticket list/search uses the same visibility boundary as ticket detail:
 requesters receive only tickets where they are the requester, while `AGENT`,
@@ -53,6 +53,15 @@ Comment responses expose commenter UUIDs and timestamps only, never password,
 password hash, token, or session fields. Comment creation writes a minimal
 `TICKET_COMMENTED` activity row without exposing activity internals through the
 comment API.
+
+Ticket activity history uses the same visibility boundary as ticket detail:
+owner requesters and support roles with all-ticket visibility can read activity
+for visible tickets. Activity responses expose actor UUIDs, action names,
+safe field-name summaries, and timestamps only. They do not expose ticket
+descriptions, comment bodies, credentials, tokens, sessions, passwords, password
+hashes, or raw before/after values. Activity rows are append-only through ticket
+workflow operations in this MVP slice; there is no public create, update, or
+delete activity endpoint.
 
 ## Token Or Session Handling
 
@@ -108,7 +117,7 @@ Demo data must be fictional. Demo credentials should be generated or safely expo
 
 ## Data Retention
 
-Before production use, define retention for tickets, comments, analytics suggestions, sessions, and audit logs.
+Before production use, define retention for tickets, comments, analytics suggestions, sessions, and audit logs. MVP ticket activity rows are retained with their tickets; production retention, export, and purge policy remain future work.
 
 ## Incident Response
 

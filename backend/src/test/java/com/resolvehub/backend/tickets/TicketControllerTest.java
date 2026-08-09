@@ -452,6 +452,141 @@ class TicketControllerTest {
     }
 
     @Test
+    void requesterCanReadOwnTicketActivityHistoryWithoutSensitiveValues() throws Exception {
+        String ownerEmail = "ticket-activity-owner@example.test";
+        String ownerAuthorization = registerAndLogin(ownerEmail, "Ticket Activity Owner");
+        UUID ownerId = userIdFor(ownerEmail);
+        MvcResult created = createTicket(
+                ownerAuthorization,
+                "Activity ticket",
+                "The activity stream should avoid sensitive fictional content.",
+                "general",
+                "MEDIUM");
+        String ticketId = fieldFrom(created, "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "title": "Activity ticket updated"
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/tickets/{id}/comments", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "body": "The fictional secret-like value should not enter audit rows."
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.content[0].ticketId").value(ticketId))
+                .andExpect(jsonPath("$.content[0].actorId").value(ownerId.toString()))
+                .andExpect(jsonPath("$.content[0].action").value("TICKET_CREATED"))
+                .andExpect(jsonPath("$.content[0].changedFields", contains("title", "description", "categoryId", "priority", "status")))
+                .andExpect(jsonPath("$.content[1].action").value("TICKET_UPDATED"))
+                .andExpect(jsonPath("$.content[1].changedFields", contains("title")))
+                .andExpect(jsonPath("$.content[2].action").value("TICKET_COMMENTED"))
+                .andExpect(jsonPath("$.content[2].changedFields", contains("comment")))
+                .andExpect(jsonPath("$.content[0].createdAt", notNullValue()))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(10))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.empty").value(false))
+                .andExpect(jsonPath("$..password").doesNotExist())
+                .andExpect(jsonPath("$..passwordHash").doesNotExist())
+                .andExpect(jsonPath("$..token").doesNotExist())
+                .andExpect(jsonPath("$..body").doesNotExist());
+    }
+
+    @Test
+    void supportCanReadAssignmentActivityAndRequesterCannotReadAnotherTicketActivity() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-activity-private-owner@example.test", "Ticket Activity Private Owner");
+        String otherAuthorization = registerAndLogin("ticket-activity-private-other@example.test", "Ticket Activity Private Other");
+        String leadEmail = saveAccount("ticket-activity-lead@example.test", AccountRole.TEAM_LEAD);
+        String agentEmail = saveAccount("ticket-activity-agent@example.test", AccountRole.AGENT);
+        String leadAuthorization = authorizationHeaderFor(leadEmail);
+        UUID agentId = userIdFor(agentEmail);
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Assignment activity ticket",
+                "Assignment history is visible to support roles.",
+                "workflow",
+                "HIGH"), "id");
+
+        mockMvc.perform(patch("/api/tickets/{id}/assignment", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, leadAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "assigneeId": "%s"
+                                }
+                                """.formatted(agentId)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, leadAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].action").value("TICKET_CREATED"))
+                .andExpect(jsonPath("$.content[1].action").value("TICKET_ASSIGNED"))
+                .andExpect(jsonPath("$.content[1].changedFields", contains("currentAssigneeId")));
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, otherAuthorization))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
+    }
+
+    @Test
+    void ticketActivitiesRequireAuthenticationValidPaginationAndExistingTicket() throws Exception {
+        mockMvc.perform(get("/api/tickets/{id}/activities", UUID.randomUUID()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Authentication required."));
+
+        String authorization = registerAndLogin("ticket-activity-validation@example.test", "Ticket Activity Validation");
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", UUID.randomUUID())
+                        .header(HttpHeaders.AUTHORIZATION, authorization))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Ticket not found."));
+
+        String ticketId = fieldFrom(createTicket(
+                authorization,
+                "Activity validation ticket",
+                "Invalid pagination should be rejected.",
+                "general",
+                "LOW"), "id");
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .param("page", "-1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Page must be zero or greater."));
+
+        mockMvc.perform(get("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorization)
+                        .param("size", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Size must be between 1 and 100."));
+
+        mockMvc.perform(post("/api/tickets/{id}/activities", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, authorization))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
     void agentCanSelfAssignAndLeadCanReassignAndUnassignTicket() throws Exception {
         String ownerAuthorization = registerAndLogin("ticket-assignment-owner@example.test", "Ticket Assignment Owner");
         String agentEmail = saveAccount("ticket-assignment-agent@example.test", AccountRole.AGENT);

@@ -1,6 +1,8 @@
 package com.resolvehub.backend.tickets;
 
 import com.resolvehub.backend.activity.TicketActivity;
+import com.resolvehub.backend.activity.TicketActivityPageRequest;
+import com.resolvehub.backend.activity.TicketActivityPageResponse;
 import com.resolvehub.backend.activity.TicketActivityRepository;
 import com.resolvehub.backend.auth.AccountRole;
 import com.resolvehub.backend.auth.EndpointPermission;
@@ -58,7 +60,8 @@ class TicketService {
     @Transactional
     TicketResponse create(CreateTicketRequest request, UserSummaryResponse requester) {
         validateCategory(request.categoryId());
-        Ticket ticket = ticketRepository.save(Ticket.create(request, requester.id()));
+        Ticket ticket = ticketRepository.saveAndFlush(Ticket.create(request, requester.id()));
+        ticketActivityRepository.save(TicketActivity.ticketCreated(ticket.id(), requester.id()));
         return TicketResponse.from(ticket);
     }
 
@@ -109,6 +112,19 @@ class TicketService {
                 request.size(),
                 Sort.by("createdAt").ascending().and(Sort.by("id").ascending()));
         return TicketCommentPageResponse.from(ticketCommentRepository.findByTicketId(ticket.id(), pageRequest));
+    }
+
+    @Transactional(readOnly = true)
+    TicketActivityPageResponse activities(
+            UUID ticketId,
+            TicketActivityPageRequest request,
+            UserSummaryResponse currentUser) {
+        Ticket ticket = requireVisibleTicket(ticketId, currentUser);
+        PageRequest pageRequest = PageRequest.of(
+                request.page(),
+                request.size(),
+                Sort.by("createdAt").ascending().and(Sort.by("id").ascending()));
+        return TicketActivityPageResponse.from(ticketActivityRepository.findByTicketId(ticket.id(), pageRequest));
     }
 
     @Transactional
