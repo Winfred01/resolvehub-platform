@@ -3,6 +3,8 @@ package com.resolvehub.backend.tickets;
 import com.resolvehub.backend.auth.AuthorizationService;
 import com.resolvehub.backend.auth.EndpointPermission;
 import com.resolvehub.backend.auth.UserSummaryResponse;
+import com.resolvehub.backend.activity.TicketActivityPageRequest;
+import com.resolvehub.backend.activity.TicketActivityPageResponse;
 import com.resolvehub.backend.comments.CreateTicketCommentRequest;
 import com.resolvehub.backend.comments.TicketCommentPageRequest;
 import com.resolvehub.backend.comments.TicketCommentPageResponse;
@@ -95,6 +97,16 @@ class TicketController {
             @RequestParam(required = false) Integer size) {
         UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
         return ticketService.comments(id, TicketCommentPageRequest.from(page, size), currentUser);
+    }
+
+    @GetMapping("/{id}/activities")
+    TicketActivityPageResponse activities(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
+        return ticketService.activities(id, TicketActivityPageRequest.from(page, size), currentUser);
     }
 
     @PatchMapping("/{id}")

@@ -54,10 +54,14 @@ remain future work.
 - Indexes: `ticket_id`, `created_at`
 - Audit: append-only
 
-The current local H2 MVP slice writes `TICKET_UPDATED`, `TICKET_ASSIGNED`, and
-`TICKET_COMMENTED` activity rows for ticket mutations. Full activity history
-read APIs and richer changed-field payloads remain planned for the dedicated
-activity issue.
+The current local H2 MVP slice writes `TICKET_CREATED`, `TICKET_UPDATED`,
+`TICKET_ASSIGNED`, and `TICKET_COMMENTED` activity rows for ticket mutations.
+The read API returns rows oldest-first with zero-based pagination. The
+`changed_fields` column stores safe comma-separated field names only, not
+before/after values, descriptions, comment bodies, credentials, tokens,
+passwords, or password hashes. PostgreSQL foreign-key migrations, normalized
+assignment history, richer before/after summaries, and production retention jobs
+remain future work.
 
 The current local H2 MVP list/search slice also maps nullable
 `current_assignee_id` for filtering assigned queues. No assignment mutation API
