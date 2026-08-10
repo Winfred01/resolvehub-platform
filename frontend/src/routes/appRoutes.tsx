@@ -4,7 +4,7 @@ import { AppLayout } from "../layouts/AppLayout";
 import { HomePage } from "../pages/HomePage";
 import { LoginPlaceholderPage } from "../pages/LoginPlaceholderPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
-import { TicketsPlaceholderPage } from "../pages/TicketsPlaceholderPage";
+import { TicketsPage } from "../pages/TicketsPage";
 
 const appRoutes: RouteObject[] = [
   {
@@ -13,7 +13,7 @@ const appRoutes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "login", element: <LoginPlaceholderPage /> },
-      { path: "tickets", element: <TicketsPlaceholderPage /> },
+      { path: "tickets", element: <TicketsPage /> },
       { path: "*", element: <NotFoundPage /> }
     ]
   }

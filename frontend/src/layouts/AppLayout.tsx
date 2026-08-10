@@ -11,7 +11,7 @@ type NavigationItem = {
 const navigationItems: readonly NavigationItem[] = [
   { to: "/", label: "Foundation", end: true },
   { to: "/login", label: "Login placeholder" },
-  { to: "/tickets", label: "Tickets placeholder" }
+  { to: "/tickets", label: "Tickets" }
 ];
 
 export function AppLayout() {
