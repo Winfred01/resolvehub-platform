@@ -1,6 +1,6 @@
 # ResolveHub Frontend
 
-Current scope: Issue #3 establishes the initial React and TypeScript frontend scaffold. Prompt 7 only planned this client; this branch adds the first runnable application shell without implementing product workflows.
+Current scope: Issue #19 adds the first ticket workflow UI on top of the React and TypeScript frontend scaffold. The route uses typed ticket API boundaries and fictional demo data until authenticated backend session wiring is added.
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ npm run preview
 
 - `/`: foundation landing page for the ResolveHub frontend.
 - `/login`: placeholder page. Authentication is not implemented.
-- `/tickets`: placeholder page. Ticket workflows are not implemented.
+- `/tickets`: ticket workspace with list, detail, create, edit, loading, empty, error, validation, and responsive states.
 - `/*`: accessible Not Found page.
 
 ## Accessibility Foundation
@@ -64,18 +64,19 @@ npm run preview
 - Focus-visible styles.
 - Responsive layout baseline.
 - Reduced-motion respect for global scrolling behavior.
+- Labeled ticket filters and form fields.
+- Status and priority are exposed as text, not color alone.
 
 ## Not Implemented
 
 - Authentication.
-- Ticket list, detail, form, Kanban, comments, or dashboard.
-- Backend or analytics integration.
-- API client calls.
+- Kanban, comments, dashboard, or analytics suggestions.
+- Authenticated backend session selection for the REST gateway.
 - Production deployment.
 
 ## Future Issues
 
-Future issues may add authentication UI, ticket workflow UI, dashboard screens, API integration, and stronger accessibility testing after their dependencies are complete.
+Future issues may add authentication UI, Kanban workflow, dashboard screens, analytics suggestions, end-to-end coverage, and stronger accessibility testing after their dependencies are complete.
 
 ## No-Secret Requirement
 
