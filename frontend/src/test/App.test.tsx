@@ -61,7 +61,7 @@ describe("ResolveHub app shell", () => {
       "page"
     );
     expect(
-      await screen.findByRole("heading", { name: "Cannot access shared support queue" })
+      await screen.findByRole("article", { name: "Cannot access shared support queue" })
     ).toBeInTheDocument();
   });
 
@@ -81,7 +81,9 @@ describe("Ticket workspace", () => {
   it("renders list, detail, filters, and create form controls", async () => {
     render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
 
-    expect(await screen.findByText("VPN drops during ticket handoff")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: /VPN drops during ticket handoff/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Support tickets" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Create ticket" })).toBeInTheDocument();
     expect(screen.getByLabelText("Ticket filters")).toBeInTheDocument();
@@ -122,7 +124,7 @@ describe("Ticket workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create ticket" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Printer queue is stuck" })
+      await screen.findByRole("article", { name: "Printer queue is stuck" })
     ).toBeInTheDocument();
     expect(screen.getByText("The fictional east office queue has stopped processing requests."))
       .toBeInTheDocument();
@@ -144,9 +146,9 @@ describe("Ticket workspace", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save ticket" }));
 
-    expect(await screen.findByRole("heading", { name: "Shared queue access restored" }))
+    expect(await screen.findByRole("article", { name: "Shared queue access restored" }))
       .toBeInTheDocument();
-    const detailPanel = screen.getByRole("article", { name: /Shared queue access restored/i });
+    const detailPanel = screen.getByRole("article", { name: "Shared queue access restored" });
     expect(within(detailPanel).getByText("Triaged")).toBeInTheDocument();
   });
 
@@ -162,5 +164,85 @@ describe("Ticket workspace", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Backend unavailable.");
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+});
+describe("Kanban workflow", () => {
+  it("groups tickets into status columns and disables unavailable transitions", async () => {
+    render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
+
+    const board = await screen.findByRole("region", { name: "Status board" });
+    const openColumn = within(board).getByRole("region", { name: "Open" });
+    const triagedColumn = within(board).getByRole("region", { name: "Triaged" });
+    const openCard = await within(openColumn).findByRole("article", {
+      name: /Kanban card Cannot access shared support queue/i
+    });
+
+    expect(openCard).toBeInTheDocument();
+    expect(
+      await within(triagedColumn).findByRole("article", {
+        name: /Kanban card Workflow approval email missing/i
+      })
+    ).toBeInTheDocument();
+    expect(within(openCard).getByRole("option", { name: "Closed" })).toBeDisabled();
+    expect(within(openCard).getByRole("button", { name: "Apply" })).toBeDisabled();
+  });
+
+  it("moves a ticket through the keyboard-operable status controls", async () => {
+    render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
+
+    const board = await screen.findByRole("region", { name: "Status board" });
+    const openColumn = within(board).getByRole("region", { name: "Open" });
+    const triagedColumn = within(board).getByRole("region", { name: "Triaged" });
+    const openCard = await within(openColumn).findByRole("article", {
+      name: /Kanban card Cannot access shared support queue/i
+    });
+
+    fireEvent.change(within(openCard).getByLabelText("Move status"), {
+      target: { value: "TRIAGED" }
+    });
+    fireEvent.click(within(openCard).getByRole("button", { name: "Apply" }));
+
+    expect(
+      await within(triagedColumn).findByRole("article", {
+        name: /Kanban card Cannot access shared support queue/i
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("shows a recoverable error and keeps the card in place when a status update fails", async () => {
+    const failingGateway: TicketGateway = {
+      listTickets: vi.fn().mockResolvedValue({
+        content: [demoTickets[0]],
+        page: 0,
+        size: 20,
+        totalElements: 1,
+        totalPages: 1,
+        empty: false
+      }),
+      getTicket: vi.fn(),
+      createTicket: vi.fn(),
+      updateTicket: vi.fn().mockRejectedValue(new Error("Status service unavailable."))
+    };
+
+    render(<TicketsPage gateway={failingGateway} />);
+
+    const board = await screen.findByRole("region", { name: "Status board" });
+    const openColumn = within(board).getByRole("region", { name: "Open" });
+    const openCard = await within(openColumn).findByRole("article", {
+      name: /Kanban card Cannot access shared support queue/i
+    });
+
+    fireEvent.change(within(openCard).getByLabelText("Move status"), {
+      target: { value: "TRIAGED" }
+    });
+    fireEvent.click(within(openCard).getByRole("button", { name: "Apply" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Status service unavailable.");
+    expect(
+      within(openColumn).getByRole("article", {
+        name: /Kanban card Cannot access shared support queue/i
+      })
+    ).toBeInTheDocument();
+    expect(within(openCard).getByLabelText("Move status")).toHaveValue("OPEN");
   });
 });

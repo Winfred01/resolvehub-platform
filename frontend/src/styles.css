@@ -399,6 +399,118 @@ textarea {
   color: #40516f;
 }
 
+
+.kanban-panel {
+  display: grid;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-block: 1px solid #cbd7e6;
+}
+
+.kanban-note,
+.kanban-empty,
+.transition-note {
+  margin: 0;
+  color: #40516f;
+}
+
+.kanban-note {
+  font-weight: 700;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.kanban-column {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-height: 16rem;
+  padding: 0.75rem;
+  border: 1px solid #cbd7e6;
+  border-radius: 0.5rem;
+  background: #ffffff;
+}
+
+.kanban-column-heading {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-column-heading h3,
+.kanban-card h4 {
+  margin: 0;
+  color: #172033;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.kanban-column-heading span {
+  display: inline-grid;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #0b5563;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.kanban-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kanban-card {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid #e3e9f2;
+  border-radius: 0.45rem;
+  background: #f7f8fb;
+}
+
+.kanban-card p {
+  margin: 0;
+  color: #40516f;
+}
+
+.kanban-move-controls {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.kanban-move-controls label {
+  display: grid;
+  gap: 0.35rem;
+  color: #40516f;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+button:disabled,
+button:disabled:hover {
+  border-color: #a9b8ca;
+  color: #40516f;
+  background: #e8edf4;
+  cursor: not-allowed;
+}
+
+.transition-note {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
 .ticket-form {
   display: grid;
   gap: 0.9rem;
@@ -449,7 +561,8 @@ textarea {
   .ticket-filters,
   .ticket-grid,
   .ticket-metadata,
-  .form-row {
+  .form-row,
+  .kanban-board {
     grid-template-columns: 1fr;
   }
 

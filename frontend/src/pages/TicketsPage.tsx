@@ -35,6 +35,23 @@ const priorityLabels: Record<TicketPriority, string> = {
   HIGH: "High",
   URGENT: "Urgent"
 };
+const statusColumns: readonly TicketStatus[] = [
+  "OPEN",
+  "TRIAGED",
+  "IN_PROGRESS",
+  "WAITING_ON_REQUESTER",
+  "RESOLVED",
+  "CLOSED"
+];
+
+const statusTransitions: Readonly<Record<TicketStatus, readonly TicketStatus[]>> = {
+  OPEN: ["TRIAGED", "IN_PROGRESS", "WAITING_ON_REQUESTER"],
+  TRIAGED: ["IN_PROGRESS", "WAITING_ON_REQUESTER", "RESOLVED"],
+  IN_PROGRESS: ["WAITING_ON_REQUESTER", "RESOLVED"],
+  WAITING_ON_REQUESTER: ["IN_PROGRESS", "RESOLVED"],
+  RESOLVED: ["IN_PROGRESS", "CLOSED"],
+  CLOSED: []
+};
 
 type TicketsPageProps = {
   gateway?: TicketGateway;
@@ -106,6 +123,9 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [form, setForm] = useState<FormState>(blankForm);
   const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [pendingStatusById, setPendingStatusById] = useState<Record<string, TicketStatus>>({});
+  const [kanbanError, setKanbanError] = useState("");
+  const [movingTicketId, setMovingTicketId] = useState<string | null>(null);
 
   async function loadTickets(nextFilters = filters, shouldShowLoading = true) {
     if (shouldShowLoading) {
@@ -164,6 +184,24 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
 
     return `${tickets.length} tickets`;
   }, [tickets.length, viewState]);
+  const ticketsByStatus = useMemo(
+    () =>
+      statusColumns.reduce<Record<TicketStatus, TicketSummary[]>>(
+        (columns, status) => ({
+          ...columns,
+          [status]: tickets.filter((ticket) => ticket.status === status)
+        }),
+        {
+          OPEN: [],
+          TRIAGED: [],
+          IN_PROGRESS: [],
+          WAITING_ON_REQUESTER: [],
+          RESOLVED: [],
+          CLOSED: []
+        }
+      ),
+    [tickets]
+  );
 
   function updateFilter<K extends keyof TicketFilters>(key: K, value: TicketFilters[K]) {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -222,6 +260,52 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
     }
   }
 
+  function updatePendingStatus(ticketId: string, status: TicketStatus) {
+    setPendingStatusById((current) => ({ ...current, [ticketId]: status }));
+    setKanbanError("");
+  }
+
+  function canMoveTicket(ticket: TicketSummary, nextStatus: TicketStatus) {
+    return statusTransitions[ticket.status].includes(nextStatus);
+  }
+
+  async function handleKanbanStatusSubmit(ticket: TicketSummary) {
+    const nextStatus = pendingStatusById[ticket.id] ?? ticket.status;
+
+    if (!canMoveTicket(ticket, nextStatus)) {
+      setKanbanError(
+        `${ticket.title} cannot move from ${statusLabels[ticket.status]} to ${statusLabels[nextStatus]}.`
+      );
+      return;
+    }
+
+    setMovingTicketId(ticket.id);
+    setKanbanError("");
+
+    try {
+      const updatedTicket = await gateway.updateTicket(ticket.id, {
+        status: nextStatus,
+        version: ticket.version
+      });
+
+      setTickets((currentTickets) =>
+        currentTickets.map((currentTicket) =>
+          currentTicket.id === updatedTicket.id ? updatedTicket : currentTicket
+        )
+      );
+      setSelectedId(updatedTicket.id);
+      setPendingStatusById((current) => {
+        const remaining = { ...current };
+        delete remaining[ticket.id];
+        return remaining;
+      });
+    } catch (error) {
+      setPendingStatusById((current) => ({ ...current, [ticket.id]: ticket.status }));
+      setKanbanError(error instanceof Error ? error.message : "Ticket status could not be updated.");
+    } finally {
+      setMovingTicketId(null);
+    }
+  }
   return (
     <section className="ticket-workspace" aria-labelledby="tickets-heading">
       <div className="workspace-heading">
@@ -290,6 +374,87 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
         </label>
         <button type="submit">Apply filters</button>
       </form>
+
+      {viewState === "ready" ? (
+        <section className="kanban-panel" aria-labelledby="kanban-heading">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Kanban workflow</p>
+              <h2 id="kanban-heading">Status board</h2>
+            </div>
+            <p className="kanban-note">Updates use explicit controls for keyboard access.</p>
+          </div>
+          {kanbanError ? (
+            <div className="form-errors" role="alert">
+              <p>{kanbanError}</p>
+            </div>
+          ) : null}
+          <div className="kanban-board" aria-label="Tickets grouped by status">
+            {statusColumns.map((status) => (
+              <section className="kanban-column" key={status} aria-labelledby={`kanban-${status}`}>
+                <div className="kanban-column-heading">
+                  <h3 id={`kanban-${status}`}>{statusLabels[status]}</h3>
+                  <span>{ticketsByStatus[status].length}</span>
+                </div>
+                {ticketsByStatus[status].length === 0 ? (
+                  <p className="kanban-empty">No tickets</p>
+                ) : (
+                  <ul className="kanban-list">
+                    {ticketsByStatus[status].map((ticket) => {
+                      const pendingStatus = pendingStatusById[ticket.id] ?? ticket.status;
+                      const isNewStatus = pendingStatus !== ticket.status;
+                      const canSubmit = isNewStatus && canMoveTicket(ticket, pendingStatus);
+
+                      return (
+                        <li key={ticket.id}>
+                          <article className="kanban-card" aria-label={`Kanban card ${ticket.title}`}>
+                            <h4 id={`kanban-card-${ticket.id}`}>{ticket.title}</h4>
+                            <p>{getCategoryName(ticket.categoryId)}</p>
+                            <span className={`pill priority-${ticket.priority.toLowerCase()}`}>
+                              {priorityLabels[ticket.priority]}
+                            </span>
+                            <div className="kanban-move-controls">
+                              <label>
+                                Move status
+                                <select
+                                  value={pendingStatus}
+                                  onChange={(event) =>
+                                    updatePendingStatus(ticket.id, event.target.value as TicketStatus)
+                                  }
+                                >
+                                  {statusColumns.map((nextStatus) => (
+                                    <option
+                                      key={nextStatus}
+                                      value={nextStatus}
+                                      disabled={nextStatus !== ticket.status && !canMoveTicket(ticket, nextStatus)}
+                                    >
+                                      {statusLabels[nextStatus]}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <button
+                                type="button"
+                                disabled={!canSubmit || movingTicketId === ticket.id}
+                                onClick={() => void handleKanbanStatusSubmit(ticket)}
+                              >
+                                {movingTicketId === ticket.id ? "Moving" : "Apply"}
+                              </button>
+                            </div>
+                            {isNewStatus && !canSubmit ? (
+                              <p className="transition-note">Transition unavailable for this role.</p>
+                            ) : null}
+                          </article>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </section>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {viewState === "error" ? (
         <div className="state-panel" role="alert">
