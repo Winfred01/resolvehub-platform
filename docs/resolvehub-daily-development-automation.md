@@ -79,10 +79,104 @@ Every run must scan for secrets and private data before commit or GitHub update.
 - Do not mark Draft PRs ready for review automatically.
 - Do not merge PRs automatically.
 - Use explicit evidence comments for validation results.
+- Treat PR creation as GitHub integration work, not implementation work. If
+  implementation is complete, validation has passed, and the branch is pushed,
+  a PR creation failure must be recorded separately as
+  `PR_WRITE_PERMISSION_BLOCKED` rather than `IMPLEMENTATION FAILURE`.
+- Use deterministic PR creation fallback order:
+  1. GitHub connector PR creation. If it returns `403 Resource not accessible by integration`, classify `CONNECTOR_PR_WRITE_UNAVAILABLE`.
+  2. GitHub CLI. If `gh` is missing, classify `GH_CLI_UNAVAILABLE`; if present but unauthenticated, classify `GH_CLI_UNAUTHENTICATED`; do not alter authentication automatically.
+  3. Browser fallback only when repo, base branch, head branch, Draft state, title, and body can be inspected before submission. If browser output or page state is unavailable, classify `BROWSER_FALLBACK_UNVERIFIABLE` and do not submit blindly.
+
+## PR Reconciliation Mode
+
+If a workstream already has:
+
+```text
+IMPLEMENTATION_COMPLETE
+VALIDATION_PASSED
+BRANCH_PUSHED
+PR_MISSING
+```
+
+the automation must enter `PR_RECONCILIATION_MODE`. In this mode it may only
+inspect the active branch, inspect GitHub PR state, attempt authorized PR
+creation through the fallback order above, and report the remaining blocker.
+It must not recreate the worktree, create another branch, reimplement the
+feature, rerun full implementation logic, or select the next issue.
+
+When PR creation is still unavailable, close out as:
+
+```text
+BLOCKED_EXTERNAL_INTEGRATION
+PR_WRITE_PERMISSION_BLOCKED
+```
+
+while retaining the active issue ownership for the next scheduled run.
+
+## Lifecycle States
+
+Each workstream must track these concepts independently:
+
+```text
+ISSUE_SELECTED
+IMPLEMENTATION_IN_PROGRESS
+IMPLEMENTATION_COMPLETE
+VALIDATION_PASSED
+BRANCH_PUSHED
+PR_MISSING
+DRAFT_PR_OPEN
+REVIEW_PENDING
+READY_TO_MERGE
+MERGED
+ISSUE_CLOSED
+WORKSTREAM_COMPLETE
+```
+
+External blockers must be represented separately from implementation failure:
+
+```text
+PR_WRITE_PERMISSION_BLOCKED
+CI_BLOCKED
+REVIEW_BLOCKED
+```
+
+An issue with a pushed, validated implementation and only a missing PR remains
+the active workstream until its configured handoff rule is satisfied.
 
 ## Merge Strategy
 
 `allow_auto_merge = false`. Even when lint, tests, build, and security checks pass, the automation may only push a branch, create or update a Draft PR, and report readiness. Human review remains required.
+
+## Merged PR / Open Issue Reconciliation
+
+The automation must not rely only on GitHub auto-close keywords. If a PR
+associated with an issue is merged, the merged branch/workstream clearly maps to
+that issue, required validation is complete, implementation exists in `main`,
+and the issue remains open only because the PR body used wording such as
+`Related to #N`, classify:
+
+```text
+MERGED_ISSUE_NOT_CLOSED
+```
+
+If authorized issue mutation is available, close the issue as `completed`. If
+issue mutation is unavailable, record the user action
+`Close Issue #N as completed` and do not treat the open issue as unfinished
+implementation work.
+
+## Issue Closing Policy
+
+Draft PR bodies may use `Related to #N` while external review is pending. The
+handoff rule is:
+
+- Prefer updating the PR body to `Closes #N` before merge when an authorized and
+  reviewed PR-body update path is available.
+- Otherwise, after a successful merge, explicitly close the related issue as
+  `completed` through an authorized issue mutation.
+- If neither mutation path is available, record
+  `ISSUE_N_MANUAL_CLOSE_REQUIRED` and keep the implementation lifecycle marked
+  complete.
 
 ## Close-Out Rules
 
