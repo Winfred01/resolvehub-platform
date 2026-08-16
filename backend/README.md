@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, the first assignment workflow slice, ticket comment creation/listing, and ticket activity-history reads. It does not implement analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, the first assignment workflow slice, ticket comment creation/listing, ticket activity-history reads, and dashboard summary/trend read APIs. It does not implement analytics integration, production PostgreSQL connectivity, or SQL migrations.
 
 ## Package Boundaries
 
@@ -12,6 +12,7 @@ This scaffold includes backend startup, configuration boundaries, package owners
 - `com.resolvehub.backend.tickets`: ticket creation, search, update, assignment, comments endpoint routing, and detail APIs.
 - `com.resolvehub.backend.comments`: ticket comment persistence and response contracts.
 - `com.resolvehub.backend.activity`: ticket activity persistence and audit-history response contracts.
+- `com.resolvehub.backend.dashboard`: dashboard metric aggregation and response contracts.
 - `com.resolvehub.backend.health`: scaffold health endpoint.
 - `com.resolvehub.backend.config`: backend configuration properties.
 
@@ -152,6 +153,27 @@ or edited directly through the API. Responses expose `id`, `ticketId`,
 `actorId`, `action`, `changedFields`, and `createdAt`; field summaries never
 include comment bodies, ticket descriptions, tokens, credentials, or password
 data. Activities are returned oldest-first with zero-based pagination.
+
+Read dashboard summary metrics:
+
+```bash
+curl 'http://localhost:8080/api/dashboard/summary?from=2026-08-01T00:00:00Z&to=2026-08-31T23:59:59Z' \
+  -H "Authorization: Bearer <team-lead-or-admin-token>"
+```
+
+Read dashboard trends:
+
+```bash
+curl 'http://localhost:8080/api/dashboard/trends?granularity=DAILY' \
+  -H "Authorization: Bearer <team-lead-or-admin-token>"
+```
+
+Dashboard endpoints are read-only and require `TEAM_LEAD` or `ADMIN`. Summary
+responses include total/open/in-progress/resolved/closed ticket counts plus
+status, category, and priority distributions. Trend responses include ordered
+daily or weekly buckets for ticket creations and status movement events. These
+responses never include ticket descriptions, comment bodies, tokens,
+credentials, passwords, password hashes, or user profile fields.
 
 After startup, verify the health endpoint:
 

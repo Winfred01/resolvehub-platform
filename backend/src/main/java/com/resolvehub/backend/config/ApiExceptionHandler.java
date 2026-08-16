@@ -5,6 +5,7 @@ import com.resolvehub.backend.auth.DuplicateEmailException;
 import com.resolvehub.backend.auth.ForbiddenException;
 import com.resolvehub.backend.auth.InvalidCredentialsException;
 import com.resolvehub.backend.auth.UserNotFoundException;
+import com.resolvehub.backend.dashboard.DashboardValidationException;
 import com.resolvehub.backend.tickets.TicketConflictException;
 import com.resolvehub.backend.tickets.TicketAssignmentValidationException;
 import com.resolvehub.backend.tickets.TicketNotFoundException;
@@ -103,6 +104,13 @@ class ApiExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(ApiErrorResponse.of(HttpStatus.CONFLICT, exception.getMessage(), Map.of()));
+    }
+
+    @ExceptionHandler(DashboardValidationException.class)
+    ResponseEntity<ApiErrorResponse> handleDashboardValidation(DashboardValidationException exception) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.of(HttpStatus.BAD_REQUEST, exception.getMessage(), Map.of()));
     }
 
     record ApiErrorResponse(
