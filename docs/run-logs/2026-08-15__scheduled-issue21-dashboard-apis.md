@@ -1,0 +1,30 @@
+# Scheduled Issue #21 Dashboard API Closeout
+
+- Timestamp: 2026-08-15 20:17:30 -04:00
+- Run ID: scheduled-20260815-2000-issue21-dashboard-apis-001
+- Automation memory was loaded first; local ResolveHub repository status was checked and `git fetch origin` completed without force operations.
+- Live reconciliation: PR #45 for Issue #20 was externally merged into `origin/main` at `f2597bae13d5b774b002c05eece73b7245c611e7`, but Issue #20 remained open because the PR body used `Related to #20`; the automation did not close Issue #20.
+- Live GitHub state before selection: no open PRs; Issues #20-#27 remained open; Issue #21 dependencies #15 and #18 were closed.
+- Selection: Issue #21 `Implement dashboard summary and trend APIs` was selected because its dependencies were closed, no active PR or branch/worktree existed for Issue #21, and higher-priority Issue #26 remained dependency-blocked by #20/#22/#25.
+- Branch/worktree: `backend/issue-21-dashboard-apis` at `C:/Users/winfred/Documents/Codex/worktrees/resolvehub-issue-21`, based on `origin/main`.
+- Implementation commit: `79554e4` (`feat: add dashboard summary APIs`).
+- Implemented: read-only `/api/dashboard/summary` and `/api/dashboard/trends`; `TEAM_LEAD`/`ADMIN` authorization through `VIEW_DASHBOARD`; ISO instant date range validation; `DAILY`/`WEEKLY` trend granularity; aggregate-only summary and trend responses; API contract and backend README documentation.
+- Tests added: `DashboardControllerTest` covers lead access, requester denial, missing auth, invalid date/granularity validation, summary distributions, ordered trend buckets, and absence of sensitive response fields.
+- Validation passed:
+  - Backend Maven `test`: 51 tests, 0 failures.
+  - Backend Maven `package -DskipTests`: passed.
+  - Frontend `npm.cmd ci`: passed with the known local `react-router@8.3.0` engine warning for Node `22.20.0`; 0 vulnerabilities.
+  - Frontend `npm.cmd run test:run`: 15 tests passed.
+  - Frontend `npm.cmd run lint`: passed.
+  - Frontend `npm.cmd run build`: passed.
+  - Frontend `npm.cmd audit --audit-level=high`: 0 vulnerabilities.
+  - Analytics `python -m pytest analytics-service/tests`: 1 test passed.
+  - `docker compose config`: passed.
+  - `node scripts/validate-planning-foundation.js`: passed.
+  - `node scripts/validate-github-metadata-state.js`: passed with `privacy_findings=0`.
+  - `git diff --check`: passed with expected CRLF warnings only.
+  - Strict changed-file high-confidence secret scan: `high_confidence_findings=0`.
+- Push: branch `backend/issue-21-dashboard-apis` pushed to origin at `79554e4`.
+- Draft PR: not opened. GitHub connector `create_pull_request` returned `403 Resource not accessible by integration`; `gh` CLI was unavailable; browser-control fallback was not used to submit because the Node browser tool suppressed documentation, browser state, and error output, so repo/base/head/Draft/body fields could not be verified before submission. A follow-up connector read confirmed no open PR existed after the failed attempt.
+- Security/privacy: no merge, auto-merge, PR ready transition, approval, issue closure, label mutation, force push, Canada job-search data access, Gmail data access, browser/session data access, resume data access, private address/phone data access, or credential change was performed.
+- Final state: FAILED_CLOSED
