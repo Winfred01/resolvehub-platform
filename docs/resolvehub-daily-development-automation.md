@@ -114,6 +114,78 @@ PR_WRITE_PERMISSION_BLOCKED
 
 while retaining the active issue ownership for the next scheduled run.
 
+## Stable External Blocker Policy
+
+External integration blockers must not create repository churn when nothing has
+changed. For PR write failures, the automation must compute a stable blocker
+fingerprint from:
+
+```text
+issue_number
+branch
+branch_head
+pr_absence
+blocker_type
+blocker_reason
+```
+
+For Issue #21, this means:
+
+```text
+issue_number = 21
+branch = backend/issue-21-dashboard-apis
+blocker_type = PR_WRITE_PERMISSION_BLOCKED
+```
+
+If the issue number, branch, branch head, PR absence, blocker category, and
+blocker reason are unchanged from the previous run, classify the run as:
+
+```text
+BLOCKED_EXTERNAL_INTEGRATION_UNCHANGED
+```
+
+For `BLOCKED_EXTERNAL_INTEGRATION_UNCHANGED`, the automation must perform no
+repository mutation:
+
+- Do not create a run-log file.
+- Do not create a repository commit.
+- Do not push the branch.
+- Do not rerun full implementation validation.
+- Do not create another branch or worktree.
+- Do not modify Issue #21 source code.
+- Do not select Issue #22 or any later issue.
+
+The automation may update external automation memory with a compact heartbeat
+and the current run time. The user-facing report must say that the run
+completed with a stable external blocker and that the implementation remains
+complete and healthy (`implementation remains complete and healthy`). It must
+not describe the implementation or workstream as
+failed when only PR creation is externally blocked.
+
+## Run-Log Policy
+
+Repository run logs are written only for meaningful state transitions, such as:
+
+```text
+implementation started
+implementation completed
+validation changed
+branch first pushed
+Draft PR created
+CI status materially changed
+review requested
+PR marked ready
+PR merged
+Issue closed
+blocker category changed
+blocker resolved
+```
+
+Repeating the same PR write failure, such as the same GitHub `403 Resource not
+accessible by integration`, is not a meaningful repository state transition.
+For an unchanged external blocker, record only external automation memory if a
+heartbeat is needed.
+
 ## Lifecycle States
 
 Each workstream must track these concepts independently:
@@ -137,6 +209,7 @@ External blockers must be represented separately from implementation failure:
 
 ```text
 PR_WRITE_PERMISSION_BLOCKED
+BLOCKED_EXTERNAL_INTEGRATION_UNCHANGED
 CI_BLOCKED
 REVIEW_BLOCKED
 ```
