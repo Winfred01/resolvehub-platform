@@ -25,6 +25,9 @@ jobs:
       - name: Validate planning foundation
         run: node scripts/validate-planning-foundation.js
 
+      - name: Validate Portfolio-first roadmap
+        run: node scripts/validate-portfolio-first-roadmap.js
+
       - name: Validate GitHub metadata and privacy state
         run: node scripts/validate-github-metadata-state.js
 

@@ -1,5 +1,7 @@
 # Testing Strategy
 
+Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+
 ## Frontend
 
 - Unit tests for utility logic with Vitest.
@@ -22,8 +24,11 @@
 
 ## Analytics
 
-- Pytest tests for category suggestion, duplicate suggestion, priority recommendation, and health endpoint behavior.
-- Contract tests between backend and analytics service.
+- Pytest tests for the analytics health endpoint.
+- Category and priority suggestion tests apply if optional Issue #23 is enabled
+  before v0.1.
+- Duplicate suggestion and full backend/frontend analytics integration tests are
+  deferred to v0.2 with Issues #24 and #25.
 
 ## API Contract
 
@@ -33,7 +38,11 @@
 
 ## End-To-End
 
-- Playwright tests for login, ticket creation, ticket update, comments, search, dashboard, and logout.
+- Portfolio-first v0.1 Playwright smoke tests should cover requester ticket
+  creation, agent triage/update/comment, lead/admin authorization, search/filter,
+  Kanban, dashboard, and logout where frontend session integration exists.
+- Analytics suggestion display is not a required v0.1 E2E path unless #23 is
+  explicitly enabled as a stretch goal.
 
 ## Docker Smoke Tests
 
@@ -58,6 +67,29 @@
 ## CI Gates
 
 Planned gates: lint, unit tests, integration tests, E2E smoke, Docker smoke, dependency scan, secret scan, and docs validation.
+
+## Validation Tiers
+
+### Tier 1: Read-only reconciliation
+
+For unchanged external blockers, run only lightweight Git/GitHub state checks.
+Do not run full test suites or create repository run-log commits.
+
+### Tier 2: Documentation and governance changes
+
+Run planning validation, roadmap-mode validation, GitHub metadata/privacy
+validation, `git diff --check`, and targeted secret scans.
+
+### Tier 3: Scoped implementation
+
+Run tests relevant to the changed workstream and any directly affected shared
+contracts.
+
+### Tier 4: Release candidate
+
+Run full required v0.1 validation: backend, frontend, included analytics
+components, security, accessibility, E2E, Docker, CI/release checks, and secret
+scans.
 
 ## Test Data
 

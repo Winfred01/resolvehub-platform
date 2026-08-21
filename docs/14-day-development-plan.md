@@ -1,5 +1,13 @@
 # 14-Day Development Plan
 
+Status: historical baseline / original implementation plan.
+
+This document records the original 14-day planning sequence. It is no longer the
+authoritative automation issue-selection source. The current roadmap mode is
+`PORTFOLIO_FIRST_V0_1`; use
+[portfolio-first-v0.1-roadmap.md](portfolio-first-v0.1-roadmap.md) for active
+v0.1 dependency order, analytics scope, and daily automation selection rules.
+
 ## Day 1: Product Foundation
 
 - Goals: PRD, repository audit, milestone plan, issue plan.

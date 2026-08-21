@@ -93,7 +93,9 @@ if (!fs.existsSync(foundationCloseoutPath)) errors.push("docs/github-foundation-
 if (!fs.existsSync(coreCloseoutPath)) errors.push("docs/github-core-workflow-issues-closeout.md is missing");
 if (!fs.existsSync(finalCloseoutPath)) errors.push("docs/github-final-issues-closeout.md is missing");
 const map = fs.existsSync(mapPath) ? fs.readFileSync(mapPath, "utf8") : "";
-if ((map.match(/open-created/g) || []).length !== 26) errors.push("issue map should contain 26 open-created rows");
+if ((map.match(/\|\s*open-created(?:;[^|]*)?\s*\|/g) || []).length !== 26) {
+  errors.push("issue map should contain 26 issue rows with open-created history");
+}
 if (map.includes("Planned - not created")) errors.push("issue map should not contain planned placeholders");
 
 const privacyPatterns = [

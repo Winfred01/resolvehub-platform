@@ -25,6 +25,8 @@ const requiredFiles = [
   "docs/interview-notes.md",
   "docs/branch-worktree-plan.md",
   "docs/14-day-development-plan.md",
+  "docs/portfolio-first-v0.1-roadmap.md",
+  "docs/manual-github-issue-updates.md",
   "docs/github-issues-plan.md",
   "docs/github-milestones-plan.md",
 ];

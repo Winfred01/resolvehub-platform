@@ -41,9 +41,15 @@ Support teams need a clear, auditable workflow for receiving requests, triaging 
 - Authentication and authorization.
 - Ticket management.
 - Workflow and Kanban.
-- Dashboard metrics.
-- Analytics suggestion contracts.
-- Tests, logging, Docker planning, CI planning, accessibility, and demo strategy.
+- Dashboard metrics and dashboard UI.
+- Portfolio-focused quality, accessibility, security, E2E, Docker demo, and
+  release documentation.
+- Optional lightweight category/priority suggestion service if #23 is enabled
+  as a stretch goal.
+
+Duplicate suggestion and full analytics workflow integration are deferred from
+Portfolio-first v0.1 to v0.2. They remain valid roadmap capabilities but do not
+block v0.1 release.
 
 ## Success Metrics
 
@@ -60,7 +66,9 @@ Support teams need a clear, auditable workflow for receiving requests, triaging 
 - Create, view, update, search, filter, assign, comment, and soft-close tickets.
 - Record activity history for ticket changes.
 - Provide dashboard summary and trend endpoints.
-- Store analytics suggestions as reviewable suggestions.
+- Provide a dashboard UI over the dashboard endpoints.
+- Store analytics suggestions as reviewable suggestions only if the optional
+  stretch analytics work is enabled.
 
 ## Non-Functional Requirements
 
@@ -106,9 +114,11 @@ Use password hashing, role authorization, CSRF/CORS strategy, XSS and SQL inject
 
 ## Release Criteria
 
-- MVP issues completed and tested.
+- Portfolio-first v0.1 criteria completed and tested.
 - Security checks passing.
 - Demo data fictional.
 - Docker smoke test passing.
 - Documentation and demo script updated.
 - No known secret or privacy leakage.
+- #24 duplicate suggestion and #25 full analytics workflow integration are not
+  required for Portfolio-first v0.1.
