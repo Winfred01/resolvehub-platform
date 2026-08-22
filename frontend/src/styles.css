@@ -202,6 +202,11 @@ button:hover {
   gap: 1.25rem;
 }
 
+.dashboard-workspace {
+  display: grid;
+  gap: 1.25rem;
+}
+
 .workspace-heading,
 .panel-heading {
   display: flex;
@@ -225,8 +230,18 @@ button:hover {
   border-block: 1px solid #cbd7e6;
 }
 
+.dashboard-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(10rem, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding-block: 1rem;
+  border-block: 1px solid #cbd7e6;
+}
+
 .ticket-filters label,
-.ticket-form label {
+.ticket-form label,
+.dashboard-filters label {
   display: grid;
   gap: 0.35rem;
   color: #40516f;
@@ -399,6 +414,144 @@ textarea {
   color: #40516f;
 }
 
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(8rem, 1fr));
+  gap: 0.75rem;
+}
+
+.metric-tile {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: 1rem;
+  border: 1px solid #cbd7e6;
+  border-radius: 0.5rem;
+  background: #ffffff;
+}
+
+.metric-tile span {
+  color: #40516f;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.metric-tile strong {
+  color: #172033;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-chart {
+  display: grid;
+  gap: 1rem;
+  min-height: 18rem;
+  padding: 1rem;
+  border: 1px solid #cbd7e6;
+  border-radius: 0.5rem;
+  background: #ffffff;
+}
+
+.dashboard-trend-chart {
+  grid-column: 1 / -1;
+}
+
+.dashboard-bars {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.dashboard-bar-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.7fr) minmax(8rem, 1fr) minmax(2rem, auto);
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dashboard-bar-row span:first-child,
+.dashboard-note,
+.dashboard-empty {
+  color: #40516f;
+}
+
+.dashboard-bar-track {
+  display: block;
+  height: 0.75rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: #e8edf4;
+}
+
+.dashboard-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #0b5563;
+}
+
+.trend-bars {
+  display: grid;
+  grid-auto-columns: minmax(8rem, 1fr);
+  grid-auto-flow: column;
+  gap: 0.75rem;
+  min-height: 14rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+}
+
+.trend-column {
+  display: grid;
+  grid-template-rows: minmax(8rem, 1fr) auto auto;
+  gap: 0.5rem;
+  min-width: 8rem;
+  color: #40516f;
+}
+
+.trend-column-bars {
+  display: flex;
+  gap: 0.35rem;
+  align-items: end;
+  min-height: 8rem;
+  padding: 0.5rem;
+  border: 1px solid #e3e9f2;
+  border-radius: 0.45rem;
+  background: #f7f8fb;
+}
+
+.trend-created,
+.trend-movement {
+  display: block;
+  width: 50%;
+  min-height: 0.5rem;
+  border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.trend-created {
+  background: #0b5563;
+}
+
+.trend-movement {
+  background: #7a5c14;
+}
+
+.trend-column strong {
+  color: #172033;
+  font-size: 0.9rem;
+}
+
+.dashboard-note,
+.dashboard-empty {
+  margin: 0;
+  font-weight: 700;
+}
+
 
 .kanban-panel {
   display: grid;
@@ -559,8 +712,12 @@ button:disabled:hover {
   }
 
   .ticket-filters,
+  .dashboard-filters,
   .ticket-grid,
   .ticket-metadata,
+  .metric-grid,
+  .dashboard-grid,
+  .dashboard-bar-row,
   .form-row,
   .kanban-board {
     grid-template-columns: 1fr;

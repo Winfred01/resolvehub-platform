@@ -1,6 +1,10 @@
 # ResolveHub Frontend
 
-Current scope: Issue #20 adds a responsive Kanban workflow to the ticket workspace. Status updates use keyboard-operable controls and typed ticket API boundaries with fictional demo data until authenticated backend session wiring is added.
+Current scope: Issue #22 adds the responsive dashboard surface for the Issue #21
+backend dashboard API contract. The dashboard renders summary metrics,
+status/category/priority distributions, trend buckets, loading, empty, and error
+states with fictional demo data until authenticated backend session wiring is
+selected.
 
 ## Prerequisites
 
@@ -52,6 +56,7 @@ npm run preview
 - `/`: foundation landing page for the ResolveHub frontend.
 - `/login`: placeholder page. Authentication is not implemented.
 - `/tickets`: ticket workspace with list, detail, create, edit, Kanban status board, loading, empty, error, validation, and responsive states.
+- `/dashboard`: dashboard metrics surface with summary tiles, distribution charts, trend buckets, loading, empty, error, and responsive states.
 - `/*`: accessible Not Found page.
 
 ## Accessibility Foundation
@@ -67,11 +72,13 @@ npm run preview
 - Labeled ticket filters, forms, and Kanban status controls.
 - Status and priority are exposed as text, not color alone.
 - Kanban updates use explicit select and button controls for keyboard access.
+- Dashboard charts expose text labels and counts, not color alone.
+- Dashboard date and granularity filters use labeled form controls.
 
 ## Not Implemented
 
 - Authentication.
-- Comments, dashboard, analytics suggestions, or realtime collaboration.
+- Comments UI, analytics suggestions, or realtime collaboration.
 - Authenticated backend session selection for the REST gateway.
 - Production deployment.
 

@@ -1,10 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
+import { createDemoDashboardGateway } from "../api/dashboardGateway";
 import { createDemoTicketGateway } from "../api/ticketGateway";
 import { demoTickets } from "../data/ticketFixtures";
+import { DashboardPage } from "../pages/DashboardPage";
 import { TicketsPage } from "../pages/TicketsPage";
 import { AppRoutes } from "../routes/appRoutes";
+import type { DashboardGateway } from "../types/dashboard";
 import type { TicketGateway } from "../types/tickets";
 
 function renderRoute(path: string) {
@@ -63,6 +66,18 @@ describe("ResolveHub app shell", () => {
     expect(
       await screen.findByRole("article", { name: "Cannot access shared support queue" })
     ).toBeInTheDocument();
+  });
+
+  it("renders the dashboard route with active navigation", async () => {
+    renderRoute("/dashboard");
+
+    expect(
+      await screen.findByRole("heading", { name: "Support dashboard" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
   });
 
   it("renders an accessible not found route", () => {
@@ -163,6 +178,54 @@ describe("Ticket workspace", () => {
     render(<TicketsPage gateway={failingGateway} />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Backend unavailable.");
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+});
+
+describe("Dashboard workspace", () => {
+  it("renders summary metrics, distributions, and trend buckets", async () => {
+    render(<DashboardPage gateway={createDemoDashboardGateway(demoTickets)} />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Support dashboard" })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Dashboard filters")).toBeInTheDocument();
+    expect(screen.getByText("3 tickets")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Status" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Category" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Priority" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ticket volume" })).toBeInTheDocument();
+    expect(screen.getByText("Account access")).toBeInTheDocument();
+    expect(screen.getByText(/1 created, 0 moved/i)).toBeInTheDocument();
+  });
+
+  it("shows an empty dashboard state for a date range with no metrics", async () => {
+    render(<DashboardPage gateway={createDemoDashboardGateway(demoTickets)} />);
+
+    fireEvent.change(await screen.findByLabelText("From"), {
+      target: { value: "2026-09-01" }
+    });
+    fireEvent.change(screen.getByLabelText("To"), {
+      target: { value: "2026-09-30" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Refresh dashboard" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "No dashboard metrics in this range" })
+    ).toBeInTheDocument();
+  });
+
+  it("renders a recoverable error when dashboard metrics fail to load", async () => {
+    const failingGateway: DashboardGateway = {
+      getSummary: vi.fn().mockRejectedValue(new Error("Dashboard service unavailable.")),
+      getTrends: vi.fn()
+    };
+
+    render(<DashboardPage gateway={failingGateway} />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Dashboard service unavailable."
+    );
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 });

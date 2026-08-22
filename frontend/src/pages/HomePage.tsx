@@ -6,13 +6,13 @@ export function HomePage() {
       <p className="eyebrow">Frontend foundation</p>
       <h1 id="home-heading">ResolveHub foundation</h1>
       <p className="lede">
-        This scaffold starts the React and TypeScript client with accessible
-        navigation, route placeholders, linting, testing, and build tooling.
+        ResolveHub combines a ticket workspace, Kanban workflow, and dashboard
+        reporting surface for a portfolio-ready support operations MVP.
       </p>
       <StatusNote title="Current implementation boundary">
-        Issue #3 creates the app shell only. Authentication, tickets,
-        dashboard, analytics, backend integration, and deployment remain future
-        work.
+        The frontend uses fictional demo data until authenticated browser
+        session wiring is selected. Analytics suggestions and production
+        deployment remain future work.
       </StatusNote>
     </section>
   );

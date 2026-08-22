@@ -4,10 +4,10 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
 Current status: ResolveHub is no longer planning-only. `origin/main` contains
 the frontend scaffold, Spring Boot backend, auth/RBAC, ticket backend workflow,
-ticket frontend workflow, Kanban, FastAPI health scaffold, Docker Compose
-foundation, and GitHub Actions CI. Issue #21 dashboard APIs are implemented on
-`backend/issue-21-dashboard-apis` and await PR/merge before they become mainline
-architecture.
+ticket frontend workflow, Kanban, dashboard backend APIs, FastAPI health
+scaffold, Docker Compose foundation, and GitHub Actions CI. Issue #22 dashboard
+UI is implemented on `frontend/issue-22-dashboard-ui` and awaits PR/merge before
+it becomes mainline architecture.
 
 ## System Context
 
@@ -30,8 +30,8 @@ flowchart LR
 | Authentication/RBAC backend | MERGED |
 | Ticket create/detail/update/search/filter backend | MERGED |
 | Assignment, comments, and activity history backend | MERGED |
-| Dashboard summary/trend backend APIs | IMPLEMENTED_UNMERGED on Issue #21 branch |
-| Dashboard UI | PLANNED for Issue #22 |
+| Dashboard summary/trend backend APIs | MERGED |
+| Dashboard UI | IMPLEMENTED_UNMERGED on Issue #22 branch |
 | FastAPI analytics health scaffold | MERGED |
 | Category/priority suggestion service | OPTIONAL_STRETCH via Issue #23 |
 | Duplicate suggestion | DEFERRED_TO_V0_2 via Issue #24 |
@@ -42,16 +42,16 @@ flowchart LR
 ## Frontend
 
 The React TypeScript client owns the user-facing ticket workflow. `origin/main`
-includes the ticket workspace and Kanban surface. Dashboard charts are planned
-next after Issue #21 is merged. Authentication UI remains a frontend integration
-gap even though backend auth/RBAC exists.
+includes the ticket workspace and Kanban surface. Issue #22 adds the dashboard
+route, summary tiles, distribution charts, trend buckets, and dashboard states
+on its active branch. Authentication UI remains a frontend integration gap even
+though backend auth/RBAC exists.
 
 ## Backend
 
 The Spring Boot API owns authentication, authorization, ticket workflow rules,
-comments, activity history, and the source-of-truth ticket data. `origin/main`
-contains the core workflow endpoints. Issue #21 adds dashboard aggregation APIs
-on an unmerged branch.
+comments, activity history, dashboard aggregation, and the source-of-truth
+ticket data. `origin/main` contains the core workflow and dashboard endpoints.
 
 ## Analytics
 
