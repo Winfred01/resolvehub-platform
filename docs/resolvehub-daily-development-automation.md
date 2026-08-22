@@ -7,11 +7,39 @@
 - Schedule: Every day at 8:00 PM
 - Timezone: America/Toronto
 - Memory location: `$CODEX_HOME/automations/resolvehub-daily-mvp-development/memory.md`
-- Initial status: ACTIVE
+- Status: ACTIVE
+- Roadmap mode: `PORTFOLIO_FIRST_V0_1`
+- Auto merge: disabled
+
+## Authoritative Scope
+
+The current roadmap source is
+[portfolio-first-v0.1-roadmap.md](portfolio-first-v0.1-roadmap.md). The original
+14-day plan is historical baseline context and must not override
+Portfolio-first selection.
+
+The core v0.1 sequence is:
+
+```text
+#21 Dashboard APIs
+-> PR / review / merge
+-> #22 Dashboard UI
+-> documentation/status refresh
+-> scoped #26 QA/accessibility/security/E2E
+-> scoped #27 Docker/demo/portfolio release
+-> v0.1
+```
+
+Analytics scope:
+
+- `#23`: optional stretch goal for v0.1 only when
+  `ENABLE_V0_1_ANALYTICS_STRETCH = true`.
+- `#24`: deferred to v0.2.
+- `#25`: deferred to v0.2.
 
 ## Bootstrap Review Gate
 
-Initial gate values:
+Historical bootstrap values were:
 
 ```text
 bootstrap_review_required = true
@@ -19,90 +47,274 @@ allow_new_issue_selection = false
 allow_auto_merge = false
 ```
 
-While the bootstrap review gate is active, scheduled runs may only inspect the bootstrap state, Issue #2, current branch/PR status, validation results, and close out. They must not select Issue #3 or any other new issue, create business scaffolds, or bypass the gate.
-
-Only a later explicit Prompt 8B-2 may set:
+Bootstrap has completed and current values are:
 
 ```text
 bootstrap_review_required = false
 allow_new_issue_selection = true
+allow_auto_merge = false
 ```
 
-## Issue Selection Order
+Prompt 9-R1 and 9-R2 bootstrap transitions remain historical context only. Do
+not reactivate the bootstrap gate unless the user explicitly changes it.
 
-After the bootstrap gate is lifted, the automation selects one issue at a time:
+## Pre-run Requirements
 
-1. Exclude issues with an active open PR.
-2. Exclude issues whose dependencies are not complete.
-3. Exclude issues labeled `status:blocked`.
-4. Sort by `priority:p0`, then `priority:p1`, then `priority:p2`.
-5. For equal priority, follow dependency order from `docs/github-issue-map.md`.
-6. Check active worktrees and avoid file ownership conflicts.
+Every scheduled run must:
+
+1. Read automation memory first.
+2. Check local repository status.
+3. Fetch origin without force operations.
+4. Read current GitHub issue, PR, branch, and dependency state.
+5. Read project governance docs relevant to the active workstream.
+6. Preserve the privacy boundary: no Canada job-search automation, trackers,
+   Gmail data, application answers, resume data, browser sessions, cookies,
+   credentials, private addresses, phone numbers, or unrelated private data.
+
+## Workstream Classification
+
+The daily automation starts with:
+
+```text
+CREATED
+-> MEMORY_LOADED
+-> REPOSITORY_CHECKED
+-> GITHUB_STATE_READ
+-> WORKSTREAM_CLASSIFIED
+```
+
+After classification:
+
+### Case A: Existing implementation workstream
+
+If a branch or PR exists for the active issue, resume or reconcile that
+workstream. Do not select a new issue.
+
+### Case B: Implementation complete, PR missing
+
+Enter `PR_CREATION_PENDING`. If authorized PR creation fails, enter
+`PR_CREATION_BLOCKED` and report `BLOCKED_EXTERNAL_CLOSED` or
+`MANUAL_ACTION_REQUIRED_CLOSED` as appropriate. Do not reimplement the issue and
+do not select another issue.
+
+### Case C: PR open
+
+Enter `REVIEW_PENDING` or `CI_PENDING`. Read status only unless review requests
+code changes.
+
+### Case D: PR merged
+
+Reconcile issue closure and mark the workstream complete. Then and only then
+evaluate the next Portfolio-first roadmap action.
+
+### Case E: No active workstream
+
+Select the next eligible task according to:
+
+1. Portfolio-first roadmap order.
+2. Dependency completion.
+3. Priority.
+4. Worktree/file ownership conflicts.
+
+## Portfolio-first Issue Selection
+
+After #21 completes, select according to this order:
+
+1. #22.
+2. Documentation/status refresh if not already complete.
+3. Scoped #26.
+4. Scoped #27.
+5. v0.1 release readiness.
+
+Do not select #23 before v0.1 unless memory or configuration explicitly says:
+
+```text
+ENABLE_V0_1_ANALYTICS_STRETCH = true
+```
+
+Do not select #24 or #25 under `PORTFOLIO_FIRST_V0_1` unless the user later
+changes roadmap mode.
 
 ## Dependency Gate
 
-The automation must verify dependencies from the GitHub issue body and `docs/github-issue-map.md` before selecting work. It must not start a dependent issue while its prerequisite issue is still open or awaiting merge unless a later prompt explicitly changes the dependency policy.
+The automation must verify dependencies from live GitHub issue bodies and
+current planning docs. It must not rely on issue number order or the historical
+14-day sequence.
+
+#25 is not a hard dependency for Portfolio-first #26 or #27. Analytics-specific
+quality/release coverage can be added when #23/#24/#25 are implemented later.
 
 ## Branch And Worktree Strategy
 
-- One issue maps to one branch or worktree.
-- Use a dedicated branch/worktree only when actual file changes are needed.
-- Base issue branches on the current planning branch or the appropriate parent branch, not stale `main`.
-- Do not reuse another issue's worktree.
-- Stop and record a blocker if worktree ownership conflicts appear.
+- One active implementation issue maps to one branch or worktree.
+- Use a dedicated branch/worktree for real changes.
+- Do not reuse another active issue's worktree.
+- Historical merged branches or worktree directories do not block new issue
+  selection by themselves.
+- A branch/worktree counts as active only if it is associated with unmerged
+  implementation, an open PR, unresolved review/change requests, or another
+  incomplete current workstream.
+- Stop and record a blocker if real file ownership conflicts appear.
 
-## Test Gates
+## Stable External Blocker Policy
 
-Every run must execute the validation that applies to the selected issue. During bootstrap, the required validation is:
-
-```powershell
-node scripts/validate-planning-foundation.js
-node scripts/validate-github-metadata-state.js
-git diff --check
-```
-
-Application build claims are not allowed until the corresponding scaffold exists. Correct bootstrap build states are:
+Record a stable blocker fingerprint with:
 
 ```text
-Frontend build: Not applicable - scaffold not created
-Backend build: Not applicable - scaffold not created
-Analytics build: Not applicable - scaffold not created
+issue_number
+branch
+branch_head
+blocker_category
+blocker_reason
+pr_state
 ```
 
-## Security Gates
+If the fingerprint is unchanged from the previous run, close with
+`BLOCKED_EXTERNAL_CLOSED` or equivalent. In that state, do not:
 
-Every run must scan for secrets and private data before commit or GitHub update. The automation must not commit tokens, cookies, sessions, Gmail content, job-search data, browser data, private addresses, phone numbers, application answers, or real credentials.
+- rerun full tests;
+- modify code;
+- create a new repository run-log commit;
+- push a docs-only heartbeat;
+- create a duplicate branch;
+- select another issue;
+- repeatedly retry unsafe browser submission.
+
+Allowed actions are lightweight live Git/GitHub checks, automation memory
+heartbeat when required, and concise user-facing status.
+
+## Run-log Policy
+
+Repository run logs are written only for meaningful state transitions:
+
+- issue selected;
+- implementation started;
+- implementation completed;
+- validation materially changed;
+- branch first pushed;
+- Draft PR created;
+- CI failure discovered;
+- review changes requested;
+- PR merged;
+- issue closed;
+- blocker changed;
+- blocker resolved;
+- roadmap/governance materially changed.
+
+Do not create a run-log or commit for an unchanged blocker heartbeat.
+
+## Validation Tiers
+
+### Tier 1: Read-only reconciliation
+
+For unchanged external blockers, run live Git/PR state checks only. Do not run
+full test suites.
+
+### Tier 2: Documentation and governance changes
+
+Run:
+
+- planning validator;
+- portfolio roadmap validator;
+- relevant automation/state-machine tests;
+- GitHub metadata/privacy validator;
+- `git diff --check`;
+- targeted secret scan.
+
+### Tier 3: Scoped implementation
+
+Run tests relevant to the changed workstream.
+
+### Tier 4: Release candidate
+
+Run full required v0.1 validation: backend, frontend, included analytics
+components, security, accessibility, E2E, Docker, CI/release checks, and secret
+scans.
 
 ## PR Strategy
 
-- Create or update a Draft PR for issue branches that contain real changes.
+- Create or update a Draft PR for branches that contain real changes.
 - Do not mark Draft PRs ready for review automatically.
 - Do not merge PRs automatically.
-- Use explicit evidence comments for validation results.
+- Do not approve your own PR.
+- Do not enable auto-merge.
+- Use explicit evidence comments or PR body evidence for validation results.
+
+## PR Linkage Policy
+
+- Use `Closes #N` when the PR completes the entire linked issue.
+- Use `Related to #N` only for partial work.
+
+Do not use `Related to #N` by default for one-issue/one-PR implementation
+workstreams that satisfy the issue definition of done.
 
 ## Merge Strategy
 
-`allow_auto_merge = false`. Even when lint, tests, build, and security checks pass, the automation may only push a branch, create or update a Draft PR, and report readiness. Human review remains required.
+`allow_auto_merge = false`. Even when lint, tests, build, and security checks
+pass, the automation may only push a branch, create or update a Draft PR, and
+report readiness. Human review remains required.
 
-## Close-Out Rules
+## Terminal State Semantics
 
-Each run must end as `CLOSED` or `FAILED_CLOSED`. It must not remain in waiting states such as waiting for review, waiting for GitHub, waiting for dependency, waiting for user, or retrying indefinitely.
+The scheduler may still require every run to end with machine state `CLOSED` or
+`FAILED_CLOSED`. User-facing outcome semantics must be recorded separately:
 
-## Manual Run
+- `SUCCESS_CLOSED`: meaningful intended work completed.
+- `NO_CHANGE_CLOSED`: reconciliation found no required change.
+- `BLOCKED_EXTERNAL_CLOSED`: implementation is healthy but an external
+  integration, review, or tool blocks progress.
+- `MANUAL_ACTION_REQUIRED_CLOSED`: a specific user/admin action is required.
+- `FAILED_IMPLEMENTATION_CLOSED`: product implementation failed.
+- `FAILED_VALIDATION_CLOSED`: tests, security, or quality checks failed.
+- `MAINTENANCE_PENDING_CLOSED`: no more daily MVP implementation work should be
+  selected until the user approves the next mode.
 
-Manual bootstrap validation run:
+## Automation Memory Schema
+
+Memory should record at least:
 
 ```text
-run_id = prompt8b-bootstrap-001
-trigger_type = manual_bootstrap_validation
+roadmap_mode
+active_workstream
+active_issue
+active_branch
+active_pr
+implementation_state
+validation_state
+pr_state
+review_state
+merge_state
+issue_close_state
+blocker_category
+blocker_fingerprint
+last_meaningful_transition
+next_action
+v0_1_scope
+deferred_scope
+stretch_scope
 ```
 
-Future scheduled runs must use new run IDs and must not represent manual bootstrap validation as a scheduled success.
-
-## Disable Method
-
-Pause or disable this automation through the Codex automation controls for `resolvehub-daily-mvp-development`. Do not delete unrelated automations and do not modify Canada job-search automations.
+Do not store secrets or unrelated private data.
 
 ## MVP Completion Transition
 
-When all v0.1 issues are complete and release criteria pass, the automation should stop selecting daily MVP work and record a maintenance-pending state. It must not change its schedule by itself. It should report that weekly maintenance is recommended and wait for explicit user approval.
+When all Portfolio-first v0.1 criteria pass, do not automatically change the
+schedule. Set memory equivalent to:
+
+```text
+roadmap_mode = PORTFOLIO_FIRST_V0_1
+mvp_status = COMPLETE
+development_selection = PAUSED
+maintenance_status = PENDING_USER_APPROVAL
+```
+
+Report that weekly maintenance is recommended. Do not select #23/#24/#25 simply
+because daily execution still exists. Wait for explicit user approval before
+transitioning to maintenance, beginning v0.1.1/v0.2, or reactivating deferred
+analytics work.
+
+## Disable Method
+
+Pause or disable this automation through the Codex automation controls for
+`resolvehub-daily-mvp-development`. Do not delete unrelated automations and do
+not modify Canada job-search automations.

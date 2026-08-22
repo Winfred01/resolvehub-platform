@@ -4,6 +4,21 @@ Generated at: 2026-07-14T10:19:27Z
 
 Status: Prompt 8A-R2-3 completed the final Analytics, Dashboard, Quality, Deployment, and Portfolio batch. All 26 planned non-PR GitHub issues now have real issue numbers and URLs.
 
+Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+
+Current roadmap overlay:
+
+- This table was originally generated as the GitHub issue creation map. The
+  `open-created` status text is historical issue-creation evidence, not current
+  implementation state.
+- Active workstream: #21 until dashboard API PR/review/merge completes.
+- Next core v0.1 implementation issue: #22 after #21 merges.
+- #23 is optional stretch for v0.1 and valid v0.2 work if deferred.
+- #24 and #25 are deferred to v0.2 and are not Portfolio-first v0.1 blockers.
+- Scoped #26 depends on implemented core workflows plus #22, not full #25
+  analytics integration.
+- Scoped #27 depends on #22 and scoped #26, not full #25 analytics integration.
+
 | Plan # | GitHub # | Title | Milestone | Type | Area | Priority | Workstream | Dependencies | Blocks | GitHub URL | Status |
 |---:|---:|---|---|---|---|---|---|---|---|---|---|
 | 1 | #2 | Validate repository foundation and development conventions | v0.1 Foundation and Architecture | type:documentation | area:docs | priority:p0 | product/prd | none | #3, #4, #5, #6 | https://github.com/Winfred01/resolvehub-platform/issues/2 | open-created |
@@ -27,8 +42,8 @@ Status: Prompt 8A-R2-3 completed the final Analytics, Dashboard, Quality, Deploy
 | 19 | #20 | Build responsive Kanban workflow | v0.1 Core Ticket Workflow | type:feature | area:frontend | priority:p1 | frontend/core-ui | #19, #14 | none | https://github.com/Winfred01/resolvehub-platform/issues/20 | open-created |
 | 20 | #21 | Implement dashboard summary and trend APIs | v0.1 Analytics and Dashboard | type:feature | area:backend | priority:p1 | backend/core-api | #15, #18 | #22 | https://github.com/Winfred01/resolvehub-platform/issues/21 | open-created |
 | 21 | #22 | Build responsive dashboard charts | v0.1 Analytics and Dashboard | type:feature | area:frontend | priority:p1 | frontend/core-ui | #3, #21 | #26, #27 | https://github.com/Winfred01/resolvehub-platform/issues/22 | open-created |
-| 22 | #23 | Implement category and priority suggestion service | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | #5, #13 | #25 | https://github.com/Winfred01/resolvehub-platform/issues/23 | open-created |
-| 23 | #24 | Implement duplicate ticket suggestion | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | #5, #15 | #25 | https://github.com/Winfred01/resolvehub-platform/issues/24 | open-created |
-| 24 | #25 | Integrate analytics suggestions with ticket workflow | v0.1 Analytics and Dashboard | type:feature | area:frontend, area:backend, area:analytics | priority:p1 | analytics/service | #23, #24, #13, #19 | #26, #27 | https://github.com/Winfred01/resolvehub-platform/issues/25 | open-created |
-| 25 | #26 | Add integrated quality, accessibility, security and E2E gates | v0.1 Quality, Deployment and Portfolio | type:test, type:security | area:infrastructure | priority:p0 | qa/test-suite | #8, #12, #20, #25, #22 | #27 | https://github.com/Winfred01/resolvehub-platform/issues/26 | open-created |
-| 26 | #27 | Complete Docker demo deployment, seeded data and v0.1 portfolio release | v0.1 Quality, Deployment and Portfolio | type:infrastructure, type:documentation | area:infrastructure, area:docs | priority:p1 | infrastructure/deployment | #7, #8, #26, #22, #25 | none | https://github.com/Winfred01/resolvehub-platform/issues/27 | open-created |
+| 22 | #23 | Implement category and priority suggestion service | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | #5, #13 | optional input to #25 in v0.2 | https://github.com/Winfred01/resolvehub-platform/issues/23 | open-created; optional-stretch |
+| 23 | #24 | Implement duplicate ticket suggestion | v0.1 Analytics and Dashboard | type:feature | area:analytics | priority:p1 | analytics/service | #5, #15 | optional input to #25 in v0.2 | https://github.com/Winfred01/resolvehub-platform/issues/24 | open-created; deferred-v0.2 |
+| 24 | #25 | Integrate analytics suggestions with ticket workflow | v0.1 Analytics and Dashboard | type:feature | area:frontend, area:backend, area:analytics | priority:p1 | analytics/service | #23, #24, #13, #19 | v0.2 analytics release path | https://github.com/Winfred01/resolvehub-platform/issues/25 | open-created; deferred-v0.2 |
+| 25 | #26 | Add integrated quality, accessibility, security and E2E gates | v0.1 Quality, Deployment and Portfolio | type:test, type:security | area:infrastructure | priority:p0 | qa/test-suite | #8, #12, #20, #22 for Portfolio-first v0.1; analytics-specific gates after #23/#24/#25 | #27 | https://github.com/Winfred01/resolvehub-platform/issues/26 | open-created; scoped-v0.1 |
+| 26 | #27 | Complete Docker demo deployment, seeded data and v0.1 portfolio release | v0.1 Quality, Deployment and Portfolio | type:infrastructure, type:documentation | area:infrastructure, area:docs | priority:p1 | infrastructure/deployment | #7, #8, #26, #22 for Portfolio-first v0.1; analytics optional/stretch | none | https://github.com/Winfred01/resolvehub-platform/issues/27 | open-created; scoped-v0.1 |

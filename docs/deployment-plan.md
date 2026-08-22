@@ -1,6 +1,11 @@
 # Deployment Plan
 
-Current status: planning only. No deployment has been created.
+Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+
+Current status: Docker Compose and CI foundations exist, but the final
+portfolio demo release package is not complete. The v0.1 demo path depends on
+#22 dashboard UI, scoped #26 validation, and scoped #27 demo/release work. Full
+#24/#25 analytics completion is not a v0.1 release prerequisite.
 
 ## Demo Hosting Options
 
@@ -11,7 +16,10 @@ Current status: planning only. No deployment has been created.
 
 ## Recommended MVP Demo Path
 
-Use Docker Compose locally first. After local smoke tests pass, choose a low-cost hosted frontend and backend option with managed PostgreSQL if the demo needs to be public.
+Use Docker Compose locally first. After local smoke tests pass, prepare
+portfolio release notes, screenshots, and a demo script. Choose a low-cost
+hosted frontend and backend option with managed PostgreSQL only if the demo
+needs to be public.
 
 ## Environment Variables
 
@@ -26,6 +34,9 @@ Run database migrations during deployment or as a controlled release step.
 - Backend: `/actuator/health` or equivalent.
 - Analytics: `/analytics/health`.
 - Frontend: static asset availability.
+
+Analytics health can remain part of the stack smoke test even when #23/#24/#25
+feature work is deferred.
 
 ## Logging
 
