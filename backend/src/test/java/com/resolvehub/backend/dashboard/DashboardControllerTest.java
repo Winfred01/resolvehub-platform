@@ -141,6 +141,70 @@ class DashboardControllerTest {
     }
 
     @Test
+    void trendEndpointReturnsOrderedWeeklyBucketsStartingOnMondayUtc() throws Exception {
+        String requesterAuthorization = registerAndLogin("dashboard-weekly-owner@example.test", "Dashboard Weekly Owner");
+        String leadAuthorization = authorizationHeaderFor(saveAccount("dashboard-weekly-lead@example.test", AccountRole.TEAM_LEAD));
+
+        String sundayTicketId = fieldFrom(createTicket(
+                requesterAuthorization,
+                "Sunday weekly trend ticket",
+                "Sunday fictional trend description.",
+                "general",
+                "LOW"), "id");
+        String mondayTicketId = fieldFrom(createTicket(
+                requesterAuthorization,
+                "Monday weekly trend ticket",
+                "Monday fictional trend description.",
+                "network",
+                "HIGH"), "id");
+        String nextWeekTicketId = fieldFrom(createTicket(
+                requesterAuthorization,
+                "Next week trend ticket",
+                "Next week fictional trend description.",
+                "workflow",
+                "MEDIUM"), "id");
+
+        setTicketCreatedAt(sundayTicketId, "2026-08-02T23:15:00Z");
+        setTicketCreatedAt(mondayTicketId, "2026-08-03T00:30:00Z");
+        setTicketCreatedAt(nextWeekTicketId, "2026-08-10T09:45:00Z");
+
+        moveStatus(leadAuthorization, mondayTicketId, "TRIAGED");
+        setLatestStatusMovementAt(mondayTicketId, "2026-08-04T12:00:00Z");
+        moveStatus(leadAuthorization, nextWeekTicketId, "TRIAGED");
+        setLatestStatusMovementAt(nextWeekTicketId, "2026-08-11T14:30:00Z");
+
+        mockMvc.perform(get("/api/dashboard/trends")
+                        .header(HttpHeaders.AUTHORIZATION, leadAuthorization)
+                        .param("from", "2026-08-01T00:00:00Z")
+                        .param("to", "2026-08-15T00:00:00Z")
+                        .param("granularity", "weekly"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.granularity").value("WEEKLY"))
+                .andExpect(jsonPath("$.buckets", hasSize(3)))
+                .andExpect(jsonPath("$.buckets[*].bucketStart", contains("2026-07-27", "2026-08-03", "2026-08-10")))
+                .andExpect(jsonPath("$.buckets[0].createdTickets").value(1))
+                .andExpect(jsonPath("$.buckets[0].statusMovements").value(0))
+                .andExpect(jsonPath("$.buckets[1].createdTickets").value(1))
+                .andExpect(jsonPath("$.buckets[1].statusMovements").value(1))
+                .andExpect(jsonPath("$.buckets[2].createdTickets").value(1))
+                .andExpect(jsonPath("$.buckets[2].statusMovements").value(1));
+    }
+
+    @Test
+    void adminCanReadDashboardSummary() throws Exception {
+        String requesterAuthorization = registerAndLogin("dashboard-admin-owner@example.test", "Dashboard Admin Owner");
+        String adminAuthorization = authorizationHeaderFor(saveAccount("dashboard-admin@example.test", AccountRole.ADMIN));
+
+        createTicket(requesterAuthorization, "Admin visible dashboard ticket", "Fictional admin dashboard description.", "general", "LOW");
+
+        mockMvc.perform(get("/api/dashboard/summary")
+                        .header(HttpHeaders.AUTHORIZATION, adminAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalTickets").value(1))
+                .andExpect(jsonPath("$.openTickets").value(1));
+    }
+
+    @Test
     void dashboardRequiresLeadOrAdminAndValidQueryParameters() throws Exception {
         mockMvc.perform(get("/api/dashboard/summary"))
                 .andExpect(status().isUnauthorized())
