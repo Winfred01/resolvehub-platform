@@ -1,22 +1,44 @@
-# Planned Resume Bullet Candidates
+# Portfolio Evidence Drafting Notes
 
-Current status: planning only. These bullets must not be used as completed implementation claims until code exists and is verified.
+Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-## Safe Current Wording
+This file is not a formal resume. Use it only as draft portfolio wording after
+verifying the current code and release status. Do not claim unmerged branches,
+deferred analytics, public deployment, or production readiness as completed
+work.
 
-- Designed and documented the product, architecture, API contract, database schema, security model, and testing strategy for ResolveHub, a planned full-stack technical support and issue management platform.
-- Structured a portfolio repository plan with separated frontend, backend, analytics, database, infrastructure, QA, and documentation workstreams.
-- Defined MVP scope, user stories, GitHub issue plan, milestone plan, branch/worktree strategy, and 14-day development roadmap.
+## Currently Defensible Portfolio Wording
+
+- Built a ResolveHub MVP repository with React/TypeScript frontend, Spring Boot
+  backend, FastAPI service scaffold, Docker Compose foundation, GitHub Actions
+  CI, and documented security/testing practices.
+- Implemented core support-ticket backend workflows including authentication,
+  role-based authorization, ticket create/detail/list/update/search/filter,
+  assignment, comments, and activity history.
+- Implemented a React ticket workspace with list/detail/create/edit flows and a
+  responsive Kanban workflow backed by typed API boundaries.
+- Maintained portfolio-focused documentation that distinguishes merged
+  functionality, active unmerged workstreams, planned work, and deferred v0.2
+  analytics scope.
+
+## Wording That Requires More Evidence
+
+Use only after the relevant work is merged and validated:
+
+- Dashboard APIs are complete on main.
+- Dashboard UI is complete.
+- Integrated E2E/accessibility/security gates are complete.
+- Docker demo release package is complete.
+- ResolveHub v0.1 is released.
 
 ## Not Yet Allowed
 
 Do not claim:
 
-- Built a React platform.
-- Implemented Spring Boot APIs.
-- Deployed Docker services.
-- Created an AI classifier.
-- Completed authentication.
-- Released a production-ready product.
-
-React, TypeScript, Spring Boot, FastAPI, PostgreSQL, and Docker should not be added as completed project evidence until implementation exists.
+- Public production deployment.
+- Production-grade PostgreSQL operations.
+- Production-ready security hardening.
+- AI/ML classifier or external AI integration.
+- Duplicate detection or full analytics workflow integration.
+- Completion of #21 until its PR/merge lifecycle is done.
+- Completion of #24/#25 under Portfolio-first v0.1.

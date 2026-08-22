@@ -1,8 +1,15 @@
 # Demo Plan
 
+Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+
 ## Demo Story
 
 The demo should show a requester creating a support ticket, an agent triaging it, a team lead reviewing dashboard metrics, and an admin managing roles.
+
+Full analytics workflow integration is not required for the Portfolio-first v0.1
+demo. Category/priority suggestions may be shown only if optional Issue #23 is
+enabled and completed before release. Duplicate suggestions and full analytics
+workflow integration are v0.2 work.
 
 ## Demo Data
 
@@ -22,12 +29,15 @@ The demo should be resettable to a known fictional dataset.
 2. Create ticket.
 3. Log in as agent.
 4. Triage and comment.
-5. Review analytics suggestion.
-6. Move ticket through workflow.
+5. Move ticket through workflow.
+6. Review Kanban state.
 7. Log in as lead.
 8. Review dashboard.
 9. Log in as admin.
 10. Review role management and audit notes.
+
+Optional stretch step: review category/priority suggestion if #23 is completed
+and included in the release.
 
 ## Screenshots
 
