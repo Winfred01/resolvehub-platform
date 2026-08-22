@@ -6,10 +6,11 @@ authorization, dashboard reporting, and portfolio-ready engineering practice.
 
 Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-Current status: the core ticket workflow is implemented on `origin/main`;
-Issue #21 dashboard APIs are implemented on the active branch
-`backend/issue-21-dashboard-apis` but are not yet merged; dashboard UI,
-portfolio-focused quality gates, and the v0.1 demo release remain.
+Current status: the core ticket workflow and Issue #21 dashboard APIs are
+merged on `origin/main`; Issue #22 dashboard UI is implemented on the active
+branch `frontend/issue-22-dashboard-ui` and awaits PR/review/merge before it
+becomes mainline. The documentation/status refresh, portfolio-focused quality
+gates, and the v0.1 demo release remain.
 
 ## Problem
 
@@ -53,8 +54,8 @@ portfolio-focused v0.1 release. See
 | Assignment, comments, and activity history backend | MERGED | `origin/main` |
 | Ticket frontend workflow | MERGED | `origin/main` |
 | Kanban workflow | MERGED | `origin/main` |
-| Dashboard backend APIs | IMPLEMENTED_UNMERGED | `backend/issue-21-dashboard-apis` |
-| Dashboard frontend | PLANNED | next roadmap issue #22 |
+| Dashboard backend APIs | MERGED | `origin/main` |
+| Dashboard frontend | IMPLEMENTED_UNMERGED | `frontend/issue-22-dashboard-ui` |
 | FastAPI analytics scaffold and health endpoint | MERGED | `origin/main` |
 | Category/priority suggestion service | OPTIONAL_STRETCH | issue #23 |
 | Duplicate suggestion | DEFERRED | issue #24 |
