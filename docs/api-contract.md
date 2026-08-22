@@ -119,6 +119,16 @@ users return 404 without exposing sensitive fields.
 | `GET /api/dashboard/summary` | Summary metrics | Required | lead, admin | date range | counts | 401,403 | date range | read-only |
 | `GET /api/dashboard/trends` | Trend metrics | Required | lead, admin | date range, granularity | time series | 401,403 | granularity enum | read-only |
 
+Implemented dashboard fields for the initial Issue #21 slice:
+
+- `GET /api/dashboard/summary` accepts optional `from` and `to` query parameters as ISO-8601 instants.
+- Summary responses expose `totalTickets`, `openTickets`, `inProgressTickets`, `resolvedTickets`, `closedTickets`, `statusDistribution`, `categoryDistribution`, and `priorityDistribution`.
+- `GET /api/dashboard/trends` accepts optional `from`, `to`, and `granularity`; `granularity` defaults to `DAILY` and may be `DAILY` or `WEEKLY`.
+- Trend responses expose `granularity` and ordered `buckets`; each bucket includes `bucketStart`, `createdTickets`, and `statusMovements`.
+- Ticket creations are grouped from ticket `createdAt` values. Status movements are grouped from `TICKET_UPDATED` activity rows whose safe field summary includes `status`.
+- Dashboard endpoints require `TEAM_LEAD` or `ADMIN` through `VIEW_DASHBOARD`; missing credentials return 401 and lower roles return 403.
+- Dashboard responses expose aggregate counts only. They do not include ticket descriptions, comment bodies, requester identities, assignee identities, credentials, tokens, sessions, passwords, or password hashes.
+
 ## Analytics
 
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |

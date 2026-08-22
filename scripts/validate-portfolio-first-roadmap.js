@@ -15,6 +15,14 @@ function requireIncludes(filePath, needle, label = needle) {
   }
 }
 
+function requireIncludesNormalized(filePath, needle, label = needle) {
+  const text = read(filePath).replace(/\s+/g, " ");
+  const normalizedNeedle = needle.replace(/\s+/g, " ");
+  if (!text.includes(normalizedNeedle)) {
+    errors.push(`${filePath} missing ${label}`);
+  }
+}
+
 function requireNotIncludes(filePath, needle, label = needle) {
   const text = read(filePath);
   if (text.includes(needle)) {
@@ -40,7 +48,7 @@ if (!errors.length) {
   }
 
   requireIncludes(plan, "historical baseline", "historical baseline marker");
-  requireIncludes(plan, "no longer the\nauthoritative automation issue-selection source", "14-day deactivation");
+  requireIncludesNormalized(plan, "no longer the authoritative automation issue-selection source", "14-day deactivation");
 
   requireIncludes(roadmap, "#21 Dashboard APIs", "Issue #21 roadmap start");
   requireIncludes(roadmap, "Issue #24 and Issue #25 are not required", "v0.1 analytics deferral");
