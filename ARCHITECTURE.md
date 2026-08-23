@@ -4,10 +4,9 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
 Current status: ResolveHub is no longer planning-only. `origin/main` contains
 the frontend scaffold, Spring Boot backend, auth/RBAC, ticket backend workflow,
-ticket frontend workflow, Kanban, dashboard backend APIs, FastAPI health
-scaffold, Docker Compose foundation, and GitHub Actions CI. Issue #22 dashboard
-UI is implemented on `frontend/issue-22-dashboard-ui` and awaits PR/merge before
-it becomes mainline architecture.
+ticket frontend workflow, Kanban, dashboard backend APIs, dashboard UI, FastAPI
+health scaffold, Docker Compose foundation, and GitHub Actions CI. Scoped #26
+quality gates and scoped #27 demo/release work remain before v0.1 readiness.
 
 ## System Context
 
@@ -31,7 +30,7 @@ flowchart LR
 | Ticket create/detail/update/search/filter backend | MERGED |
 | Assignment, comments, and activity history backend | MERGED |
 | Dashboard summary/trend backend APIs | MERGED |
-| Dashboard UI | IMPLEMENTED_UNMERGED on Issue #22 branch |
+| Dashboard UI | MERGED via PR #48 |
 | FastAPI analytics health scaffold | MERGED |
 | Category/priority suggestion service | OPTIONAL_STRETCH via Issue #23 |
 | Duplicate suggestion | DEFERRED_TO_V0_2 via Issue #24 |
@@ -42,10 +41,10 @@ flowchart LR
 ## Frontend
 
 The React TypeScript client owns the user-facing ticket workflow. `origin/main`
-includes the ticket workspace and Kanban surface. Issue #22 adds the dashboard
-route, summary tiles, distribution charts, trend buckets, and dashboard states
-on its active branch. Authentication UI remains a frontend integration gap even
-though backend auth/RBAC exists.
+includes the ticket workspace, Kanban surface, and dashboard route. The
+dashboard renders summary tiles, distribution charts, trend buckets, and
+responsive dashboard states from the backend dashboard APIs. Authentication UI
+remains a frontend integration gap even though backend auth/RBAC exists.
 
 ## Backend
 
@@ -105,7 +104,7 @@ validation before declaring the release complete.
 3. Support roles triage, assign, comment, and update status/priority.
 4. Ticket mutations append activity history.
 5. Kanban presents workflow state in the frontend.
-6. Dashboard UI will read summary/trend APIs after #21 and #22 are complete.
+6. Dashboard UI reads summary/trend APIs now that #21 and #22 are merged.
 
 ## Analytics Suggestion Flow
 

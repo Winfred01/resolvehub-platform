@@ -11,8 +11,9 @@ Current roadmap overlay:
 - This table was originally generated as the GitHub issue creation map. The
   `open-created` status text is historical issue-creation evidence, not current
   implementation state.
-- Active workstream: #21 until dashboard API PR/review/merge completes.
-- Next core v0.1 implementation issue: #22 after #21 merges.
+- Active workstream: documentation/status refresh after #22 merge; scoped #26
+  is next after this PR lifecycle completes.
+- Next core v0.1 action: documentation/status refresh after #22 merge, then scoped #26.
 - #23 is optional stretch for v0.1 and valid v0.2 work if deferred.
 - #24 and #25 are deferred to v0.2 and are not Portfolio-first v0.1 blockers.
 - Scoped #26 depends on implemented core workflows plus #22, not full #25
