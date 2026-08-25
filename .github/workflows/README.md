@@ -27,3 +27,18 @@ publish containers, or require secret-bearing environment variables.
 The workflow uses placeholder-only repository data and read-only repository
 permissions. Deployment, container publishing, cloud credentials, and release
 automation remain out of scope for this issue.
+
+## Auto Draft PR Handoff
+
+`auto-draft-pr-handoff.yml` creates missing Draft PRs for eligible pushed branches
+and for eligible historical branches discovered by the hourly/manual scan.
+
+Eligible branches are issue workstream branches containing `/issue-<number>-`
+and documentation status-refresh branches matching `docs/status-refresh-*`.
+The workflow skips `main`, `master`, branches already contained in `main`, and
+branches that already have any open or closed PR targeting `main`.
+
+The workflow uses the built-in `${{ github.token }}` with `contents: read`,
+`issues: read`, and `pull-requests: write`. It does not use a PAT, approve PRs,
+mark PRs Ready for Review, merge PRs, enable auto-merge, force-push, close
+issues directly, or modify labels/milestones.

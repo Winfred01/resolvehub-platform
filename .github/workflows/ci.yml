@@ -28,6 +28,9 @@ jobs:
       - name: Validate Portfolio-first roadmap
         run: node scripts/validate-portfolio-first-roadmap.js
 
+      - name: Validate Auto Draft PR handoff
+        run: node scripts/validate-auto-draft-pr-handoff.js
+
       - name: Validate GitHub metadata and privacy state
         run: node scripts/validate-github-metadata-state.js
 
