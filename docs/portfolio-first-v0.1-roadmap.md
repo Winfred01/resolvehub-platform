@@ -18,10 +18,9 @@ override this dependency-aware roadmap.
 -> v0.1
 ```
 
-Issue #21 remains the active workstream until its PR/merge lifecycle is
-complete. If the branch is implemented and pushed but PR creation remains
-blocked by external GitHub integration permissions, the automation must report a
-manual/external blocker and must not start Issue #22.
+Issue #21 and Issue #22 are merged on `origin/main` through PR #47 and PR #48.
+The current Portfolio-first action is this documentation/status refresh before
+scoped Issue #26 is selected.
 
 ## v0.1 Must-have
 
@@ -103,8 +102,8 @@ Issue #24 and Issue #25 are not required for Portfolio-first v0.1 completion.
 
 | Issue | Portfolio-first v0.1 semantics |
 |---|---|
-| #21 | Active workstream. Must reach PR/review/merge before #22 starts. |
-| #22 | Next implementation work after #21 merges. |
+| #21 | Completed and merged through PR #47. |
+| #22 | Completed and merged through PR #48. |
 | #23 | Optional stretch only; not a core v0.1 blocker. |
 | #24 | Deferred to v0.2; not a v0.1 blocker. |
 | #25 | Deferred to v0.2; not a v0.1 blocker. |
@@ -115,11 +114,10 @@ Issue #24 and Issue #25 are not required for Portfolio-first v0.1 completion.
 
 When no active workstream is present, select in this order:
 
-1. #22 after #21 is merged.
-2. Documentation/status refresh if not already complete.
-3. Scoped #26.
-4. Scoped #27.
-5. v0.1 release readiness.
+1. Documentation/status refresh after #22 merge if not already complete.
+2. Scoped #26.
+3. Scoped #27.
+4. v0.1 release readiness.
 
 Do not select #23 before v0.1 unless `ENABLE_V0_1_ANALYTICS_STRETCH = true`.
 Do not select #24 or #25 under `PORTFOLIO_FIRST_V0_1` unless the user changes
