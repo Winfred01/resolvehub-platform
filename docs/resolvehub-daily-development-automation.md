@@ -92,10 +92,16 @@ workstream. Do not select a new issue.
 
 ### Case B: Implementation complete, PR missing
 
-Enter `PR_CREATION_PENDING`. If authorized PR creation fails, enter
-`PR_CREATION_BLOCKED` and report `BLOCKED_EXTERNAL_CLOSED` or
-`MANUAL_ACTION_REQUIRED_CLOSED` as appropriate. Do not reimplement the issue and
-do not select another issue.
+Enter `PR_HANDOFF_PENDING` after a validated branch is pushed. The repository
+Auto Draft PR Handoff workflow is the primary PR creation path. If the workflow
+creates a Draft PR, enter `DRAFT_PR_OPEN` on the next reconciliation. If the
+workflow is disabled, unavailable, or failed and no other authorized PR creation
+path exists, enter `PR_HANDOFF_FAILED`.
+
+The older `PR_CREATION_PENDING` and `PR_CREATION_BLOCKED` terms remain historical
+aliases for pre-handoff runs. A GitHub connector `403 Resource not accessible by
+integration` is no longer enough by itself to declare a permanent manual handoff
+blocker when Auto Draft PR Handoff is enabled on `main`.
 
 ### Case C: PR open
 
@@ -318,3 +324,121 @@ analytics work.
 Pause or disable this automation through the Codex automation controls for
 `resolvehub-daily-mvp-development`. Do not delete unrelated automations and do
 not modify Canada job-search automations.
+
+## Auto Draft PR Handoff
+
+After a validated implementation or documentation branch is pushed, the
+repository Auto Draft PR Handoff workflow is the primary PR creation path:
+
+```text
+branch pushed
+-> PR_HANDOFF_PENDING
+-> GitHub Actions creates Draft PR
+-> DRAFT_PR_OPEN
+```
+
+The workflow is `.github/workflows/auto-draft-pr-handoff.yml`. It runs on pushes
+to eligible branches, manual `workflow_dispatch`, and an hourly fallback scan at
+`17 * * * *` so branches that existed before the workflow was merged can be
+backfilled without heartbeat commits.
+
+Eligible branches are:
+
+- issue workstream branches containing `/issue-<number>-`, such as
+  `backend/issue-21-dashboard-apis`, `frontend/issue-22-dashboard-ui`,
+  `qa/issue-26-quality-gates`, and `release/issue-27-v0.1-release`;
+- documentation status-refresh branches matching `docs/status-refresh-*`.
+
+The workflow skips:
+
+- `main` and `master`;
+- branches already contained in `main`;
+- branches that already have an open or closed PR targeting `main` for the exact
+  head branch.
+
+During `PR_HANDOFF_PENDING`:
+
+- implementation remains complete;
+- validation remains valid;
+- do not reimplement;
+- do not create a new implementation branch;
+- do not create a heartbeat commit merely to retrigger the workflow;
+- do not select the next issue;
+- do not rerun heavy validation solely because the PR is not visible yet.
+
+Classify `PR_HANDOFF_FAILED` only when the GitHub Actions workflow itself is
+disabled, unavailable, or has failed and there is no other authorized PR creation
+path. If repository-level Actions permissions prevent PR creation, classify
+`ONE_TIME_REPOSITORY_SETTING_REQUIRED` and give only this setup path:
+
+```text
+Repository -> Settings -> Actions -> General -> Workflow permissions -> enable "Allow GitHub Actions to create and approve pull requests"
+```
+
+The workflow still only creates Draft PRs. It must not mark PRs Ready for Review,
+approve PRs, merge PRs, enable auto-merge, force-push, close issues directly,
+modify labels or milestones, request PATs, read credentials, read browser state,
+or access Canada job-search, Gmail, resume, browser-session, or unrelated private
+data.
+
+### GitHub Connector Fallback Semantics
+
+If connector PR creation fails with `403 Resource not accessible by integration`:
+
+1. Check whether Auto Draft PR Handoff is enabled on `main`.
+2. Check whether a relevant workflow run exists or is expected.
+3. Enter `PR_HANDOFF_PENDING`.
+4. Stop repository mutation for that run.
+5. Reconcile on the next scheduled run.
+
+If the Draft PR appears, enter `DRAFT_PR_OPEN`. If the Actions workflow itself
+fails, enter `PR_HANDOFF_FAILED`. If the repository setting prevents GitHub
+Actions PR creation, enter `ONE_TIME_REPOSITORY_SETTING_REQUIRED`. Do not treat
+an expected asynchronous handoff as a stable external blocker.
+
+### Scheduler Prompt Sync Block
+
+Repo governance has been updated here, but the real Codex scheduler
+configuration is not proven to be repository-sourced. Until the scheduler source
+is verified, classify scheduler synchronization as `USER_UPDATE_REQUIRED`.
+
+Paste this block once into the real `ResolveHub Daily MVP Development`
+automation instructions:
+
+```text
+Automatic Draft PR handoff:
+After an eligible validated branch is pushed, use repository Auto Draft PR
+Handoff as the primary PR creation path. The workflow is
+.github/workflows/auto-draft-pr-handoff.yml and runs on eligible branch pushes,
+workflow_dispatch, and hourly fallback scan at 17 * * * *.
+
+Eligible branches: branches containing /issue-<number>- and docs/status-refresh-*.
+Skip main, master, branches already contained in main, and branches that already
+have any open or closed PR targeting main for the exact head branch.
+
+Lifecycle:
+branch pushed -> PR_HANDOFF_PENDING -> GitHub Actions creates Draft PR ->
+DRAFT_PR_OPEN.
+
+During PR_HANDOFF_PENDING: implementation remains complete, validation remains
+valid, no reimplementation, no new implementation branch, no heartbeat commit,
+no next Issue selection, and no heavy validation rerun solely because the PR is
+not visible yet.
+
+Connector 403 no longer means permanent manual handoff when Auto Draft PR
+Handoff is enabled. If connector PR creation returns 403, check whether the
+auto-handoff workflow is enabled on main and whether a relevant workflow run is
+expected, then enter PR_HANDOFF_PENDING and reconcile on the next scheduled run.
+
+Classify PR_HANDOFF_FAILED only when the GitHub Actions workflow is disabled,
+unavailable, or failed and there is no other authorized PR creation path. If the
+repository setting prevents GitHub Actions PR creation, classify
+ONE_TIME_REPOSITORY_SETTING_REQUIRED and give this setup path:
+Repository -> Settings -> Actions -> General -> Workflow permissions -> enable
+"Allow GitHub Actions to create and approve pull requests".
+
+The workflow may only create Draft PRs. It must never mark Ready for Review,
+approve, merge, enable auto-merge, force-push, close issues outside merged PR
+lifecycle, modify credentials, use PATs, read browser cookies/sessions, or touch
+private/job-search/Gmail/resume/browser-session data.
+```

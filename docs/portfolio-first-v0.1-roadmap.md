@@ -206,3 +206,20 @@ maintenance_status = PENDING_USER_APPROVAL
 Report that weekly maintenance is recommended and wait for explicit user
 approval before transitioning to maintenance, beginning v0.1.1/v0.2, or
 reactivating deferred analytics work.
+
+## Auto Draft PR Handoff Overlay
+
+For Portfolio-first workstreams, a pushed and validated branch without a visible
+PR now enters `PR_HANDOFF_PENDING` when `.github/workflows/auto-draft-pr-handoff.yml`
+is enabled on `main`. The automation must wait for the GitHub Actions handoff
+instead of repeatedly classifying connector `403 Resource not accessible by
+integration` as a permanent manual blocker.
+
+If the Draft PR appears, continue as `DRAFT_PR_OPEN`. If the workflow is
+disabled, unavailable, or failed, classify `PR_HANDOFF_FAILED`. If repository
+Actions settings prevent PR creation, classify `ONE_TIME_REPOSITORY_SETTING_REQUIRED`.
+
+The status-refresh branch `docs/status-refresh-after-issue22` is an expected
+backfill candidate after the workflow is merged. Its automated Draft PR must not
+include `Closes #22` or `Closes #26`; it is documentation/governance handoff
+only, and scoped #26 remains blocked until that PR lifecycle completes.

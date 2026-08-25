@@ -1,0 +1,154 @@
+name: Auto Draft PR Handoff
+
+on:
+  push:
+    branches:
+      - "**/issue-*-*"
+      - "docs/status-refresh-*"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
+jobs:
+  auto-draft-pr:
+    name: Create missing Draft PRs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Draft PRs for eligible pushed branches
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const policy = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/auto-draft-pr-handoff-policy.js`);
+            const { owner, repo } = context.repo;
+            const base = "main";
+
+            async function listCandidateBranches() {
+              const candidates = new Set();
+              if (context.eventName === "push" && context.ref && context.ref.startsWith("refs/heads/")) {
+                candidates.add(context.ref.replace("refs/heads/", ""));
+              }
+
+              if (context.eventName === "schedule" || context.eventName === "workflow_dispatch") {
+                const branches = await github.paginate(github.rest.repos.listBranches, {
+                  owner,
+                  repo,
+                  per_page: 100,
+                });
+                for (const branch of branches) {
+                  candidates.add(branch.name);
+                }
+              }
+
+              return [...candidates].filter(policy.isEligibleBranch).sort();
+            }
+
+            async function branchExists(branch) {
+              try {
+                await github.rest.repos.getBranch({ owner, repo, branch });
+                return true;
+              } catch (error) {
+                if (error.status === 404) return false;
+                throw error;
+              }
+            }
+
+            async function isMergedToMain(branch) {
+              const comparison = await github.rest.repos.compareCommitsWithBasehead({
+                owner,
+                repo,
+                basehead: `${base}...${branch}`,
+              });
+              return comparison.data.ahead_by === 0;
+            }
+
+            async function hasAnyPrTargetingMain(branch) {
+              const prs = await github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: "all",
+                head: `${owner}:${branch}`,
+                base,
+                per_page: 100,
+              });
+              return prs.length > 0;
+            }
+
+            async function createDraftPr(branch) {
+              if (policy.isDocsStatusRefreshBranch(branch)) {
+                return github.rest.pulls.create({
+                  owner,
+                  repo,
+                  base,
+                  head: branch,
+                  draft: true,
+                  maintainer_can_modify: false,
+                  title: policy.titleForDocsStatusRefresh(branch),
+                  body: policy.docsStatusRefreshPrBody(branch),
+                });
+              }
+
+              const issueNumber = policy.getIssueNumber(branch);
+              if (!issueNumber) {
+                core.info(`Skipping ${branch}: no issue number found.`);
+                return null;
+              }
+
+              const issue = await github.rest.issues.get({ owner, repo, issue_number: issueNumber });
+              return github.rest.pulls.create({
+                owner,
+                repo,
+                base,
+                head: branch,
+                draft: true,
+                maintainer_can_modify: false,
+                title: policy.titleForIssueBranch(branch, issueNumber, issue.data.title),
+                body: policy.issuePrBody(branch, issueNumber),
+              });
+            }
+
+            const candidates = await listCandidateBranches();
+            core.info(`Candidate branches: ${candidates.length ? candidates.join(", ") : "none"}`);
+
+            for (const branch of candidates) {
+              if (!(await branchExists(branch))) {
+                core.info(`Skipping ${branch}: branch no longer exists.`);
+                continue;
+              }
+
+              if (await isMergedToMain(branch)) {
+                core.info(`Skipping ${branch}: branch is already contained in ${base}.`);
+                continue;
+              }
+
+              if (await hasAnyPrTargetingMain(branch)) {
+                core.info(`Skipping ${branch}: a PR already exists for this exact head and base.`);
+                continue;
+              }
+
+              try {
+                const result = await createDraftPr(branch);
+                if (result) core.info(`Created Draft PR #${result.data.number} for ${branch}.`);
+              } catch (error) {
+                if (error.status === 403) {
+                  core.setFailed([
+                    "ONE_TIME_REPOSITORY_SETTING_REQUIRED: GitHub Actions could not create a Draft PR.",
+                    "Repository -> Settings -> Actions -> General -> Workflow permissions -> enable Allow GitHub Actions to create and approve pull requests.",
+                    "This workflow only creates Draft PRs; it does not approve PRs, mark them Ready for Review, merge them, or enable auto-merge.",
+                    `Original error: ${error.message}`,
+                  ].join("\n"));
+                  return;
+                }
+                throw error;
+              }
+            }
