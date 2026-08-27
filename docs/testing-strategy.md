@@ -38,9 +38,11 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
 ## End-To-End
 
-- Portfolio-first v0.1 Playwright smoke tests should cover requester ticket
-  creation, agent triage/update/comment, lead/admin authorization, search/filter,
-  Kanban, dashboard, and logout where frontend session integration exists.
+- Portfolio-first v0.1 Playwright smoke tests cover requester ticket creation,
+  keyboard-operable Kanban status controls, dashboard filters, and chart text
+  equivalents for the implemented demo workflow.
+- Backend role-boundary tests cover requester, support role, lead, and admin
+  authorization behavior until frontend session integration exists.
 - Analytics suggestion display is not a required v0.1 E2E path unless #23 is
   explicitly enabled as a stretch goal.
 
@@ -66,7 +68,9 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
 ## CI Gates
 
-Planned gates: lint, unit tests, integration tests, E2E smoke, Docker smoke, dependency scan, secret scan, and docs validation.
+Current gates: docs/privacy validators, Issue #26 quality-gate inventory,
+frontend lint/component/accessibility tests/build/audit, Playwright E2E smoke,
+backend Maven tests/package, analytics health tests, and Docker Compose config.
 
 ## Validation Tiers
 

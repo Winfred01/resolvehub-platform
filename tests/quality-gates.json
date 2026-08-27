@@ -1,0 +1,39 @@
+{
+  "issue": 26,
+  "roadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "fictionalDataOnly": true,
+  "requiredGates": [
+    {
+      "name": "frontend-accessibility",
+      "command": "cd frontend && npm run test:run",
+      "evidence": "React Testing Library role/name coverage for shell, tickets, Kanban and dashboard"
+    },
+    {
+      "name": "e2e-browser-smoke",
+      "command": "cd frontend && npm run e2e",
+      "evidence": "Playwright smoke paths for requester ticket creation, Kanban workflow controls and dashboard charts"
+    },
+    {
+      "name": "backend-security",
+      "command": "cd backend && mvn test",
+      "evidence": "Spring Boot authorization and sensitive-response regression tests"
+    },
+    {
+      "name": "privacy-metadata",
+      "command": "node scripts/validate-github-metadata-state.js",
+      "evidence": "Repository privacy validator reports zero findings"
+    }
+  ],
+  "manualKeyboardSmoke": [
+    "Use the skip link to move focus to main content.",
+    "Tab through primary navigation and verify the active route is announced.",
+    "Tab through /tickets filters, create form and Kanban status controls.",
+    "Change a Kanban status with the select control and activate Apply with the keyboard.",
+    "Tab through /dashboard date and granularity filters and refresh metrics."
+  ],
+  "outOfScope": [
+    "Production penetration testing",
+    "Paid scanning services",
+    "Analytics-specific suggestion E2E paths for deferred Issues #23, #24 and #25"
+  ]
+}

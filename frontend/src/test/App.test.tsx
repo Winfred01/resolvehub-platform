@@ -93,6 +93,32 @@ describe("ResolveHub app shell", () => {
 });
 
 describe("Ticket workspace", () => {
+  it("keeps ticket workflow controls accessible by role, label, and name", async () => {
+    render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
+
+    expect(await screen.findByLabelText("Ticket filters")).toBeInTheDocument();
+    const filters = screen.getByLabelText("Ticket filters");
+    expect(screen.getByLabelText("Search")).toHaveAttribute("type", "search");
+    expect(within(filters).getByLabelText("Status")).toBeInTheDocument();
+    expect(within(filters).getByLabelText("Priority")).toBeInTheDocument();
+    expect(within(filters).getByLabelText("Category")).toBeInTheDocument();
+    expect(within(filters).getByRole("button", { name: "Apply filters" })).toBeInTheDocument();
+
+    const board = await screen.findByRole("region", { name: "Status board" });
+    expect(within(board).getByRole("region", { name: "Open" })).toBeInTheDocument();
+    expect(within(board).getByRole("region", { name: "Triaged" })).toBeInTheDocument();
+
+    const openCard = await within(board).findByRole("article", {
+      name: /Kanban card Cannot access shared support queue/i
+    });
+    expect(within(openCard).getByLabelText("Move status")).toBeInTheDocument();
+    expect(within(openCard).getByRole("button", { name: "Apply" })).toBeDisabled();
+
+    expect(screen.getByLabelText("Title")).toHaveAttribute("maxLength", "120");
+    expect(screen.getByLabelText("Description")).toHaveAttribute("maxLength", "4000");
+    expect(screen.getByRole("button", { name: "Create ticket" })).toBeInTheDocument();
+  });
+
   it("renders list, detail, filters, and create form controls", async () => {
     render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
 
@@ -183,6 +209,28 @@ describe("Ticket workspace", () => {
 });
 
 describe("Dashboard workspace", () => {
+  it("exposes dashboard charts and filters with accessible text equivalents", async () => {
+    const { container } = render(<DashboardPage gateway={createDemoDashboardGateway(demoTickets)} />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Support dashboard" })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Dashboard filters")).toBeInTheDocument();
+    expect(screen.getByLabelText("From")).toHaveAttribute("type", "date");
+    expect(screen.getByLabelText("To")).toHaveAttribute("type", "date");
+    expect(screen.getByLabelText("Granularity")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Refresh dashboard" })).toBeInTheDocument();
+
+    expect(container.querySelector('[aria-label="Status distribution"]')).toBeInTheDocument();
+    expect(container.querySelector('[aria-label="Category distribution"]')).toBeInTheDocument();
+    expect(container.querySelector('[aria-label="Priority distribution"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[aria-label="Created tickets and status movements"]')
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll('[aria-hidden="true"]').length).toBeGreaterThan(0);
+    expect(screen.getByText(/1 created, 0 moved/i)).toBeInTheDocument();
+  });
+
   it("renders summary metrics, distributions, and trend buckets", async () => {
     render(<DashboardPage gateway={createDemoDashboardGateway(demoTickets)} />);
 
