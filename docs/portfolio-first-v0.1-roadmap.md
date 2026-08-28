@@ -18,9 +18,9 @@ override this dependency-aware roadmap.
 -> v0.1
 ```
 
-Issue #21 and Issue #22 are merged on `origin/main` through PR #47 and PR #48.
-The current Portfolio-first action is this documentation/status refresh before
-scoped Issue #26 is selected.
+Issue #21, Issue #22, and scoped Issue #26 are merged on `origin/main` through
+PR #47, PR #48, and PR #51. The current Portfolio-first action is scoped Issue
+#27 demo/release packaging before v0.1 release readiness.
 
 ## v0.1 Must-have
 
@@ -31,7 +31,8 @@ scoped Issue #26 is selected.
 - Issue #21 dashboard backend APIs, merged through PR review.
 - Issue #22 dashboard frontend.
 - Current-status documentation refresh.
-- Scoped Issue #26 quality, accessibility, security, and E2E gates.
+- Scoped Issue #26 quality, accessibility, security, and E2E gates, merged
+  through PR #51.
 - Scoped Issue #27 Docker demo and portfolio release package.
 
 ## v0.1 Optional Stretch
@@ -107,8 +108,8 @@ Issue #24 and Issue #25 are not required for Portfolio-first v0.1 completion.
 | #23 | Optional stretch only; not a core v0.1 blocker. |
 | #24 | Deferred to v0.2; not a v0.1 blocker. |
 | #25 | Deferred to v0.2; not a v0.1 blocker. |
-| #26 | Scoped v0.1 quality gates for implemented core workflow plus #22; analytics-specific gates can be added later. |
-| #27 | Scoped v0.1 demo/release package after #22 and scoped #26; analytics is optional/stretch, not a release blocker. |
+| #26 | Completed and merged through PR #51 for scoped v0.1 quality gates. |
+| #27 | Current scoped v0.1 demo/release package after #22 and scoped #26; analytics is optional/stretch, not a release blocker. |
 
 ## Daily Automation Selection Policy
 

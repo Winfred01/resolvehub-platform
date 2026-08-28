@@ -18,7 +18,16 @@ Required scoped gates:
   `cd backend && mvn test`.
 - Repository metadata/privacy validation through
   `node scripts/validate-github-metadata-state.js`.
+- Issue #27 local demo release validation through
+  `node scripts/validate-demo-release.js`.
 
 The manual keyboard smoke checklist in `tests/quality-gates.json` covers skip
 link behavior, primary navigation, ticket filters/forms, Kanban status controls,
 and dashboard filters. All fixtures must remain fictional.
+
+## Portfolio Demo Seed
+
+`tests/demo-seed-data.json` is the canonical fictional seed manifest for the
+local v0.1 demo package. It defines demo personas, tickets, dashboard
+expectations, reset instructions, and analytics deferral boundaries without
+committing fixed personal credentials.

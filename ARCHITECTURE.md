@@ -5,8 +5,9 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 Current status: ResolveHub is no longer planning-only. `origin/main` contains
 the frontend scaffold, Spring Boot backend, auth/RBAC, ticket backend workflow,
 ticket frontend workflow, Kanban, dashboard backend APIs, dashboard UI, FastAPI
-health scaffold, Docker Compose foundation, and GitHub Actions CI. Scoped #26
-quality gates and scoped #27 demo/release work remain before v0.1 readiness.
+health scaffold, Docker Compose foundation, GitHub Actions CI, and scoped #26
+quality gates. Scoped #27 demo/release work is the remaining Portfolio-first
+v0.1 workstream before release readiness.
 
 ## System Context
 
@@ -35,8 +36,8 @@ flowchart LR
 | Category/priority suggestion service | OPTIONAL_STRETCH via Issue #23 |
 | Duplicate suggestion | DEFERRED_TO_V0_2 via Issue #24 |
 | Full analytics workflow integration | DEFERRED_TO_V0_2 via Issue #25 |
-| Integrated E2E/accessibility/security gates | REMAINING via scoped Issue #26 |
-| Docker demo and portfolio release package | REMAINING via scoped Issue #27 |
+| Integrated E2E/accessibility/security gates | MERGED via PR #51 |
+| Docker demo and portfolio release package | IN_PROGRESS via scoped Issue #27 |
 
 ## Frontend
 
@@ -74,8 +75,14 @@ persistence where PostgreSQL integration is not yet complete.
 ## Docker And CI
 
 Docker Compose and GitHub Actions foundations are present on `origin/main`.
-Portfolio-first v0.1 still requires scoped #26 quality gates and #27 demo/release
-validation before declaring the release complete.
+Portfolio-first v0.1 still requires scoped #27 demo/release validation before
+declaring the release complete.
+
+The local demo release package uses the root `docker-compose.yml`, the
+fictional seed manifest in `tests/demo-seed-data.json`, and the validation
+script `scripts/validate-demo-release.js`. The package verifies local service
+availability, reset instructions, release documentation, and analytics deferral
+boundaries without adding production credentials.
 
 ## Request Flow
 

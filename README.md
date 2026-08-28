@@ -6,10 +6,10 @@ authorization, dashboard reporting, and portfolio-ready engineering practice.
 
 Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-Current status: the core ticket workflow, Issue #21 dashboard APIs, and
-Issue #22 dashboard UI are merged on `origin/main`. This documentation/status
-refresh records that handoff; scoped #26 quality gates and scoped #27 demo
-release work remain before v0.1 readiness.
+Current status: the core ticket workflow, Issue #21 dashboard APIs, Issue #22
+dashboard UI, and scoped Issue #26 quality gates are merged on `origin/main`.
+Scoped Issue #27 demo release packaging is the current Portfolio-first v0.1
+workstream before release readiness.
 
 ## Problem
 
@@ -61,8 +61,8 @@ portfolio-focused v0.1 release. See
 | Full analytics workflow integration | DEFERRED | issue #25 |
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
-| Integrated E2E/accessibility/security release gates | REMAINING | scoped issue #26 |
-| Docker demo and portfolio release package | REMAINING | scoped issue #27 |
+| Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |
+| Docker demo and portfolio release package | IN_PROGRESS | scoped issue #27 |
 
 ## MVP Features
 
@@ -153,7 +153,23 @@ Planning and metadata validation:
 node scripts/validate-planning-foundation.js
 node scripts/validate-github-metadata-state.js
 node scripts/validate-portfolio-first-roadmap.js
+node scripts/validate-quality-gates.js
+node scripts/validate-demo-release.js
 ```
+
+Local demo release validation:
+
+```powershell
+docker compose -f docker-compose.yml config
+docker compose up --build
+curl http://localhost:5173
+curl http://localhost:18080/api/health
+curl http://localhost:8000/analytics/health
+docker compose down --volumes
+```
+
+See [docs/demo-release-guide.md](docs/demo-release-guide.md) and
+[docs/v0.1-release-notes.md](docs/v0.1-release-notes.md).
 
 ## Security
 
