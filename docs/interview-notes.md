@@ -2,7 +2,9 @@
 
 ## Project Narrative
 
-ResolveHub is planned as a technical support and issue management platform. The design emphasizes practical support workflows, audit history, role-based access, analytics-assisted triage, and portfolio-ready engineering discipline.
+ResolveHub is a technical support and issue management platform MVP. The design
+emphasizes practical support workflows, audit history, role-based access,
+analytics boundaries, and portfolio-ready engineering discipline.
 
 ## Engineering Themes
 
@@ -10,6 +12,8 @@ ResolveHub is planned as a technical support and issue management platform. The 
 - Security-first planning: no secrets, role matrix, audit logs, input validation.
 - Evidence-based claims: planning documents do not imply implementation.
 - Workstream separation: frontend, backend, analytics, database, infrastructure, QA, docs.
+- Local demo discipline: Docker Compose health checks, resettable fictional
+  seed data, and release validation before portfolio claims.
 
 ## Questions To Prepare
 
@@ -19,6 +23,9 @@ ResolveHub is planned as a technical support and issue management platform. The 
 - How would you test authorization?
 - How would you keep demo data safe?
 
-## Current Limitations
+## Current Demo Position
 
-The project is not implemented yet. Any interview discussion should be framed as design and planning unless later prompts add working code.
+The core ticket workflow, dashboard, and scoped quality gates are implemented
+and merged before Issue #27. The portfolio demo package is local-first, uses
+fictional data, and does not claim a public production deployment. #23 remains
+optional stretch; #24 and #25 are deferred to v0.2.

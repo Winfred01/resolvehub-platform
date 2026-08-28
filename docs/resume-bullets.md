@@ -20,6 +20,8 @@ work.
 - Maintained portfolio-focused documentation that distinguishes merged
   functionality, active unmerged workstreams, planned work, and deferred v0.2
   analytics scope.
+- Prepared a local Docker Compose portfolio demo package with fictional seed
+  data, reset guidance, health-check verification, and release validation.
 
 ## Wording That Requires More Evidence
 
@@ -27,8 +29,7 @@ Use only after the relevant work is merged and validated:
 
 - Dashboard APIs are complete on main.
 - Dashboard UI is complete.
-- Integrated E2E/accessibility/security gates are complete.
-- Docker demo release package is complete.
+- Docker demo release package is complete and merged.
 - ResolveHub v0.1 is released.
 
 ## Not Yet Allowed
@@ -40,5 +41,5 @@ Do not claim:
 - Production-ready security hardening.
 - AI/ML classifier or external AI integration.
 - Duplicate detection or full analytics workflow integration.
-- Completion of #21 until its PR/merge lifecycle is done.
+- Completion of unmerged release branches.
 - Completion of #24/#25 under Portfolio-first v0.1.

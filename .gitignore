@@ -25,6 +25,7 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
+*.egg-info/
 *.pyc
 
 # IDE and OS

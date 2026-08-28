@@ -1,0 +1,98 @@
+{
+  "issue": 27,
+  "roadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "fictionalDataOnly": true,
+  "resettable": true,
+  "resetCommand": "docker compose down --volumes && docker compose up --build",
+  "credentialPolicy": "Demo account credentials are generated at demo reset time and are not stored in this file.",
+  "accounts": [
+    {
+      "id": "demo-requester",
+      "displayName": "Riley Chen",
+      "email": "riley.requester@example.test",
+      "role": "REQUESTER",
+      "credentialSource": "generated-at-demo-reset"
+    },
+    {
+      "id": "demo-agent",
+      "displayName": "Jordan Patel",
+      "email": "jordan.agent@example.test",
+      "role": "SUPPORT_AGENT",
+      "credentialSource": "generated-at-demo-reset"
+    },
+    {
+      "id": "demo-lead",
+      "displayName": "Morgan Lee",
+      "email": "morgan.lead@example.test",
+      "role": "TEAM_LEAD",
+      "credentialSource": "generated-at-demo-reset"
+    },
+    {
+      "id": "demo-admin",
+      "displayName": "Avery Brooks",
+      "email": "avery.admin@example.test",
+      "role": "ADMIN",
+      "credentialSource": "generated-at-demo-reset"
+    }
+  ],
+  "categories": [
+    "Hardware",
+    "Access",
+    "Software",
+    "Network"
+  ],
+  "tickets": [
+    {
+      "id": "RH-DEMO-1001",
+      "summary": "Laptop dock fails in demo lab",
+      "status": "OPEN",
+      "priority": "HIGH",
+      "category": "Hardware",
+      "requester": "demo-requester",
+      "assignee": "demo-agent",
+      "fictional": true
+    },
+    {
+      "id": "RH-DEMO-1002",
+      "summary": "Password reset approval pending",
+      "status": "TRIAGED",
+      "priority": "MEDIUM",
+      "category": "Access",
+      "requester": "demo-requester",
+      "assignee": "demo-agent",
+      "fictional": true
+    },
+    {
+      "id": "RH-DEMO-1003",
+      "summary": "Dashboard export button unavailable",
+      "status": "IN_PROGRESS",
+      "priority": "LOW",
+      "category": "Software",
+      "requester": "demo-requester",
+      "assignee": "demo-agent",
+      "fictional": true
+    },
+    {
+      "id": "RH-DEMO-1004",
+      "summary": "Training room Wi-Fi drops intermittently",
+      "status": "RESOLVED",
+      "priority": "MEDIUM",
+      "category": "Network",
+      "requester": "demo-requester",
+      "assignee": "demo-agent",
+      "fictional": true
+    }
+  ],
+  "dashboardExpectations": {
+    "minimumVisibleStatusBuckets": 4,
+    "trendGranularities": [
+      "daily",
+      "weekly"
+    ],
+    "textEquivalentRequired": true
+  },
+  "analyticsExamples": {
+    "includedInV0_1": false,
+    "reason": "Issues #23, #24 and #25 are optional or deferred under Portfolio-first v0.1."
+  }
+}

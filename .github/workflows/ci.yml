@@ -34,6 +34,9 @@ jobs:
       - name: Validate Issue #26 quality gate inventory
         run: node scripts/validate-quality-gates.js
 
+      - name: Validate Issue #27 demo release package
+        run: node scripts/validate-demo-release.js
+
       - name: Validate GitHub metadata and privacy state
         run: node scripts/validate-github-metadata-state.js
 

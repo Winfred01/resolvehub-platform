@@ -6,13 +6,19 @@ services:
     working_dir: /workspace/frontend
     command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
     environment:
-      VITE_BACKEND_URL: http://localhost:${BACKEND_PORT:-8080}
+      VITE_BACKEND_URL: http://localhost:${BACKEND_PORT:-18080}
       VITE_ANALYTICS_URL: http://localhost:${ANALYTICS_PORT:-8000}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:
       - ./frontend:/workspace/frontend
       - frontend-node-modules:/workspace/frontend/node_modules
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5173').then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
     depends_on:
       - backend
       - analytics
@@ -26,7 +32,7 @@ services:
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:5173}
       RESOLVEHUB_ANALYTICS_BASE_URL: http://analytics:${ANALYTICS_PORT:-8000}
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "${BACKEND_PORT:-18080}:8080"
     volumes:
       - ./backend:/workspace/backend
       - backend-maven-cache:/root/.m2
@@ -34,7 +40,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/127.0.0.1/8080'"]
+      test: ["CMD-SHELL", "bash -ec \"exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /api/health HTTP/1.1\\r\\nHost: 127.0.0.1\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'\""]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -65,7 +71,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-resolvehub_local}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-resolvehub_local_password}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-15432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
