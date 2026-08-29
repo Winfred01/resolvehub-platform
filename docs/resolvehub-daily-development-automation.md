@@ -132,6 +132,10 @@ After #21 completes, select according to this order:
 4. Scoped #27.
 5. v0.1 release readiness.
 
+After v0.1 release readiness is reached, daily MVP implementation selection is
+paused. Do not automatically select #23, #24, #25, v0.1.1, or v0.2 work until
+the user explicitly approves the next mode.
+
 Do not select #23 before v0.1 unless memory or configuration explicitly says:
 
 ```text

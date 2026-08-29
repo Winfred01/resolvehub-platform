@@ -6,10 +6,11 @@ authorization, dashboard reporting, and portfolio-ready engineering practice.
 
 Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-Current status: the core ticket workflow, Issue #21 dashboard APIs, Issue #22
-dashboard UI, and scoped Issue #26 quality gates are merged on `origin/main`.
-Scoped Issue #27 demo release packaging is the current Portfolio-first v0.1
-workstream before release readiness.
+Current status: Portfolio-first v0.1 is complete on `origin/main`. The core
+ticket workflow, Issue #21 dashboard APIs, Issue #22 dashboard UI, scoped Issue
+#26 quality gates, and scoped Issue #27 demo release packaging are merged.
+Daily MVP development selection is paused pending explicit maintenance or v0.2
+approval.
 
 ## Problem
 
@@ -62,7 +63,7 @@ portfolio-focused v0.1 release. See
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
 | Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |
-| Docker demo and portfolio release package | IN_PROGRESS | scoped issue #27 |
+| Docker demo and portfolio release package | MERGED | `origin/main` via PR #52 |
 
 ## MVP Features
 

@@ -18,9 +18,10 @@ override this dependency-aware roadmap.
 -> v0.1
 ```
 
-Issue #21, Issue #22, and scoped Issue #26 are merged on `origin/main` through
-PR #47, PR #48, and PR #51. The current Portfolio-first action is scoped Issue
-#27 demo/release packaging before v0.1 release readiness.
+Issue #21, Issue #22, scoped Issue #26, and scoped Issue #27 are merged on
+`origin/main` through PR #47, PR #48, PR #51, and PR #52. Portfolio-first v0.1
+is complete. Daily MVP development selection is paused pending explicit user
+approval for maintenance, v0.1.1, v0.2, or deferred analytics work.
 
 ## v0.1 Must-have
 
@@ -109,7 +110,7 @@ Issue #24 and Issue #25 are not required for Portfolio-first v0.1 completion.
 | #24 | Deferred to v0.2; not a v0.1 blocker. |
 | #25 | Deferred to v0.2; not a v0.1 blocker. |
 | #26 | Completed and merged through PR #51 for scoped v0.1 quality gates. |
-| #27 | Current scoped v0.1 demo/release package after #22 and scoped #26; analytics is optional/stretch, not a release blocker. |
+| #27 | Completed and merged through PR #52; analytics remains optional/stretch or deferred as documented, not a release blocker. |
 
 ## Daily Automation Selection Policy
 
@@ -119,6 +120,10 @@ When no active workstream is present, select in this order:
 2. Scoped #26.
 3. Scoped #27.
 4. v0.1 release readiness.
+
+After v0.1 release readiness is reached, do not select another implementation
+issue under daily MVP development. Pause selection until the user explicitly
+approves maintenance, v0.1.1, v0.2, or deferred analytics work.
 
 Do not select #23 before v0.1 unless `ENABLE_V0_1_ANALYTICS_STRETCH = true`.
 Do not select #24 or #25 under `PORTFOLIO_FIRST_V0_1` unless the user changes
