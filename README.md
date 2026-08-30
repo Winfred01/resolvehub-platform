@@ -4,14 +4,13 @@ ResolveHub is a full-stack technical support and issue management platform for
 demonstrating practical support workflow design, ticket operations, role-aware
 authorization, dashboard reporting, and portfolio-ready engineering practice.
 
-Current live roadmap mode: `PORTFOLIO_FIRST_V0_1` is complete.
+Completed baseline roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-Proposed next roadmap mode after this governance PR is merged and the real scheduler configuration is updated: `ANALYTICS_ASSISTED_V0_2`.
+Current live roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
-Current status: Portfolio-first v0.1 is complete on `origin/main`. The core
-ticket workflow, Issue #21 dashboard APIs, Issue #22 dashboard UI, scoped Issue
-#26 quality gates, and scoped Issue #27 demo release packaging are merged.
-Daily MVP development selection is paused. The user has authorized v0.2 roadmap planning only; product implementation, including Issue #23, must not start from this planning PR.
+Current status: Portfolio-first v0.1 is complete on `origin/main`. The v0.2
+roadmap is active, and Issue #23 adds the first analytics-assisted triage
+capability.
 
 ## Problem
 
@@ -79,7 +78,7 @@ hidden recommendation acceptance.
 | Dashboard backend APIs | MERGED | `origin/main` |
 | Dashboard frontend | MERGED | `origin/main` via PR #48 |
 | FastAPI analytics scaffold and health endpoint | MERGED | `origin/main` |
-| Category/priority suggestion service | PROPOSED_V0_2_CORE | issue #23 |
+| Category/priority suggestion service | IMPLEMENTED_V0_2_CORE | issue #23 |
 | Duplicate suggestion | PROPOSED_V0_2_CORE | issue #24 |
 | Full analytics workflow integration | PROPOSED_V0_2_CORE | issue #25 |
 | Docker Compose foundation | MERGED | `origin/main` |
@@ -96,7 +95,7 @@ hidden recommendation acceptance.
 - Dashboard metrics for volume, status, priority, category, and trends.
 - Portfolio-focused documentation, quality gates, Docker demo flow, and
   release notes.
-- Optional analytics suggestion capability if #23 is enabled before v0.1.
+- Deterministic advisory category and priority suggestions for v0.2 triage.
 
 ## Non-Goals For Portfolio-first v0.1
 

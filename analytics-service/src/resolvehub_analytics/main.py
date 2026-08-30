@@ -4,6 +4,8 @@ from typing import Literal
 from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
 
+from resolvehub_analytics.triage import router as triage_router
+
 
 class HealthResponse(BaseModel):
     model_config = ConfigDict(
@@ -41,6 +43,8 @@ def create_app() -> FastAPI:
             service="resolvehub-analytics",
             checked_at=datetime.now(timezone.utc),
         )
+
+    app.include_router(triage_router)
 
     return app
 
