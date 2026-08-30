@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from typing import Literal
 
@@ -53,6 +54,8 @@ class TriageSuggestionResponse(BaseModel):
 
 
 router = APIRouter(tags=["suggestions"])
+
+TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 
 
 CATEGORY_RULES: dict[TicketCategory, tuple[str, ...]] = {
@@ -122,7 +125,9 @@ PRIORITY_RULES: dict[TicketPriority, tuple[str, ...]] = {
         "data leak",
         "down",
         "outage",
-        "production",
+        "production down",
+        "production outage",
+        "production unavailable",
         "security breach",
         "system unavailable",
     ),
@@ -214,7 +219,27 @@ def _suggest_priority(text: str) -> tuple[TicketPriority, float, str]:
 
 
 def _keyword_score(text: str, keywords: tuple[str, ...]) -> int:
-    return sum(1 for keyword in keywords if keyword in text)
+    text_tokens = _tokens_for(text)
+    return sum(1 for keyword in keywords if _keyword_matches(text_tokens, keyword))
+
+
+def _keyword_matches(text_tokens: tuple[str, ...], keyword: str) -> bool:
+    keyword_tokens = _tokens_for(keyword)
+    if not keyword_tokens:
+        return False
+
+    if len(keyword_tokens) == 1:
+        return keyword_tokens[0] in text_tokens
+
+    phrase_length = len(keyword_tokens)
+    return any(
+        text_tokens[index : index + phrase_length] == keyword_tokens
+        for index in range(len(text_tokens) - phrase_length + 1)
+    )
+
+
+def _tokens_for(text: str) -> tuple[str, ...]:
+    return tuple(TOKEN_PATTERN.findall(text.casefold()))
 
 
 def _confidence_from_score(score: int, tied: int) -> float:

@@ -43,6 +43,42 @@ def test_triage_suggestion_is_deterministic_for_fixtures() -> None:
     assert first.json() == second.json()
 
 
+def test_triage_suggestion_does_not_match_partial_priority_tokens() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/analytics/suggestions/triage",
+        json={"title": "Download problem", "description": "Download fails for one guide."},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["priority"] != "URGENT"
+
+
+def test_triage_suggestion_does_not_match_partial_category_tokens() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/analytics/suggestions/triage",
+        json={"title": "Accounting report issue", "description": "Monthly report totals look wrong."},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["category"] != "account-access"
+
+
+def test_triage_suggestion_does_not_make_production_typo_urgent() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/analytics/suggestions/triage",
+        json={"title": "Production documentation typo", "description": "Minor typo in a production runbook."},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["priority"] == "LOW"
+
+
 def test_triage_suggestion_returns_low_confidence_safe_fallback_for_minimal_request() -> None:
     client = TestClient(create_app())
 

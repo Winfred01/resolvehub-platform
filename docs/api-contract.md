@@ -151,8 +151,9 @@ slice:
   `account-access`, `billing`, `general`, `hardware`, `network`, `privacy`,
   and `workflow`.
 - `priority` uses `LOW`, `MEDIUM`, `HIGH`, or `URGENT`.
-- Suggestions are deterministic for test fixtures and use explainable keyword
-  rules rather than machine learning or external AI provider calls.
+- Suggestions are deterministic for test fixtures and use explainable
+  token/phrase-aware keyword rules rather than machine learning, substring-only
+  matching, or external AI provider calls.
 - Minimal or uncertain requests return safe fallback values with
   `low_confidence: true`.
 - Suggestion responses are advisory, require human review, and do not mutate

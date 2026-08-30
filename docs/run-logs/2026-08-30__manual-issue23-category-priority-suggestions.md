@@ -64,6 +64,15 @@
   run-log closeout commit. Final PR CI state should be reconciled from live
   GitHub on PR #55 after the latest branch push.
 
+## Review Follow-up
+
+- Replaced substring keyword matching with token/phrase-aware matching.
+- Removed standalone `production` as an `URGENT` signal and kept production
+  urgency tied to explicit incident phrases such as `production outage`.
+- Added regression tests proving `download` does not match `down`,
+  `accounting` does not match `account`, and a production documentation typo
+  stays low priority while the VPN outage fixture remains urgent.
+
 ## Actions Not Taken
 
 - Did not select #24 or #25.

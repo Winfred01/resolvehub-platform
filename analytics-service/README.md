@@ -64,6 +64,7 @@ fields, advisory behavior, and privacy-safe logging. Do not add ML training,
 external AI provider calls, automatic ticket mutation, or real private data.
 
 Issue #23 implements category and priority suggestions with deterministic
-keyword scoring. Low-confidence, minimal, unavailable, or uncertain inputs use
-safe fallback values and remain advisory. The service does not persist ticket
-content and the suggestion response does not echo the submitted ticket body.
+token/phrase-aware keyword scoring. Low-confidence, minimal, unavailable, or
+uncertain inputs use safe fallback values and remain advisory. The service does
+not persist ticket content and the suggestion response does not echo the
+submitted ticket body.
