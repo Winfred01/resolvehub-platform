@@ -19,6 +19,21 @@ Current roadmap overlay:
 - Scoped #26 is merged through PR #51 for implemented core workflows plus #22.
 - Scoped #27 depends on #22 and scoped #26, not full #25 analytics integration.
 
+Current v0.2 planning overlay:
+
+- Portfolio-first v0.1 remains complete; this file preserves its historical
+  issue-creation table and does not reopen #21, #22, #26, or #27.
+- The proposed next roadmap mode is `ANALYTICS_ASSISTED_V0_2` after the
+  governance PR merges and the real scheduler configuration is updated.
+- #23 is promoted to V0_2_CORE as workstream 1 for deterministic category and
+  priority suggestions.
+- #24 is promoted to V0_2_CORE as workstream 2 for deterministic duplicate
+  candidate matching after #23 completes.
+- #25 is promoted to V0_2_CORE as workstream 3 for advisory backend/frontend
+  workflow integration after #23 and #24 complete.
+- Analytics-specific v0.2 quality/security/E2E work and v0.2 demo/release work
+  follow #25; do not parallelize #23 and #24 automatically.
+
 | Plan # | GitHub # | Title | Milestone | Type | Area | Priority | Workstream | Dependencies | Blocks | GitHub URL | Status |
 |---:|---:|---|---|---|---|---|---|---|---|---|---|
 | 1 | #2 | Validate repository foundation and development conventions | v0.1 Foundation and Architecture | type:documentation | area:docs | priority:p0 | product/prd | none | #3, #4, #5, #6 | https://github.com/Winfred01/resolvehub-platform/issues/2 | open-created |

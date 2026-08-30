@@ -196,3 +196,12 @@ Expected response shape:
 - Use fictional demo data only.
 - Keep secrets in environment variables or managed deployment configuration.
 - Do not log tokens, credentials, plaintext passwords, password hashes, Gmail content, browser sessions, job-search data, or private user data.
+
+## Analytics-assisted v0.2 Boundary
+
+The analytics-assisted v0.2 roadmap should integrate suggestions through a safe
+backend service boundary only after #23 and #24 are available. Backend handling
+must treat recommendations as advisory, require explicit user action before any
+state change, tolerate analytics-service failures, and record only safe review
+decisions without storing private ticket bodies, comments, credentials, tokens,
+sessions, Gmail data, browser data, or job-search data.

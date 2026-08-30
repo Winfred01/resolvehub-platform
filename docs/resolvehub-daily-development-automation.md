@@ -446,3 +446,40 @@ approve, merge, enable auto-merge, force-push, close issues outside merged PR
 lifecycle, modify credentials, use PATs, read browser cookies/sessions, or touch
 private/job-search/Gmail/resume/browser-session data.
 ```
+
+## Analytics-assisted v0.2 Planning Transition
+
+The user has authorized: `BEGIN V0.2 ROADMAP PLANNING`.
+
+This authorization is planning and governance only. Do not begin Issue #23
+implementation from the roadmap-planning workstream.
+
+The new roadmap mode is:
+
+```text
+roadmap_mode = ANALYTICS_ASSISTED_V0_2
+v0_1_status = COMPLETE
+v0_2_status = ACTIVE
+development_selection = ENABLED
+maintenance_status = SUPERSEDED_BY_V0_2_DEVELOPMENT
+```
+
+Do not treat that mode as live scheduled-automation state until the v0.2
+roadmap/governance PR is merged and the real scheduler configuration has been
+updated. Until then, keep scheduler synchronization as `USER_UPDATE_REQUIRED`.
+
+When `ANALYTICS_ASSISTED_V0_2` is live and no active workstream exists, select
+one workstream at a time in this order:
+
+1. #23 category and priority suggestion service.
+2. #24 duplicate ticket suggestion, only after #23 is merged or reconciled
+   complete.
+3. #25 analytics suggestions workflow integration, only after #23 and #24 are
+   merged or reconciled complete.
+4. Analytics-specific v0.2 quality/security/E2E workstream.
+5. v0.2 demo/documentation/release workstream.
+6. Pause at v0.2 complete pending explicit user approval.
+
+Preserve the completed Portfolio-first v0.1 baseline. Do not reopen #21, #22,
+#26, or #27. Do not select #23, #24, or #25 while a v0.2 planning PR is still
+open.

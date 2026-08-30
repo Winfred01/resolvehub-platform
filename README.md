@@ -4,13 +4,14 @@ ResolveHub is a full-stack technical support and issue management platform for
 demonstrating practical support workflow design, ticket operations, role-aware
 authorization, dashboard reporting, and portfolio-ready engineering practice.
 
-Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+Current live roadmap mode: `PORTFOLIO_FIRST_V0_1` is complete.
+
+Proposed next roadmap mode after this governance PR is merged and the real scheduler configuration is updated: `ANALYTICS_ASSISTED_V0_2`.
 
 Current status: Portfolio-first v0.1 is complete on `origin/main`. The core
 ticket workflow, Issue #21 dashboard APIs, Issue #22 dashboard UI, scoped Issue
 #26 quality gates, and scoped Issue #27 demo release packaging are merged.
-Daily MVP development selection is paused pending explicit maintenance or v0.2
-approval.
+Daily MVP development selection is paused. The user has authorized v0.2 roadmap planning only; product implementation, including Issue #23, must not start from this planning PR.
 
 ## Problem
 
@@ -43,6 +44,27 @@ Full #23/#24/#25 analytics completion is no longer required before a credible
 portfolio-focused v0.1 release. See
 [docs/portfolio-first-v0.1-roadmap.md](docs/portfolio-first-v0.1-roadmap.md).
 
+## Analytics-assisted v0.2 Roadmap
+
+The proposed v0.2 theme is `EXPLAINABLE_ANALYTICS_ASSISTED_TRIAGE_V0_2`.
+It promotes #23, #24, and #25 into a serial `V0_2_CORE` path after the completed
+v0.1 baseline:
+
+```text
+#23 Category and Priority Suggestion Service
+-> #24 Duplicate Ticket Suggestion
+-> #25 Integrate Analytics Suggestions with Ticket Workflow
+-> Analytics-specific v0.2 Quality / Security / E2E
+-> v0.2 Demo / Documentation / Release
+-> v0.2 COMPLETE
+```
+
+Recommendations must stay deterministic, explainable, advisory, human-reviewed,
+overrideable, privacy-safe, and resilient to analytics-service failure. The v0.2
+roadmap does not authorize autonomous ticket mutation, automatic closure,
+external AI provider calls, opaque ML training pipelines, real private data, or
+hidden recommendation acceptance.
+
 ## Current Implementation Matrix
 
 | Capability | State | Source |
@@ -57,9 +79,9 @@ portfolio-focused v0.1 release. See
 | Dashboard backend APIs | MERGED | `origin/main` |
 | Dashboard frontend | MERGED | `origin/main` via PR #48 |
 | FastAPI analytics scaffold and health endpoint | MERGED | `origin/main` |
-| Category/priority suggestion service | OPTIONAL_STRETCH | issue #23 |
-| Duplicate suggestion | DEFERRED | issue #24 |
-| Full analytics workflow integration | DEFERRED | issue #25 |
+| Category/priority suggestion service | PROPOSED_V0_2_CORE | issue #23 |
+| Duplicate suggestion | PROPOSED_V0_2_CORE | issue #24 |
+| Full analytics workflow integration | PROPOSED_V0_2_CORE | issue #25 |
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
 | Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |

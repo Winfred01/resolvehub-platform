@@ -1,14 +1,15 @@
 # Architecture
 
-Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+Current live roadmap mode: `PORTFOLIO_FIRST_V0_1` is complete.
+
+Proposed next roadmap mode after governance PR merge and scheduler update: `ANALYTICS_ASSISTED_V0_2`.
 
 Current status: ResolveHub Portfolio-first v0.1 is complete on `origin/main`.
 `origin/main` contains the frontend scaffold, Spring Boot backend, auth/RBAC,
 ticket backend workflow, ticket frontend workflow, Kanban, dashboard backend
 APIs, dashboard UI, FastAPI health scaffold, Docker Compose foundation, GitHub
 Actions CI, scoped #26 quality gates, and scoped #27 demo/release packaging.
-Daily MVP development selection is paused pending explicit maintenance or v0.2
-approval.
+Daily MVP development selection is paused. The current task authorizes v0.2 roadmap planning only, not Issue #23 implementation.
 
 ## System Context
 
@@ -20,7 +21,7 @@ flowchart LR
   Admin["Administrator"] --> Frontend
   Frontend --> Backend["Spring Boot API"]
   Backend --> DB["PostgreSQL target / local MVP persistence"]
-  Backend -. "optional v0.1 stretch or v0.2" .-> Analytics["FastAPI Analytics Service"]
+  Backend -. "advisory v0.2 suggestions" .-> Analytics["FastAPI Analytics Service"]
 ```
 
 ## Implementation State
@@ -34,9 +35,9 @@ flowchart LR
 | Dashboard summary/trend backend APIs | MERGED |
 | Dashboard UI | MERGED via PR #48 |
 | FastAPI analytics health scaffold | MERGED |
-| Category/priority suggestion service | OPTIONAL_STRETCH via Issue #23 |
-| Duplicate suggestion | DEFERRED_TO_V0_2 via Issue #24 |
-| Full analytics workflow integration | DEFERRED_TO_V0_2 via Issue #25 |
+| Category/priority suggestion service | PROPOSED_V0_2_CORE via Issue #23 |
+| Duplicate suggestion | PROPOSED_V0_2_CORE via Issue #24 |
+| Full analytics workflow integration | PROPOSED_V0_2_CORE via Issue #25 |
 | Integrated E2E/accessibility/security gates | MERGED via PR #51 |
 | Docker demo and portfolio release package | MERGED via PR #52 |
 
@@ -160,3 +161,16 @@ checks, and rollback review.
 - Organization-level teams.
 - Notification integrations.
 - More granular audit exports.
+
+## Analytics-assisted v0.2
+
+The proposed v0.2 architecture keeps the Spring Boot backend as ticket source of
+truth and adds advisory analytics through the existing FastAPI service boundary.
+The dependency order is #23 category/priority suggestions, then #24 duplicate
+suggestions, then #25 backend/frontend workflow integration.
+
+Suggestions must include confidence and explanation fields, remain deterministic
+for fixtures, and degrade safely when the analytics service is unavailable. The
+backend must not mutate category, priority, status, assignment, closure, or
+duplicate state without explicit user action. Frontend surfaces must make
+accept, ignore, and override decisions visible and reviewable.

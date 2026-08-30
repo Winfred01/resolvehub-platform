@@ -74,3 +74,11 @@ Require HTTPS for hosted demo. Limit CORS to configured frontend origin.
 ## Deployment Secrets
 
 All deployment secrets must be stored in the hosting provider or GitHub Actions secrets. They must not be printed in logs.
+
+## v0.2 Analytics Deployment Planning
+
+The v0.2 deployment plan should keep analytics service configuration explicit
+and optional-failure-safe. Backend and frontend deployments must tolerate an
+unavailable analytics service without blocking the core ticket workflow. Any
+hosted demo must keep analytics secrets in managed configuration and must not
+log private ticket content or recommendation input bodies.
