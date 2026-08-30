@@ -126,3 +126,15 @@ If a secret or private data leak is suspected, stop deployment, rotate credentia
 ## Threat Model
 
 Primary MVP threats: credential stuffing, broken access control, injection, XSS, exposed secrets, over-permissive CORS, accidental real data in demo, and missing audit trails.
+
+## Analytics-Assisted Triage Guardrails
+
+Analytics-assisted triage must remain advisory and human-reviewed. Suggestions
+must include confidence and explanation fields, be deterministic for fixtures,
+and never automatically mutate category, priority, duplicate state, status,
+assignment, or closure. Analytics requests and logs should use minimum necessary
+safe fields and must not store or expose credentials, tokens, sessions, private
+ticket bodies, comment bodies, Gmail content, browser-session data, job-search
+data, private addresses, phone numbers, or real customer/employer data. Backend
+and frontend flows must keep ticket work usable when analytics is unavailable or
+low confidence.

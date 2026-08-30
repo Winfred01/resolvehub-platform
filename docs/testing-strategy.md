@@ -106,3 +106,13 @@ Initial targets: 70% service-layer coverage, critical authorization paths fully 
 ## Flaky Test Handling
 
 Quarantine flaky tests only with a tracking issue. Do not ignore failing security or authorization tests.
+
+## v0.2 Analytics-specific Gates
+
+The v0.2 analytics-specific gates start only after #25 is merged. They should
+cover analytics unit/contract tests for #23 and #24, backend integration tests
+for success and analytics-service failure, frontend tests for advisory accept,
+ignore, and override flows, E2E smoke for suggestion review, and secret/privacy
+checks proving recommendation handling does not expose private ticket bodies,
+comments, credentials, tokens, sessions, Gmail data, browser data, job-search
+data, or real customer data.

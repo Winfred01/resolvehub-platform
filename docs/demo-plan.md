@@ -68,3 +68,10 @@ curl http://localhost:18080/api/health
 curl http://localhost:8000/analytics/health
 docker compose exec postgres pg_isready -U resolvehub_local -d resolvehub
 ```
+
+## v0.2 Demo Planning
+
+The v0.2 demo should extend the completed v0.1 flow with fictional suggestion
+scenarios after #23, #24, #25, analytics-specific quality gates, and v0.2 release
+docs have merged. The demo must show recommendations as advisory, explainable,
+and overrideable, including a graceful analytics-service failure path.

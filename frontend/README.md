@@ -89,3 +89,11 @@ Future issues may add authentication UI, comments, dashboard screens, analytics 
 ## No-Secret Requirement
 
 Do not commit `.env.local`, npm tokens, registry credentials, browser data, Gmail data, job-search private data, or real user/customer/employer data. Use fictional examples only.
+
+## Analytics-assisted v0.2 Boundary
+
+The analytics-assisted v0.2 roadmap should add suggestion UI only after #25 is
+selected. Frontend experiences must make recommendations visibly advisory and
+give users explicit accept, ignore, and override choices. Loading, low-confidence,
+empty, and analytics-service failure states must leave the normal ticket
+workflow usable.
