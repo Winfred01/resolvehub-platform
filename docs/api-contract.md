@@ -136,4 +136,27 @@ Implemented dashboard fields for the initial Issue #21 slice:
 | `POST /analytics/classify` | Suggest category | Service auth | backend | title, description | category, confidence | 400,401,503 | text length | deterministic best effort |
 | `POST /analytics/duplicates` | Suggest duplicates | Service auth | backend | ticket text, candidate ids | candidates | 400,401,503 | candidate cap | no mutation |
 | `POST /analytics/priority` | Recommend priority | Service auth | backend | ticket fields | priority, confidence | 400,401,503 | enum values | no mutation |
+| `POST /analytics/suggestions/triage` | Suggest category and priority | Service auth target / local service boundary | backend | title, description | category, priority, confidence, explanation, low_confidence, advisory | 422,503 | field types and text length | advisory only, no mutation |
 | `GET /analytics/health` | Health check | Internal/public-safe | ops | none | status | 503 | n/a | read-only |
+
+Implemented category and priority suggestion fields for the v0.2 Issue #23
+slice:
+
+- `POST /analytics/suggestions/triage` accepts optional `title` and
+  `description` fields. `title` is capped at 120 characters and `description`
+  is capped at 4000 characters.
+- Response fields are `category`, `priority`, `confidence`, `explanation`,
+  `low_confidence`, and `advisory`.
+- `category` uses the fixed MVP catalog:
+  `account-access`, `billing`, `general`, `hardware`, `network`, `privacy`,
+  and `workflow`.
+- `priority` uses `LOW`, `MEDIUM`, `HIGH`, or `URGENT`.
+- Suggestions are deterministic for test fixtures and use explainable
+  token/phrase-aware keyword rules rather than machine learning, substring-only
+  matching, or external AI provider calls.
+- Minimal or uncertain requests return safe fallback values with
+  `low_confidence: true`.
+- Suggestion responses are advisory, require human review, and do not mutate
+  ticket category, priority, status, assignment, closure, or duplicate state.
+- The analytics service does not persist private ticket content and does not
+  echo submitted ticket body text in the response.

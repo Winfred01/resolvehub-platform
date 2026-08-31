@@ -1,15 +1,16 @@
 # Architecture
 
-Current live roadmap mode: `PORTFOLIO_FIRST_V0_1` is complete.
+Completed baseline roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
-Proposed next roadmap mode after governance PR merge and scheduler update: `ANALYTICS_ASSISTED_V0_2`.
+Current live roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
 Current status: ResolveHub Portfolio-first v0.1 is complete on `origin/main`.
 `origin/main` contains the frontend scaffold, Spring Boot backend, auth/RBAC,
 ticket backend workflow, ticket frontend workflow, Kanban, dashboard backend
 APIs, dashboard UI, FastAPI health scaffold, Docker Compose foundation, GitHub
 Actions CI, scoped #26 quality gates, and scoped #27 demo/release packaging.
-Daily MVP development selection is paused. The current task authorizes v0.2 roadmap planning only, not Issue #23 implementation.
+The v0.2 roadmap is active, and Issue #23 adds deterministic advisory category
+and priority suggestions inside the analytics service.
 
 ## System Context
 
@@ -35,7 +36,7 @@ flowchart LR
 | Dashboard summary/trend backend APIs | MERGED |
 | Dashboard UI | MERGED via PR #48 |
 | FastAPI analytics health scaffold | MERGED |
-| Category/priority suggestion service | PROPOSED_V0_2_CORE via Issue #23 |
+| Category/priority suggestion service | IMPLEMENTED_V0_2_CORE via Issue #23 |
 | Duplicate suggestion | PROPOSED_V0_2_CORE via Issue #24 |
 | Full analytics workflow integration | PROPOSED_V0_2_CORE via Issue #25 |
 | Integrated E2E/accessibility/security gates | MERGED via PR #51 |
@@ -57,12 +58,13 @@ ticket data. `origin/main` contains the core workflow and dashboard endpoints.
 
 ## Analytics
 
-The FastAPI analytics service currently exposes a health endpoint and package
-boundary. Under `PORTFOLIO_FIRST_V0_1`, analytics is not a release blocker:
+The FastAPI analytics service exposes a health endpoint and an Issue #23
+category/priority suggestion endpoint. Under `ANALYTICS_ASSISTED_V0_2`,
+analytics work proceeds serially:
 
-- Issue #23 category/priority suggestion service is optional stretch.
-- Issue #24 duplicate suggestion is v0.2.
-- Issue #25 full analytics workflow integration is v0.2.
+- Issue #23 category/priority suggestion service.
+- Issue #24 duplicate suggestion.
+- Issue #25 full analytics workflow integration.
 
 Analytics suggestions remain advisory. They must not automatically mutate ticket
 truth or store private ticket content.
@@ -127,8 +129,8 @@ sequenceDiagram
   API->>DB: optional audited suggestion review state
 ```
 
-This flow is not required for Portfolio-first v0.1 unless the user explicitly
-enables the #23 stretch work.
+Issue #23 implements the analytics-service side of this flow for category and
+priority suggestions only. Backend and frontend integration remains Issue #25.
 
 ## Audit Flow
 
