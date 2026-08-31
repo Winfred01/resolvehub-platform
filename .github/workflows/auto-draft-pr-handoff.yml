@@ -5,6 +5,7 @@ on:
     branches:
       - "**/issue-*-*"
       - "docs/status-refresh-*"
+      - "docs/september-*-v*-execution-plan"
   workflow_dispatch:
   schedule:
     - cron: "17 * * * *"
@@ -85,7 +86,7 @@ jobs:
             }
 
             async function createDraftPr(branch) {
-              if (policy.isDocsStatusRefreshBranch(branch)) {
+              if (policy.isDocsStatusRefreshBranch(branch) || policy.isDocsExecutionPlanBranch(branch)) {
                 return github.rest.pulls.create({
                   owner,
                   repo,
@@ -93,8 +94,8 @@ jobs:
                   head: branch,
                   draft: true,
                   maintainer_can_modify: false,
-                  title: policy.titleForDocsStatusRefresh(branch),
-                  body: policy.docsStatusRefreshPrBody(branch),
+                  title: policy.titleForDocsBranch(branch),
+                  body: policy.docsPrBody(branch),
                 });
               }
 

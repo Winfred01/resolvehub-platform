@@ -8,15 +8,22 @@
 - Timezone: America/Toronto
 - Memory location: `$CODEX_HOME/automations/resolvehub-daily-mvp-development/memory.md`
 - Status: ACTIVE
-- Roadmap mode: `PORTFOLIO_FIRST_V0_1`
+- Roadmap mode: `ANALYTICS_ASSISTED_V0_2`
 - Auto merge: disabled
 
 ## Authoritative Scope
 
-The current roadmap source is
+The current product roadmap source is
+[analytics-assisted-v0.2-roadmap.md](analytics-assisted-v0.2-roadmap.md). The
+September 2026 execution cadence is documented in
+[september-2026-v0.2-execution-plan.md](september-2026-v0.2-execution-plan.md).
+The monthly calendar is a target cadence only; live GitHub state, automation
+memory, and dependency gates remain the execution authority.
+
+The Portfolio-first v0.1 roadmap remains a completed historical baseline in
 [portfolio-first-v0.1-roadmap.md](portfolio-first-v0.1-roadmap.md). The original
-14-day plan is historical baseline context and must not override
-Portfolio-first selection.
+14-day plan is historical baseline context and must not override current
+roadmap selection.
 
 The core v0.1 sequence is:
 
@@ -144,6 +151,36 @@ ENABLE_V0_1_ANALYTICS_STRETCH = true
 
 Do not select #24 or #25 under `PORTFOLIO_FIRST_V0_1` unless the user later
 changes roadmap mode.
+
+## September 2026 v0.2 Execution Cadence
+
+The September 2026 target progression is:
+
+```text
+#24 implementation and merge
+-> #25 implementation and merge
+-> analytics-specific quality/security/E2E
+-> v0.2 demo/documentation/release
+-> v0.2 completion reconciliation
+```
+
+This calendar is not permission to bypass dependency gates. At every daily run:
+
+- live GitHub state and automation memory override calendar expectations;
+- resume the existing active workstream first;
+- never start the next planned phase merely because its target date has arrived;
+- advance only after the preceding PR is merged and reconciled complete;
+- if an open PR is healthy and awaiting human Ready/review/merge, perform
+  lightweight reconciliation only and return `BLOCKED_EXTERNAL_CLOSED`;
+- do not create heartbeat commits or rerun heavy validation on an unchanged
+  external gate;
+- if work finishes earlier than the target calendar, advance on the next
+  scheduled run when all dependency gates pass;
+- keep exactly one active implementation workstream.
+
+See
+[september-2026-v0.2-execution-plan.md](september-2026-v0.2-execution-plan.md)
+for the full daily calendar.
 
 ## Dependency Gate
 
@@ -351,7 +388,8 @@ Eligible branches are:
 - issue workstream branches containing `/issue-<number>-`, such as
   `backend/issue-21-dashboard-apis`, `frontend/issue-22-dashboard-ui`,
   `qa/issue-26-quality-gates`, and `release/issue-27-v0.1-release`;
-- documentation status-refresh branches matching `docs/status-refresh-*`.
+- documentation status-refresh branches matching `docs/status-refresh-*`;
+- monthly execution-plan branches matching `docs/september-*-v*-execution-plan`.
 
 The workflow skips:
 
@@ -416,7 +454,8 @@ Handoff as the primary PR creation path. The workflow is
 .github/workflows/auto-draft-pr-handoff.yml and runs on eligible branch pushes,
 workflow_dispatch, and hourly fallback scan at 17 * * * *.
 
-Eligible branches: branches containing /issue-<number>- and docs/status-refresh-*.
+Eligible branches: branches containing /issue-<number>-, docs/status-refresh-*,
+and docs/september-*-v*-execution-plan.
 Skip main, master, branches already contained in main, and branches that already
 have any open or closed PR targeting main for the exact head branch.
 
