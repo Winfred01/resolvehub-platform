@@ -138,3 +138,9 @@ ticket bodies, comment bodies, Gmail content, browser-session data, job-search
 data, private addresses, phone numbers, or real customer/employer data. Backend
 and frontend flows must keep ticket work usable when analytics is unavailable or
 low confidence.
+
+Duplicate suggestions use safe normalized title, token-overlap, category, and
+priority signals only. Responses expose candidate IDs, confidence, matching
+signal names, and generic explanations; they do not echo ticket titles,
+descriptions, comments, credentials, tokens, sessions, or raw request bodies,
+and they do not log ticket content.

@@ -134,7 +134,7 @@ Implemented dashboard fields for the initial Issue #21 slice:
 | Endpoint | Purpose | Auth | Roles | Request | Response | Errors | Validation | Idempotency |
 |---|---|---|---|---|---|---|---|---|
 | `POST /analytics/classify` | Suggest category | Service auth | backend | title, description | category, confidence | 400,401,503 | text length | deterministic best effort |
-| `POST /analytics/duplicates` | Suggest duplicates | Service auth | backend | ticket text, candidate ids | candidates | 400,401,503 | candidate cap | no mutation |
+| `POST /analytics/suggestions/duplicates` | Suggest duplicates | Service auth target / local service boundary | backend | ticket, candidates | ranked duplicate candidates | 422,503 | candidate cap, safe field types | advisory only, no mutation |
 | `POST /analytics/priority` | Recommend priority | Service auth | backend | ticket fields | priority, confidence | 400,401,503 | enum values | no mutation |
 | `POST /analytics/suggestions/triage` | Suggest category and priority | Service auth target / local service boundary | backend | title, description | category, priority, confidence, explanation, low_confidence, advisory | 422,503 | field types and text length | advisory only, no mutation |
 | `GET /analytics/health` | Health check | Internal/public-safe | ops | none | status | 503 | n/a | read-only |
@@ -160,3 +160,25 @@ slice:
   ticket category, priority, status, assignment, closure, or duplicate state.
 - The analytics service does not persist private ticket content and does not
   echo submitted ticket body text in the response.
+
+Implemented duplicate suggestion fields for the v0.2 Issue #24 slice:
+
+- `POST /analytics/suggestions/duplicates` accepts a `ticket` object and up to
+  25 `candidates`.
+- `ticket` accepts optional `id`, `title`, `description`, `category`,
+  `priority`, and `status` fields. Candidate `id` is required; candidate
+  `title`, `description`, `category`, `priority`, and `status` are optional.
+- Text limits match the local ticket contract: `title` is capped at 120
+  characters, `description` at 4000 characters, and IDs at 80 characters.
+- Response fields are `candidates`, `low_confidence`, and `advisory`.
+- Each returned candidate contains `candidate_id`, `confidence`,
+  `matching_signals`, and safe generic `explanation` entries.
+- Matching uses deterministic normalized-title, safe token-overlap, category,
+  and priority signals. The endpoint excludes candidates whose ID matches the
+  source ticket ID and sorts ties by candidate ID for stable fixtures.
+- Empty candidate lists, unrelated candidates, or uncertain matches return an
+  empty or low-confidence advisory response without mutating ticket state.
+- Duplicate suggestions do not close, merge, update, assign, or otherwise
+  mutate tickets.
+- The analytics service does not persist private ticket content, echo submitted
+  ticket title or description text in the response, or log request bodies.

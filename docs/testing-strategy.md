@@ -27,8 +27,8 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 - Pytest tests for the analytics health endpoint.
 - Category and priority suggestion tests apply if optional Issue #23 is enabled
   before v0.1.
-- Duplicate suggestion and full backend/frontend analytics integration tests are
-  deferred to v0.2 with Issues #24 and #25.
+- Duplicate suggestion tests are implemented for Issue #24. Full
+  backend/frontend analytics integration tests are deferred to Issue #25.
 
 ## API Contract
 

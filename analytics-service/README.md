@@ -1,8 +1,9 @@
 # Analytics Service
 
-FastAPI service for ResolveHub analytics. The service exposes a health endpoint
-and a deterministic, advisory category/priority suggestion endpoint for v0.2
-triage assistance.
+FastAPI service for ResolveHub analytics. The service exposes a health endpoint,
+a deterministic advisory category/priority suggestion endpoint, and a
+deterministic advisory duplicate suggestion endpoint for v0.2 triage
+assistance.
 
 ## Local Setup
 
@@ -43,13 +44,28 @@ curl -X POST http://127.0.0.1:8000/analytics/suggestions/triage `
 The response includes `category`, `priority`, `confidence`, `explanation`,
 `low_confidence`, and `advisory`.
 
+Request duplicate suggestions:
+
+```powershell
+curl -X POST http://127.0.0.1:8000/analytics/suggestions/duplicates `
+  -H "Content-Type: application/json" `
+  -d "{\"ticket\":{\"id\":\"ticket-100\",\"title\":\"VPN outage\",\"description\":\"Agents cannot connect.\",\"category\":\"network\",\"priority\":\"URGENT\"},\"candidates\":[{\"id\":\"ticket-101\",\"title\":\"VPN outage\",\"description\":\"Support agents cannot connect to VPN.\",\"category\":\"network\",\"priority\":\"URGENT\"}]}"
+```
+
+The response includes ranked duplicate `candidates`, each with `candidate_id`,
+`confidence`, `matching_signals`, and `explanation`, plus `low_confidence` and
+`advisory`.
+
 ## Current Scope
 
 - Implemented: `GET /analytics/health`.
 - Implemented: `POST /analytics/suggestions/triage` for deterministic category
   and priority suggestions.
+- Implemented: `POST /analytics/suggestions/duplicates` for deterministic
+  duplicate candidate matching.
 - Prepared: FastAPI app factory and package boundary.
-- Not implemented: duplicate detection, backend integration, or ticket mutation.
+- Not implemented: backend integration, frontend suggestion UI, or ticket
+  mutation.
 
 All analytics test data must remain fictional and must not include real customer, employer, Gmail, browser-session, job-search, or personal data.
 
@@ -64,7 +80,10 @@ fields, advisory behavior, and privacy-safe logging. Do not add ML training,
 external AI provider calls, automatic ticket mutation, or real private data.
 
 Issue #23 implements category and priority suggestions with deterministic
-token/phrase-aware keyword scoring. Low-confidence, minimal, unavailable, or
-uncertain inputs use safe fallback values and remain advisory. The service does
-not persist ticket content and the suggestion response does not echo the
-submitted ticket body.
+token/phrase-aware keyword scoring. Issue #24 implements duplicate suggestions
+with deterministic normalized title, token-overlap, category, and priority
+signals; stable confidence sorting; self-ticket exclusion; candidate caps; and
+safe low-confidence/no-match responses. Low-confidence, minimal, unavailable,
+or uncertain inputs use safe fallback values and remain advisory. The service
+does not persist ticket content and suggestion responses do not echo submitted
+ticket body text.
