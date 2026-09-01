@@ -4,6 +4,7 @@ from typing import Literal
 from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict
 
+from resolvehub_analytics.duplicates import router as duplicates_router
 from resolvehub_analytics.triage import router as triage_router
 
 
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(triage_router)
+    app.include_router(duplicates_router)
 
     return app
 
