@@ -58,6 +58,10 @@ public class TicketActivity {
         return new TicketActivity(ticketId, actorId, "TICKET_COMMENTED", "comment");
     }
 
+    public static TicketActivity analyticsSuggestionReviewed(UUID ticketId, UUID actorId, String changedFields) {
+        return new TicketActivity(ticketId, actorId, "ANALYTICS_SUGGESTION_REVIEWED", changedFields);
+    }
+
     @PrePersist
     void markCreated() {
         createdAt = Instant.now();

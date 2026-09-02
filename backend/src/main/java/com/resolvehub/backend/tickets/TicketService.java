@@ -16,6 +16,8 @@ import com.resolvehub.backend.comments.TicketCommentPageResponse;
 import com.resolvehub.backend.comments.TicketCommentRepository;
 import com.resolvehub.backend.comments.TicketCommentResponse;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -44,16 +46,19 @@ class TicketService {
     private final TicketRepository ticketRepository;
     private final TicketActivityRepository ticketActivityRepository;
     private final TicketCommentRepository ticketCommentRepository;
+    private final TicketAnalyticsClient ticketAnalyticsClient;
     private final UserDirectoryService userDirectoryService;
 
     TicketService(
             TicketRepository ticketRepository,
             TicketActivityRepository ticketActivityRepository,
             TicketCommentRepository ticketCommentRepository,
+            TicketAnalyticsClient ticketAnalyticsClient,
             UserDirectoryService userDirectoryService) {
         this.ticketRepository = ticketRepository;
         this.ticketActivityRepository = ticketActivityRepository;
         this.ticketCommentRepository = ticketCommentRepository;
+        this.ticketAnalyticsClient = ticketAnalyticsClient;
         this.userDirectoryService = userDirectoryService;
     }
 
@@ -125,6 +130,36 @@ class TicketService {
                 request.size(),
                 Sort.by("createdAt").ascending().and(Sort.by("id").ascending()));
         return TicketActivityPageResponse.from(ticketActivityRepository.findByTicketId(ticket.id(), pageRequest));
+    }
+
+    @Transactional(readOnly = true)
+    TicketAnalyticsSuggestionResponse analyticsSuggestions(UUID ticketId, UserSummaryResponse currentUser) {
+        Ticket ticket = requireVisibleTicket(ticketId, currentUser);
+        List<Ticket> candidates = ticketRepository.findAll(analyticsCandidateSpecification(ticket, currentUser),
+                PageRequest.of(0, 25, Sort.by("updatedAt").descending().and(Sort.by("id").ascending())))
+                .getContent();
+        return ticketAnalyticsClient.suggest(ticket, candidates);
+    }
+
+    @Transactional
+    TicketSuggestionReviewResponse reviewAnalyticsSuggestion(
+            UUID ticketId,
+            TicketSuggestionReviewRequest request,
+            UserSummaryResponse currentUser) {
+        Ticket ticket = requireVisibleTicket(ticketId, currentUser);
+        Set<String> recordedFields = validateSuggestionReview(ticket, request, currentUser);
+        TicketActivity activity = ticketActivityRepository.saveAndFlush(TicketActivity.analyticsSuggestionReviewed(
+                ticket.id(),
+                currentUser.id(),
+                String.join(",", recordedFields)));
+
+        return new TicketSuggestionReviewResponse(
+                ticket.id(),
+                request.suggestionType(),
+                request.decision(),
+                List.copyOf(recordedFields),
+                activity.createdAt(),
+                true);
     }
 
     @Transactional
@@ -219,6 +254,80 @@ class TicketService {
             }
             return predicate;
         };
+    }
+
+    private Specification<Ticket> analyticsCandidateSpecification(Ticket source, UserSummaryResponse currentUser) {
+        return (root, query, criteriaBuilder) -> {
+            var predicate = criteriaBuilder.notEqual(root.get("id"), source.id());
+            if (!EndpointPermission.VIEW_ALL_TICKETS.allows(currentUser.roles())) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("requesterId"), currentUser.id()));
+            }
+            return predicate;
+        };
+    }
+
+    private Set<String> validateSuggestionReview(
+            Ticket ticket,
+            TicketSuggestionReviewRequest request,
+            UserSummaryResponse currentUser) {
+        if (request.suggestionType() == TicketSuggestionType.TRIAGE) {
+            return validateTriageSuggestionReview(request);
+        }
+        if (request.suggestionType() == TicketSuggestionType.DUPLICATE) {
+            return validateDuplicateSuggestionReview(ticket, request, currentUser);
+        }
+        throw new TicketUpdateValidationException("Invalid analytics suggestion type.");
+    }
+
+    private Set<String> validateTriageSuggestionReview(TicketSuggestionReviewRequest request) {
+        Set<String> recordedFields = new LinkedHashSet<>();
+        recordedFields.add("analyticsSuggestionReview");
+        recordedFields.add("suggestionType");
+        recordedFields.add("decision");
+
+        if (request.categoryId() != null) {
+            validateCategory(request.categoryId());
+            recordedFields.add("categoryId");
+        }
+        if (request.priority() != null) {
+            recordedFields.add("priority");
+        }
+        if (request.duplicateTicketId() != null) {
+            throw new TicketUpdateValidationException("Duplicate ticket id is only valid for duplicate reviews.");
+        }
+        if (request.decision() != TicketSuggestionDecision.IGNORE
+                && request.categoryId() == null
+                && request.priority() == null) {
+            throw new TicketUpdateValidationException("Accepted or overridden triage reviews require category or priority.");
+        }
+
+        return recordedFields;
+    }
+
+    private Set<String> validateDuplicateSuggestionReview(
+            Ticket ticket,
+            TicketSuggestionReviewRequest request,
+            UserSummaryResponse currentUser) {
+        Set<String> recordedFields = new LinkedHashSet<>();
+        recordedFields.add("analyticsSuggestionReview");
+        recordedFields.add("suggestionType");
+        recordedFields.add("decision");
+
+        if (request.categoryId() != null || request.priority() != null) {
+            throw new TicketUpdateValidationException("Category and priority are only valid for triage reviews.");
+        }
+        if (request.decision() != TicketSuggestionDecision.IGNORE) {
+            if (request.duplicateTicketId() == null) {
+                throw new TicketUpdateValidationException("Accepted or overridden duplicate reviews require a duplicate ticket id.");
+            }
+            if (ticket.id().equals(request.duplicateTicketId())) {
+                throw new TicketUpdateValidationException("A ticket cannot be reviewed as a duplicate of itself.");
+            }
+            requireVisibleTicket(request.duplicateTicketId(), currentUser);
+            recordedFields.add("duplicateTicketId");
+        }
+
+        return recordedFields;
     }
 
     private void validateUpdatePayload(UpdateTicketRequest request) {

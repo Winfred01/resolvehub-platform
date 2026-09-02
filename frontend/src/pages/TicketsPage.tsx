@@ -3,9 +3,11 @@ import { createDemoTicketGateway } from "../api/ticketGateway";
 import { ticketCategories } from "../data/ticketFixtures";
 import type {
   CreateTicketInput,
+  TicketAnalyticsSuggestion,
   TicketFilters,
   TicketGateway,
   TicketPriority,
+  TicketSuggestionReviewInput,
   TicketStatus,
   TicketSummary,
   UpdateTicketInput
@@ -66,6 +68,7 @@ type FormState = {
 };
 
 type ViewState = "loading" | "ready" | "error";
+type SuggestionState = "idle" | "loading" | "ready" | "error";
 
 const blankForm: FormState = {
   title: "",
@@ -126,6 +129,11 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
   const [pendingStatusById, setPendingStatusById] = useState<Record<string, TicketStatus>>({});
   const [kanbanError, setKanbanError] = useState("");
   const [movingTicketId, setMovingTicketId] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<TicketAnalyticsSuggestion | null>(null);
+  const [suggestionState, setSuggestionState] = useState<SuggestionState>("idle");
+  const [suggestionTicketId, setSuggestionTicketId] = useState<string | null>(null);
+  const [suggestionMessage, setSuggestionMessage] = useState("");
+  const [reviewingSuggestion, setReviewingSuggestion] = useState(false);
 
   async function loadTickets(nextFilters = filters, shouldShowLoading = true) {
     if (shouldShowLoading) {
@@ -173,6 +181,43 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
     [selectedId, tickets]
   );
 
+  useEffect(() => {
+    let active = true;
+
+    if (!selectedTicket) {
+      return () => {
+        active = false;
+      };
+    }
+
+    gateway
+      .getAnalyticsSuggestions(selectedTicket.id)
+      .then((nextSuggestions) => {
+        if (active) {
+          setSuggestionTicketId(selectedTicket.id);
+          setSuggestions(nextSuggestions);
+          setSuggestionState("ready");
+          setSuggestionMessage("");
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setSuggestionTicketId(selectedTicket.id);
+          setSuggestions(null);
+          setSuggestionMessage(
+            error instanceof Error
+              ? error.message
+              : "Analytics suggestions unavailable. Ticket workflow remains available."
+          );
+          setSuggestionState("error");
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [gateway, selectedTicket]);
+
   const ticketCountLabel = useMemo(() => {
     if (viewState === "loading") {
       return "Loading tickets";
@@ -184,6 +229,13 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
 
     return `${tickets.length} tickets`;
   }, [tickets.length, viewState]);
+  const selectedSuggestionState: SuggestionState = !selectedTicket
+    ? "idle"
+    : suggestionTicketId === selectedTicket.id
+      ? suggestionState
+      : "loading";
+  const selectedSuggestions = suggestionTicketId === selectedTicket?.id ? suggestions : null;
+  const selectedSuggestionMessage = suggestionTicketId === selectedTicket?.id ? suggestionMessage : "";
   const ticketsByStatus = useMemo(
     () =>
       statusColumns.reduce<Record<TicketStatus, TicketSummary[]>>(
@@ -305,6 +357,69 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
     } finally {
       setMovingTicketId(null);
     }
+  }
+
+  async function recordSuggestionReview(input: TicketSuggestionReviewInput) {
+    if (!selectedTicket) {
+      return;
+    }
+
+    setReviewingSuggestion(true);
+    setSuggestionMessage("");
+
+    try {
+      await gateway.reviewAnalyticsSuggestion(selectedTicket.id, input);
+      setSuggestionMessage(`${input.decision.toLocaleLowerCase()} review recorded for ${input.suggestionType.toLocaleLowerCase()}.`);
+    } catch (error) {
+      setSuggestionMessage(error instanceof Error ? error.message : "Suggestion review could not be recorded.");
+    } finally {
+      setReviewingSuggestion(false);
+    }
+  }
+
+  function stageTriageSuggestion(field: "category" | "priority") {
+    if (!selectedTicket || !selectedSuggestions) {
+      return;
+    }
+
+    const nextForm: FormState = {
+      title: selectedTicket.title,
+      description: selectedTicket.description,
+      categoryId: field === "category" ? selectedSuggestions.triage.categoryId : selectedTicket.categoryId,
+      priority: field === "priority" ? selectedSuggestions.triage.priority : selectedTicket.priority,
+      status: selectedTicket.status
+    };
+
+    setFormMode("edit");
+    setForm(nextForm);
+    setFormErrors([]);
+    void recordSuggestionReview({
+      suggestionType: "TRIAGE",
+      decision: "ACCEPT",
+      categoryId: nextForm.categoryId,
+      priority: nextForm.priority
+    });
+  }
+
+  function overrideTriageSuggestion() {
+    if (!selectedTicket) {
+      return;
+    }
+
+    void recordSuggestionReview({
+      suggestionType: "TRIAGE",
+      decision: "OVERRIDE",
+      categoryId: formMode === "edit" ? form.categoryId : selectedTicket.categoryId,
+      priority: formMode === "edit" ? form.priority : selectedTicket.priority
+    });
+  }
+
+  function acceptDuplicateSuggestion(candidateId: string) {
+    void recordSuggestionReview({
+      suggestionType: "DUPLICATE",
+      decision: "ACCEPT",
+      duplicateTicketId: candidateId
+    });
   }
   return (
     <section className="ticket-workspace" aria-labelledby="tickets-heading">
@@ -532,6 +647,131 @@ export function TicketsPage({ gateway = ticketGateway }: TicketsPageProps) {
                   </div>
                 </dl>
                 <p className="ticket-description">{selectedTicket.description}</p>
+                <section className="suggestion-panel" aria-labelledby="analytics-suggestions-heading">
+                  <div className="panel-heading">
+                    <div>
+                      <p className="eyebrow">Advisory analytics</p>
+                      <h3 id="analytics-suggestions-heading">Suggestions</h3>
+                    </div>
+                    <span className="pill">Human review</span>
+                  </div>
+                  {selectedSuggestionState === "loading" ? (
+                    <p className="suggestion-note">Loading suggestions</p>
+                  ) : null}
+                  {selectedSuggestionState === "error" ? (
+                    <p className="suggestion-note" role="status">
+                      {selectedSuggestionMessage}
+                    </p>
+                  ) : null}
+                  {selectedSuggestionState === "ready" && selectedSuggestions ? (
+                    <div className="suggestion-stack">
+                      {!selectedSuggestions.analyticsAvailable ? (
+                        <p className="suggestion-note">
+                          Analytics service unavailable; current ticket values are preserved.
+                        </p>
+                      ) : null}
+                      <article className="suggestion-card" aria-label="Triage suggestion">
+                        <div>
+                          <h4>Triage suggestion</h4>
+                          <p>
+                            {getCategoryName(selectedSuggestions.triage.categoryId)} /{" "}
+                            {priorityLabels[selectedSuggestions.triage.priority]} /{" "}
+                            {Math.round(selectedSuggestions.triage.confidence * 100)}% confidence
+                          </p>
+                        </div>
+                        <ul>
+                          {selectedSuggestions.triage.explanation.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                        {selectedSuggestions.triage.lowConfidence ? (
+                          <p className="suggestion-note">Low confidence</p>
+                        ) : null}
+                        <div className="suggestion-actions">
+                          <button
+                            type="button"
+                            disabled={reviewingSuggestion}
+                            onClick={() => stageTriageSuggestion("category")}
+                          >
+                            Accept category
+                          </button>
+                          <button
+                            type="button"
+                            disabled={reviewingSuggestion}
+                            onClick={() => stageTriageSuggestion("priority")}
+                          >
+                            Accept priority
+                          </button>
+                          <button
+                            type="button"
+                            disabled={reviewingSuggestion}
+                            onClick={overrideTriageSuggestion}
+                          >
+                            Override
+                          </button>
+                          <button
+                            type="button"
+                            disabled={reviewingSuggestion}
+                            onClick={() =>
+                              void recordSuggestionReview({
+                                suggestionType: "TRIAGE",
+                                decision: "IGNORE"
+                              })
+                            }
+                          >
+                            Ignore
+                          </button>
+                        </div>
+                      </article>
+                      <article className="suggestion-card" aria-label="Duplicate suggestions">
+                        <div>
+                          <h4>Duplicate suggestions</h4>
+                          <p>
+                            {selectedSuggestions.duplicates.candidates.length === 0
+                              ? "No candidates"
+                              : `${selectedSuggestions.duplicates.candidates.length} candidates`}
+                          </p>
+                        </div>
+                        {selectedSuggestions.duplicates.candidates.length > 0 ? (
+                          <ul className="duplicate-list">
+                            {selectedSuggestions.duplicates.candidates.map((candidate) => (
+                              <li key={candidate.candidateId}>
+                                <span>{Math.round(candidate.confidence * 100)}% confidence</span>
+                                <span>{candidate.matchingSignals.join(", ")}</span>
+                                <button
+                                  type="button"
+                                  disabled={reviewingSuggestion}
+                                  onClick={() => acceptDuplicateSuggestion(candidate.candidateId)}
+                                >
+                                  Accept duplicate
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                        <div className="suggestion-actions">
+                          <button
+                            type="button"
+                            disabled={reviewingSuggestion}
+                            onClick={() =>
+                              void recordSuggestionReview({
+                                suggestionType: "DUPLICATE",
+                                decision: "IGNORE"
+                              })
+                            }
+                          >
+                            Ignore duplicates
+                          </button>
+                        </div>
+                      </article>
+                    </div>
+                  ) : null}
+                  {selectedSuggestionMessage && selectedSuggestionState !== "error" ? (
+                    <p className="suggestion-note" role="status">
+                      {selectedSuggestionMessage}
+                    </p>
+                  ) : null}
+                </section>
               </>
             ) : (
               <div className="state-panel">

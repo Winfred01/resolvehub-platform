@@ -27,6 +27,8 @@ is not yet enforced in-process.
 | `GET /api/tickets` | List tickets | Required | all | filters, page, size | paged tickets | 401,403 | allowed filters | read-only |
 | `GET /api/ticket-categories` | List ticket categories | Required | all | none | categories | 401 | fixed MVP catalog | read-only |
 | `GET /api/tickets/{id}` | View ticket | Required | allowed actor | id | ticket detail | 401,403,404 | UUID | read-only |
+| `GET /api/tickets/{id}/analytics-suggestions` | Read advisory analytics suggestions | Required | allowed actor | id | triage and duplicate suggestions | 401,403,404 | UUID, visible ticket | read-only, graceful fallback |
+| `POST /api/tickets/{id}/analytics-suggestions/reviews` | Record suggestion review decision | Required | allowed actor | suggestionType, decision, optional safe selected fields | review receipt | 400,401,403,404 | explicit accept, ignore, or override | audit-only, no ticket mutation |
 | `PATCH /api/tickets/{id}` | Update ticket | Required | agent, lead, admin, owner-limited | patch fields | ticket | 400,401,403,404,409 | allowed status transitions | version check |
 | `PATCH /api/tickets/{id}/assignment` | Assign ticket | Required | agent self-assign, lead, admin | assigneeId, version | ticket | 400,401,403,404,409 | assignable user | version check |
 | `DELETE /api/tickets/{id}` | Soft close ticket | Required | lead, admin | reason | closed ticket | 401,403,404 | reason required | safe if already closed |
@@ -97,6 +99,8 @@ Implemented activity-history fields for the initial Issue #18 slice:
 - Response records expose `id`, `ticketId`, `actorId`, `action`, `changedFields`, and `createdAt`.
 - Activities are returned oldest-first with paged `content`, `page`, `size`, `totalElements`, `totalPages`, and `empty` metadata.
 - Core mutation events are `TICKET_CREATED`, `TICKET_UPDATED`, `TICKET_ASSIGNED`, and `TICKET_COMMENTED`.
+- Analytics review events use `ANALYTICS_SUGGESTION_REVIEWED` with safe field
+  names only.
 - `changedFields` contains safe field names only, never ticket descriptions, comment bodies, credentials, tokens, sessions, passwords, or password hashes.
 - No public create, update, or delete activity endpoint exists; activity rows are appended only by ticket workflows.
 
@@ -182,3 +186,29 @@ Implemented duplicate suggestion fields for the v0.2 Issue #24 slice:
   mutate tickets.
 - The analytics service does not persist private ticket content, echo submitted
   ticket title or description text in the response, or log request bodies.
+
+Implemented backend/frontend analytics workflow integration fields for the v0.2
+Issue #25 slice:
+
+- `GET /api/tickets/{id}/analytics-suggestions` requires a visible ticket and
+  returns `advisory`, `analyticsAvailable`, `triage`, and `duplicates`.
+- Backend suggestion responses use frontend-facing camelCase fields such as
+  `categoryId`, `candidateId`, and `matchingSignals`; the backend client still
+  accepts the analytics service's documented snake_case duplicate fields.
+- Backend analytics requests use the current ticket plus up to 25 visible
+  candidate tickets through the documented analytics service boundary.
+- If the analytics service is unavailable or returns an unusable response, the
+  backend returns `analyticsAvailable: false`, preserves current ticket
+  category and priority as low-confidence fallback values, returns no duplicate
+  candidates, and leaves normal ticket workflow usable.
+- `POST /api/tickets/{id}/analytics-suggestions/reviews` records explicit
+  `ACCEPT`, `IGNORE`, or `OVERRIDE` decisions for `TRIAGE` or `DUPLICATE`
+  suggestions. Accepted or overridden triage reviews require a safe category or
+  priority value. Accepted or overridden duplicate reviews require a visible
+  non-self duplicate ticket ID.
+- Review recording appends `ANALYTICS_SUGGESTION_REVIEWED` activity rows with
+  safe field names such as `analyticsSuggestionReview`, `suggestionType`,
+  `decision`, `categoryId`, `priority`, and `duplicateTicketId`.
+- Review recording does not automatically update category, priority, status,
+  assignment, closure, or duplicate state. Any ticket change still requires the
+  existing explicit ticket update endpoint.

@@ -1,5 +1,12 @@
 import { demoTickets } from "../data/ticketFixtures";
-import type { TicketFilters, TicketGateway, TicketPage, TicketSummary } from "../types/tickets";
+import type {
+  TicketAnalyticsSuggestion,
+  TicketFilters,
+  TicketGateway,
+  TicketPage,
+  TicketPriority,
+  TicketSummary
+} from "../types/tickets";
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -24,6 +31,71 @@ function toPage(content: TicketSummary[]): TicketPage {
     totalElements: content.length,
     totalPages: content.length > 0 ? 1 : 0,
     empty: content.length === 0
+  };
+}
+
+function suggestCategory(ticket: TicketSummary) {
+  const text = `${ticket.title} ${ticket.description}`.toLocaleLowerCase();
+
+  if (text.includes("vpn") || text.includes("connection")) {
+    return "network";
+  }
+  if (text.includes("access") || text.includes("sign in")) {
+    return "account-access";
+  }
+  if (text.includes("approval") || text.includes("queue")) {
+    return "workflow";
+  }
+
+  return ticket.categoryId;
+}
+
+function suggestPriority(ticket: TicketSummary): TicketPriority {
+  const text = `${ticket.title} ${ticket.description}`.toLocaleLowerCase();
+
+  if (text.includes("cannot") || text.includes("blocked")) {
+    return "HIGH";
+  }
+  if (text.includes("stuck") || text.includes("slow")) {
+    return "MEDIUM";
+  }
+
+  return ticket.priority;
+}
+
+function toAnalyticsSuggestion(ticket: TicketSummary, tickets: TicketSummary[]): TicketAnalyticsSuggestion {
+  const duplicateCandidates = tickets
+    .filter((candidate) => candidate.id !== ticket.id && candidate.categoryId === ticket.categoryId)
+    .slice(0, 3)
+    .map((candidate) => ({
+      candidateId: candidate.id,
+      confidence: candidate.title.toLocaleLowerCase() === ticket.title.toLocaleLowerCase() ? 0.9 : 0.54,
+      matchingSignals: ["shared_category"],
+      explanation: [
+        "Matched category metadata.",
+        "Suggestion is advisory and does not merge or mutate tickets."
+      ]
+    }));
+
+  return {
+    advisory: true,
+    analyticsAvailable: true,
+    triage: {
+      categoryId: suggestCategory(ticket),
+      priority: suggestPriority(ticket),
+      confidence: 0.74,
+      explanation: [
+        "Matched deterministic demo ticket signals.",
+        "Suggestion is advisory and requires human review."
+      ],
+      lowConfidence: false,
+      advisory: true
+    },
+    duplicates: {
+      candidates: duplicateCandidates,
+      lowConfidence: duplicateCandidates.length === 0,
+      advisory: true
+    }
   };
 }
 
@@ -77,6 +149,28 @@ export function createDemoTicketGateway(
 
       tickets = tickets.map((ticket) => (ticket.id === id ? updated : ticket));
       return updated;
+    },
+    async getAnalyticsSuggestions(id) {
+      const ticket = tickets.find((candidate) => candidate.id === id);
+
+      if (!ticket) {
+        throw new Error("Ticket was not found.");
+      }
+
+      return toAnalyticsSuggestion(ticket, tickets);
+    },
+    async reviewAnalyticsSuggestion(id, input) {
+      if (!tickets.some((ticket) => ticket.id === id)) {
+        throw new Error("Ticket was not found.");
+      }
+
+      return {
+        ticketId: id,
+        ...input,
+        recordedFields: ["analyticsSuggestionReview", "suggestionType", "decision"],
+        recordedAt: new Date().toISOString(),
+        advisory: true
+      };
     }
   };
 }
@@ -135,6 +229,15 @@ export function createRestTicketGateway(
     updateTicket(id, input) {
       return requestJson<TicketSummary>(`/api/tickets/${id}`, options, {
         method: "PATCH",
+        body: JSON.stringify(input)
+      });
+    },
+    getAnalyticsSuggestions(id) {
+      return requestJson<TicketAnalyticsSuggestion>(`/api/tickets/${id}/analytics-suggestions`, options);
+    },
+    reviewAnalyticsSuggestion(id, input) {
+      return requestJson(`/api/tickets/${id}/analytics-suggestions/reviews`, options, {
+        method: "POST",
         body: JSON.stringify(input)
       });
     }

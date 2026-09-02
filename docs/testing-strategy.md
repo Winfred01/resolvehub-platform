@@ -27,8 +27,8 @@ Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 - Pytest tests for the analytics health endpoint.
 - Category and priority suggestion tests apply if optional Issue #23 is enabled
   before v0.1.
-- Duplicate suggestion tests are implemented for Issue #24. Full
-  backend/frontend analytics integration tests are deferred to Issue #25.
+- Duplicate suggestion tests are implemented for Issue #24. Backend/frontend
+  analytics integration tests are implemented for Issue #25.
 
 ## API Contract
 
@@ -109,10 +109,11 @@ Quarantine flaky tests only with a tracking issue. Do not ignore failing securit
 
 ## v0.2 Analytics-specific Gates
 
-The v0.2 analytics-specific gates start only after #25 is merged. They should
-cover analytics unit/contract tests for #23 and #24, backend integration tests
-for success and analytics-service failure, frontend tests for advisory accept,
-ignore, and override flows, E2E smoke for suggestion review, and secret/privacy
-checks proving recommendation handling does not expose private ticket bodies,
-comments, credentials, tokens, sessions, Gmail data, browser data, job-search
-data, or real customer data.
+The v0.2 analytics-specific gates start only after #25 is merged. Issue #25 adds
+backend tests for suggestion retrieval, audit-only review decisions, hidden/self
+duplicate rejection, and analytics-service failure fallback, plus frontend tests
+for advisory accept, ignore, override, and failure states. The follow-up quality
+workstream should broaden malformed response, timeout, E2E smoke, accessibility,
+and privacy checks proving recommendation handling does not expose private
+ticket bodies, comments, credentials, tokens, sessions, Gmail data, browser
+data, job-search data, or real customer data.

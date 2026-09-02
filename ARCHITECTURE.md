@@ -10,8 +10,9 @@ ticket backend workflow, ticket frontend workflow, Kanban, dashboard backend
 APIs, dashboard UI, FastAPI health scaffold, Docker Compose foundation, GitHub
 Actions CI, scoped #26 quality gates, and scoped #27 demo/release packaging.
 The v0.2 roadmap is active. Issue #23 adds deterministic advisory category and
-priority suggestions inside the analytics service, and Issue #24 adds
-deterministic advisory duplicate ticket suggestions.
+priority suggestions inside the analytics service, Issue #24 adds deterministic
+advisory duplicate ticket suggestions, and Issue #25 integrates suggestion
+review into the ticket workflow.
 
 ## System Context
 
@@ -39,7 +40,7 @@ flowchart LR
 | FastAPI analytics health scaffold | MERGED |
 | Category/priority suggestion service | IMPLEMENTED_V0_2_CORE via Issue #23 |
 | Duplicate suggestion | IMPLEMENTED_V0_2_CORE via Issue #24 |
-| Full analytics workflow integration | PROPOSED_V0_2_CORE via Issue #25 |
+| Full analytics workflow integration | IMPLEMENTED_V0_2_CORE via Issue #25 |
 | Integrated E2E/accessibility/security gates | MERGED via PR #51 |
 | Docker demo and portfolio release package | MERGED via PR #52 |
 
@@ -65,7 +66,8 @@ endpoint. Under `ANALYTICS_ASSISTED_V0_2`, analytics work proceeds serially:
 
 - Issue #23 category/priority suggestion service.
 - Issue #24 duplicate suggestion.
-- Issue #25 full analytics workflow integration.
+- Issue #25 full analytics workflow integration through the backend/frontend
+  ticket workflow.
 
 Analytics suggestions remain advisory. They must not automatically mutate ticket
 truth or store private ticket content.
@@ -132,7 +134,11 @@ sequenceDiagram
 
 Issue #23 implements the analytics-service side of this flow for category and
 priority suggestions. Issue #24 implements duplicate candidate matching in the
-analytics service. Backend and frontend integration remains Issue #25.
+analytics service. Issue #25 adds backend endpoints that request both advisory
+suggestion types, degrade when analytics is unavailable, and record explicit
+review decisions as safe activity field names only. The frontend ticket detail
+surface displays loading, failure, low-confidence, accept, ignore, and override
+states without hidden ticket mutation.
 
 ## Audit Flow
 

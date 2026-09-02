@@ -109,6 +109,23 @@ class TicketController {
         return ticketService.activities(id, TicketActivityPageRequest.from(page, size), currentUser);
     }
 
+    @GetMapping("/{id}/analytics-suggestions")
+    TicketAnalyticsSuggestionResponse analyticsSuggestions(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id) {
+        UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
+        return ticketService.analyticsSuggestions(id, currentUser);
+    }
+
+    @PostMapping("/{id}/analytics-suggestions/reviews")
+    ResponseEntity<TicketSuggestionReviewResponse> reviewAnalyticsSuggestion(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable UUID id,
+            @Valid @RequestBody TicketSuggestionReviewRequest request) {
+        UserSummaryResponse currentUser = authorizationService.requireAuthenticated(authorization);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.reviewAnalyticsSuggestion(id, request, currentUser));
+    }
+
     @PatchMapping("/{id}")
     TicketResponse update(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,

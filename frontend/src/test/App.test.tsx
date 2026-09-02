@@ -171,6 +171,85 @@ describe("Ticket workspace", () => {
       .toBeInTheDocument();
   });
 
+  it("stages accepted triage suggestions in the edit form and records review", async () => {
+    render(
+      <TicketsPage
+        gateway={createDemoTicketGateway([
+          {
+            id: "44444444-4444-4444-8444-444444444444",
+            title: "VPN access blocked",
+            description: "The fictional requester cannot reach the secure queue.",
+            categoryId: "general",
+            priority: "LOW",
+            status: "OPEN",
+            version: 1,
+            requesterId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+            currentAssigneeId: null,
+            createdAt: "2026-09-01T10:00:00Z",
+            updatedAt: "2026-09-01T10:00:00Z"
+          }
+        ])}
+      />
+    );
+
+    expect(await screen.findByRole("article", { name: "VPN access blocked" })).toBeInTheDocument();
+    expect(await screen.findByRole("article", { name: "Triage suggestion" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Accept category" }));
+
+    const formPanel = await screen.findByRole("region", { name: "Edit ticket" });
+    expect(within(formPanel).getByLabelText("Category")).toHaveValue("network");
+    expect(await screen.findByText("accept review recorded for triage.")).toBeInTheDocument();
+  });
+
+  it("keeps ticket workflow available when analytics suggestions fail", async () => {
+    const baseGateway = createDemoTicketGateway(demoTickets);
+    const failingSuggestionGateway: TicketGateway = {
+      ...baseGateway,
+      getAnalyticsSuggestions: vi.fn().mockRejectedValue(new Error("Analytics service unavailable.")),
+      reviewAnalyticsSuggestion: vi.fn()
+    };
+
+    render(<TicketsPage gateway={failingSuggestionGateway} />);
+
+    expect(await screen.findByRole("article", { name: "Cannot access shared support queue" }))
+      .toBeInTheDocument();
+    expect(await screen.findByText("Analytics service unavailable.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create ticket" })).toBeInTheDocument();
+  });
+
+  it("records ignored and overridden suggestions explicitly", async () => {
+    const reviewAnalyticsSuggestion = vi.fn().mockResolvedValue({
+      ticketId: demoTickets[0].id,
+      suggestionType: "TRIAGE",
+      decision: "IGNORE",
+      recordedFields: ["analyticsSuggestionReview", "suggestionType", "decision"],
+      recordedAt: "2026-09-01T10:30:00Z",
+      advisory: true
+    });
+    const baseGateway = createDemoTicketGateway(demoTickets);
+    const reviewGateway: TicketGateway = {
+      ...baseGateway,
+      reviewAnalyticsSuggestion
+    };
+
+    render(<TicketsPage gateway={reviewGateway} />);
+
+    expect(await screen.findByRole("article", { name: "Triage suggestion" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ignore" }));
+    expect(await screen.findByText("ignore review recorded for triage.")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Override" }));
+    expect(reviewAnalyticsSuggestion).toHaveBeenLastCalledWith(
+      demoTickets[0].id,
+      expect.objectContaining({
+        suggestionType: "TRIAGE",
+        decision: "OVERRIDE"
+      })
+    );
+  });
+
   it("edits the selected ticket title and status", async () => {
     render(<TicketsPage gateway={createDemoTicketGateway(demoTickets)} />);
 
@@ -198,7 +277,9 @@ describe("Ticket workspace", () => {
       listTickets: vi.fn().mockRejectedValue(new Error("Backend unavailable.")),
       getTicket: vi.fn(),
       createTicket: vi.fn(),
-      updateTicket: vi.fn()
+      updateTicket: vi.fn(),
+      getAnalyticsSuggestions: vi.fn(),
+      reviewAnalyticsSuggestion: vi.fn()
     };
 
     render(<TicketsPage gateway={failingGateway} />);
@@ -332,7 +413,25 @@ describe("Kanban workflow", () => {
       }),
       getTicket: vi.fn(),
       createTicket: vi.fn(),
-      updateTicket: vi.fn().mockRejectedValue(new Error("Status service unavailable."))
+      updateTicket: vi.fn().mockRejectedValue(new Error("Status service unavailable.")),
+      getAnalyticsSuggestions: vi.fn().mockResolvedValue({
+        advisory: true,
+        analyticsAvailable: true,
+        triage: {
+          categoryId: "account-access",
+          priority: "HIGH",
+          confidence: 0.8,
+          explanation: ["Suggestion is advisory and requires human review."],
+          lowConfidence: false,
+          advisory: true
+        },
+        duplicates: {
+          candidates: [],
+          lowConfidence: true,
+          advisory: true
+        }
+      }),
+      reviewAnalyticsSuggestion: vi.fn()
     };
 
     render(<TicketsPage gateway={failingGateway} />);
