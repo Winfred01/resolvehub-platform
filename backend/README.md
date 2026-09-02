@@ -4,7 +4,7 @@ Spring Boot API foundation for ResolveHub.
 
 ## Scope
 
-This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, the first assignment workflow slice, ticket comment creation/listing, ticket activity-history reads, and dashboard summary/trend read APIs. It does not implement analytics integration, production PostgreSQL connectivity, or SQL migrations.
+This scaffold includes backend startup, configuration boundaries, package ownership, a public-safe health endpoint, initial user registration, local MVP login/logout sessions, the first role-based authorization boundary, ticket create/detail APIs, ticket list/search, ticket update workflow, fixed ticket categories, the first assignment workflow slice, ticket comment creation/listing, ticket activity-history reads, dashboard summary/trend read APIs, and advisory analytics suggestion review endpoints. It does not implement production PostgreSQL connectivity or SQL migrations.
 
 ## Package Boundaries
 
@@ -175,6 +175,29 @@ daily or weekly buckets for ticket creations and status movement events. These
 responses never include ticket descriptions, comment bodies, tokens,
 credentials, passwords, password hashes, or user profile fields.
 
+Read advisory analytics suggestions for a visible ticket:
+
+```bash
+curl http://localhost:8080/api/tickets/<ticket-id>/analytics-suggestions \
+  -H "Authorization: Bearer <token-from-login>"
+```
+
+Record an explicit suggestion review decision:
+
+```bash
+curl -X POST http://localhost:8080/api/tickets/<ticket-id>/analytics-suggestions/reviews \
+  -H "Authorization: Bearer <token-from-login>" \
+  -H "Content-Type: application/json" \
+  -d '{"suggestionType":"TRIAGE","decision":"ACCEPT","categoryId":"network","priority":"HIGH"}'
+```
+
+Suggestion reads call the FastAPI analytics service through
+`resolvehub.backend.analytics-base-url`, defaulting to `http://localhost:8000`.
+If analytics is unavailable, the backend returns an advisory low-confidence
+fallback and keeps the ticket workflow usable. Review decisions are audit-only
+and write safe field names to activity history; they do not automatically
+change category, priority, status, assignment, closure, or duplicate state.
+
 After startup, verify the health endpoint:
 
 ```bash
@@ -199,9 +222,8 @@ Expected response shape:
 
 ## Analytics-assisted v0.2 Boundary
 
-The analytics-assisted v0.2 roadmap should integrate suggestions through a safe
-backend service boundary only after #23 and #24 are available. Backend handling
-must treat recommendations as advisory, require explicit user action before any
-state change, tolerate analytics-service failures, and record only safe review
-decisions without storing private ticket bodies, comments, credentials, tokens,
-sessions, Gmail data, browser data, or job-search data.
+The analytics-assisted v0.2 backend integration treats recommendations as
+advisory, requires explicit user action before any state change, tolerates
+analytics-service failures, and records only safe review decisions without
+storing private ticket bodies, comments, credentials, tokens, sessions, Gmail
+data, browser data, or job-search data.

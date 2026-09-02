@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,11 +18,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resolvehub.backend.auth.AccountRole;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +49,9 @@ class TicketControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private TicketAnalyticsClient ticketAnalyticsClient;
 
     @BeforeEach
     void resetState() {
@@ -584,6 +591,146 @@ class TicketControllerTest {
         mockMvc.perform(post("/api/tickets/{id}/activities", ticketId)
                         .header(HttpHeaders.AUTHORIZATION, authorization))
                 .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    void supportRoleCanReadAdvisoryAnalyticsSuggestionsForVisibleTicket() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-suggestions-owner@example.test", "Ticket Suggestions Owner");
+        String agentEmail = saveAccount("ticket-suggestions-agent@example.test", AccountRole.AGENT);
+        String agentAuthorization = authorizationHeaderFor(agentEmail);
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "VPN access blocked",
+                "The fictional requester cannot reach the secure queue.",
+                "network",
+                "HIGH"), "id");
+        UUID duplicateCandidateId = UUID.randomUUID();
+        when(ticketAnalyticsClient.suggest(any(), any())).thenReturn(new TicketAnalyticsSuggestionResponse(
+                true,
+                true,
+                new TicketTriageSuggestionResponse(
+                        "network",
+                        TicketPriority.HIGH,
+                        0.82,
+                        List.of(
+                                "Matched network keywords.",
+                                "Suggestion is advisory and requires human review."),
+                        false,
+                        true),
+                new TicketDuplicateSuggestionResponse(
+                        List.of(new TicketDuplicateCandidateSuggestionResponse(
+                                duplicateCandidateId,
+                                0.74,
+                                List.of("shared_category"),
+                                List.of("Matched category metadata."))),
+                        false,
+                        true)));
+
+        mockMvc.perform(get("/api/tickets/{id}/analytics-suggestions", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, agentAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.advisory").value(true))
+                .andExpect(jsonPath("$.analyticsAvailable").value(true))
+                .andExpect(jsonPath("$.triage.categoryId").value("network"))
+                .andExpect(jsonPath("$.triage.priority").value("HIGH"))
+                .andExpect(jsonPath("$.triage.explanation[0]").value("Matched network keywords."))
+                .andExpect(jsonPath("$.duplicates.candidates[0].candidateId").value(duplicateCandidateId.toString()))
+                .andExpect(jsonPath("$", not(hasKey("description"))))
+                .andExpect(jsonPath("$", not(hasKey("password"))));
+    }
+
+    @Test
+    void analyticsSuggestionReviewsAreExplicitAuditOnlyAndSafe() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-suggestion-review-owner@example.test", "Ticket Suggestion Review Owner");
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Billing export blocked",
+                "The fictional requester cannot export the monthly billing report.",
+                "billing",
+                "MEDIUM"), "id");
+
+        mockMvc.perform(post("/api/tickets/{id}/analytics-suggestions/reviews", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "suggestionType": "TRIAGE",
+                                  "decision": "ACCEPT",
+                                  "categoryId": "billing",
+                                  "priority": "HIGH"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ticketId").value(ticketId))
+                .andExpect(jsonPath("$.suggestionType").value("TRIAGE"))
+                .andExpect(jsonPath("$.decision").value("ACCEPT"))
+                .andExpect(jsonPath("$.recordedFields", contains(
+                        "analyticsSuggestionReview",
+                        "suggestionType",
+                        "decision",
+                        "categoryId",
+                        "priority")))
+                .andExpect(jsonPath("$.recordedAt", notNullValue()))
+                .andExpect(jsonPath("$.advisory").value(true));
+
+        mockMvc.perform(get("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoryId").value("billing"))
+                .andExpect(jsonPath("$.priority").value("MEDIUM"));
+
+        String changedFields = jdbcTemplate.queryForObject(
+                "select changed_fields from ticket_activities where ticket_id = ? and action = 'ANALYTICS_SUGGESTION_REVIEWED'",
+                String.class,
+                UUID.fromString(ticketId));
+        org.assertj.core.api.Assertions.assertThat(changedFields)
+                .contains("analyticsSuggestionReview")
+                .doesNotContain("monthly billing report")
+                .doesNotContain("Billing export blocked");
+    }
+
+    @Test
+    void duplicateReviewRejectsHiddenOrSelfCandidateWithoutTicketMutation() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-duplicate-review-owner@example.test", "Ticket Duplicate Review Owner");
+        String otherAuthorization = registerAndLogin("ticket-duplicate-review-other@example.test", "Ticket Duplicate Review Other");
+        String ticketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "Cannot access workflow queue",
+                "The fictional requester cannot open the workflow queue.",
+                "workflow",
+                "HIGH"), "id");
+        String hiddenTicketId = fieldFrom(createTicket(
+                otherAuthorization,
+                "Cannot access workflow queue",
+                "Another requester owns this fictional ticket.",
+                "workflow",
+                "HIGH"), "id");
+
+        mockMvc.perform(post("/api/tickets/{id}/analytics-suggestions/reviews", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "suggestionType": "DUPLICATE",
+                                  "decision": "ACCEPT",
+                                  "duplicateTicketId": "%s"
+                                }
+                                """.formatted(ticketId)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("A ticket cannot be reviewed as a duplicate of itself."));
+
+        mockMvc.perform(post("/api/tickets/{id}/analytics-suggestions/reviews", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "suggestionType": "DUPLICATE",
+                                  "decision": "ACCEPT",
+                                  "duplicateTicketId": "%s"
+                                }
+                                """.formatted(hiddenTicketId)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Forbidden."));
     }
 
     @Test

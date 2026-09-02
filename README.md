@@ -9,8 +9,9 @@ Completed baseline roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 Current live roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
 Current status: Portfolio-first v0.1 is complete on `origin/main`. The v0.2
-roadmap is active, Issue #23 adds category/priority suggestions, and Issue #24
-adds duplicate ticket suggestions.
+roadmap is active. Issue #23 adds category/priority suggestions, Issue #24
+adds duplicate ticket suggestions, and Issue #25 integrates advisory
+suggestions into the ticket workflow.
 
 ## Problem
 
@@ -80,7 +81,7 @@ hidden recommendation acceptance.
 | FastAPI analytics scaffold and health endpoint | MERGED | `origin/main` |
 | Category/priority suggestion service | IMPLEMENTED_V0_2_CORE | issue #23 |
 | Duplicate suggestion | IMPLEMENTED_V0_2_CORE | issue #24 |
-| Full analytics workflow integration | PROPOSED_V0_2_CORE | issue #25 |
+| Full analytics workflow integration | IMPLEMENTED_V0_2_CORE | issue #25 |
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
 | Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |
@@ -96,7 +97,7 @@ hidden recommendation acceptance.
 - Portfolio-focused documentation, quality gates, Docker demo flow, and
   release notes.
 - Deterministic advisory category, priority, and duplicate suggestions for v0.2
-  triage.
+  triage, with explicit ticket workflow review actions.
 
 ## Non-Goals For Portfolio-first v0.1
 

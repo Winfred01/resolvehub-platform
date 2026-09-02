@@ -64,8 +64,9 @@ The response includes ranked duplicate `candidates`, each with `candidate_id`,
 - Implemented: `POST /analytics/suggestions/duplicates` for deterministic
   duplicate candidate matching.
 - Prepared: FastAPI app factory and package boundary.
-- Not implemented: backend integration, frontend suggestion UI, or ticket
-  mutation.
+- Implemented in Issue #25: backend and frontend advisory workflow integration
+  with explicit review decisions and safe failure handling.
+- Not implemented: automatic ticket mutation from analytics suggestions.
 
 All analytics test data must remain fictional and must not include real customer, employer, Gmail, browser-session, job-search, or personal data.
 
@@ -86,4 +87,6 @@ signals; stable confidence sorting; self-ticket exclusion; candidate caps; and
 safe low-confidence/no-match responses. Low-confidence, minimal, unavailable,
 or uncertain inputs use safe fallback values and remain advisory. The service
 does not persist ticket content and suggestion responses do not echo submitted
-ticket body text.
+ticket body text. Issue #25 connects these endpoints to the backend and
+frontend ticket workflow while preserving explicit user review and audit-only
+decision recording.

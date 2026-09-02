@@ -1,10 +1,10 @@
 # ResolveHub Frontend
 
-Current scope: Issue #22 adds the responsive dashboard surface for the Issue #21
-backend dashboard API contract. The dashboard renders summary metrics,
-status/category/priority distributions, trend buckets, loading, empty, and error
-states with fictional demo data until authenticated backend session wiring is
-selected.
+Current scope: the frontend includes ticket workspace, Kanban, dashboard, and
+Issue #25 advisory analytics suggestion review surfaces. The ticket detail
+screen renders suggestion loading, failure, category/priority accept, duplicate
+accept, ignore, and override states with fictional demo data until authenticated
+backend session wiring is selected.
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ npm run preview
 
 - `/`: foundation landing page for the ResolveHub frontend.
 - `/login`: placeholder page. Authentication is not implemented.
-- `/tickets`: ticket workspace with list, detail, create, edit, Kanban status board, loading, empty, error, validation, and responsive states.
+- `/tickets`: ticket workspace with list, detail, create, edit, Kanban status board, advisory analytics suggestions, loading, empty, error, validation, and responsive states.
 - `/dashboard`: dashboard metrics surface with summary tiles, distribution charts, trend buckets, loading, empty, error, and responsive states.
 - `/*`: accessible Not Found page.
 
@@ -78,7 +78,7 @@ npm run preview
 ## Not Implemented
 
 - Authentication.
-- Comments UI, analytics suggestions, or realtime collaboration.
+- Comments UI or realtime collaboration.
 - Authenticated backend session selection for the REST gateway.
 - Production deployment.
 
@@ -92,8 +92,9 @@ Do not commit `.env.local`, npm tokens, registry credentials, browser data, Gmai
 
 ## Analytics-assisted v0.2 Boundary
 
-The analytics-assisted v0.2 roadmap should add suggestion UI only after #25 is
-selected. Frontend experiences must make recommendations visibly advisory and
-give users explicit accept, ignore, and override choices. Loading, low-confidence,
-empty, and analytics-service failure states must leave the normal ticket
-workflow usable.
+The analytics-assisted v0.2 ticket UI makes recommendations visibly advisory
+and gives users explicit accept, ignore, and override choices. Accepting a
+category or priority suggestion stages values in the edit form and still
+requires the normal save action before ticket truth changes. Loading,
+low-confidence, empty, and analytics-service failure states leave the normal
+ticket workflow usable.
