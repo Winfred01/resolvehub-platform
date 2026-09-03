@@ -109,11 +109,15 @@ Quarantine flaky tests only with a tracking issue. Do not ignore failing securit
 
 ## v0.2 Analytics-specific Gates
 
-The v0.2 analytics-specific gates start only after #25 is merged. Issue #25 adds
-backend tests for suggestion retrieval, audit-only review decisions, hidden/self
-duplicate rejection, and analytics-service failure fallback, plus frontend tests
-for advisory accept, ignore, override, and failure states. The follow-up quality
-workstream should broaden malformed response, timeout, E2E smoke, accessibility,
-and privacy checks proving recommendation handling does not expose private
-ticket bodies, comments, credentials, tokens, sessions, Gmail data, browser
-data, job-search data, or real customer data.
+The v0.2 analytics-specific gates start only after #25 is merged. Issue #25
+merged through PR #58 and adds backend tests for suggestion retrieval,
+audit-only review decisions, hidden/self duplicate rejection, and
+analytics-service failure fallback, plus frontend tests for advisory accept,
+ignore, override, and failure states.
+
+The analytics-specific quality workstream adds gates for malformed analytics
+responses, timeout fallback, whitespace/minimal input, duplicate candidate
+limits, explicit E2E advisory review before ticket mutation, unsafe logging
+patterns, and private-data fixture exclusion. These gates preserve the advisory
+contract: suggestions may be reviewed, ignored, or staged by explicit user
+action, but they must not automatically change ticket truth.
