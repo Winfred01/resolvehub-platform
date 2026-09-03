@@ -54,3 +54,36 @@ test.describe("portfolio v0.1 smoke paths", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("analytics-assisted v0.2 smoke paths", () => {
+  test("ticket triage suggestions require explicit review before ticket mutation", async ({ page }) => {
+    await page.goto("/tickets");
+
+    await expect(page.getByRole("heading", { name: "Support tickets" })).toBeVisible();
+
+    const createForm = page.getByRole("region", { name: "Create ticket" });
+    await createForm.getByLabel("Title").fill("VPN access blocked for support queue");
+    await createForm
+      .getByLabel("Description")
+      .fill("The fictional requester cannot reach the secure queue.");
+    await createForm.getByLabel("Priority").selectOption("LOW");
+    await createForm.getByRole("button", { name: "Create ticket" }).click();
+
+    const detail = page.getByRole("article", {
+      name: "VPN access blocked for support queue",
+      exact: true
+    });
+    await expect(detail).toBeVisible();
+    await expect(detail.getByText("General")).toBeVisible();
+    await expect(detail.getByText("Low")).toBeVisible();
+
+    await expect(page.getByRole("article", { name: "Triage suggestion" })).toBeVisible();
+    await page.getByRole("button", { name: "Accept category" }).click();
+
+    await expect(page.getByRole("status")).toContainText("accept review recorded for triage.");
+    const editForm = page.getByRole("region", { name: "Edit ticket" });
+    await expect(editForm.getByLabel("Category")).toHaveValue("network");
+    await expect(detail.getByText("General")).toBeVisible();
+    await expect(detail.getByText("Low")).toBeVisible();
+  });
+});

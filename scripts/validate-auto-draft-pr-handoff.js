@@ -24,6 +24,7 @@ requireIncludes("push:", "push trigger");
 requireIncludes('"**/issue-*-*"', "issue branch push filter");
 requireIncludes('"docs/status-refresh-*"', "docs status-refresh push filter");
 requireIncludes('"docs/september-*-v*-execution-plan"', "monthly execution-plan push filter");
+requireIncludes('"qa/v0.2-analytics-quality-*"', "v0.2 analytics quality push filter");
 requireIncludes("workflow_dispatch:", "workflow_dispatch trigger");
 requireIncludes('cron: "17 * * * *"', "hourly fallback schedule");
 requireIncludes("contents: read", "least-privilege contents permission");
@@ -51,6 +52,7 @@ assert(!policy.isEligibleBranch("master"), "master must never be eligible");
 assert(policy.isEligibleBranch("backend/issue-21-dashboard-apis"), "backend issue branch should be eligible");
 assert(policy.isEligibleBranch("frontend/issue-22-dashboard-ui"), "frontend issue branch should be eligible");
 assert(policy.isEligibleBranch("qa/issue-26-quality-gates"), "qa issue branch should be eligible");
+assert(policy.isEligibleBranch("qa/v0.2-analytics-quality-security-e2e"), "v0.2 analytics quality branch should be eligible");
 assert(policy.isEligibleBranch("release/issue-27-v0.1-release"), "release issue branch should be eligible");
 assert(policy.isEligibleBranch("docs/status-refresh-after-issue22"), "docs status refresh branch should be eligible");
 assert(policy.isEligibleBranch("docs/september-2026-v0.2-execution-plan"), "monthly execution-plan branch should be eligible");
@@ -60,6 +62,7 @@ assert(policy.titleForIssueBranch("qa/issue-26-quality-gates", 26, "Add integrat
 assert(policy.titleForDocsStatusRefresh("docs/status-refresh-after-issue22") === "docs: refresh project status after Issue #22 merge", "docs status title should mention issue context without closing it");
 assert(policy.titleForDocsExecutionPlan("docs/september-2026-v0.2-execution-plan") === "docs: add September 2026 v0.2 execution plan", "monthly execution-plan title should be specific");
 assert(policy.titleForDocsBranch("docs/september-2026-v0.2-execution-plan") === "docs: add September 2026 v0.2 execution plan", "docs branch title router should support monthly plans");
+assert(policy.titleForV02AnalyticsQualityBranch("qa/v0.2-analytics-quality-security-e2e") === "test: add v0.2 analytics quality gates", "v0.2 analytics quality title should be specific");
 assert(policy.issuePrBody("frontend/issue-26-example", 26).includes("Closes #26."), "issue PR body should close matching issue");
 assert(!policy.docsStatusRefreshPrBody("docs/status-refresh-after-issue22").includes("Closes #"), "docs status PR body must not close issues");
 assert(!policy.docsStatusRefreshPrBody("docs/status-refresh-after-issue22").includes("Closes #22"), "docs status PR body must not close #22");
@@ -67,6 +70,8 @@ assert(!policy.docsStatusRefreshPrBody("docs/status-refresh-after-issue22").incl
 assert(!policy.docsPrBody("docs/september-2026-v0.2-execution-plan").includes("Closes #"), "docs planning PR body must not close issues");
 assert(!policy.docsPrBody("docs/september-2026-v0.2-execution-plan").includes("Closes #24"), "docs planning PR body must not close #24");
 assert(!policy.docsPrBody("docs/september-2026-v0.2-execution-plan").includes("Closes #25"), "docs planning PR body must not close #25");
+assert(!policy.v02AnalyticsQualityPrBody("qa/v0.2-analytics-quality-security-e2e").includes("Closes #"), "v0.2 analytics quality PR body must not close issues");
+assert(policy.v02AnalyticsQualityPrBody("qa/v0.2-analytics-quality-security-e2e").includes("Related to #25"), "v0.2 analytics quality PR body should link Issue #25 as context only");
 
 if (errors.length) {
   console.error(JSON.stringify({ ok: false, errors }, null, 2));
@@ -83,6 +88,7 @@ console.log(JSON.stringify({
     protected_branches_excluded: true,
     docs_status_refresh_has_no_issue_close: true,
     docs_execution_plan_has_no_issue_close: true,
+    v02_analytics_quality_has_no_issue_close: true,
     no_pat_or_credential_handling: true,
     no_ready_approval_merge_or_automerge: true,
   },

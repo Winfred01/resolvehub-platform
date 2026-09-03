@@ -1,6 +1,8 @@
 {
-  "issue": 26,
-  "roadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "workstream": "analytics-specific-v0.2-quality-security-e2e",
+  "baselineIssue": 26,
+  "baselineRoadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "roadmapMode": "ANALYTICS_ASSISTED_V0_2",
   "fictionalDataOnly": true,
   "requiredGates": [
     {
@@ -22,6 +24,31 @@
       "name": "privacy-metadata",
       "command": "node scripts/validate-github-metadata-state.js",
       "evidence": "Repository privacy validator reports zero findings"
+    },
+    {
+      "name": "analytics-contract-robustness",
+      "command": "cd analytics-service && python -m pytest",
+      "evidence": "Malformed, minimal, low-confidence, no-match, candidate-limit and deterministic suggestion contracts"
+    },
+    {
+      "name": "backend-analytics-resilience",
+      "command": "cd backend && mvn test",
+      "evidence": "Analytics success, timeout, unavailable, malformed-response and audit-only review decision coverage"
+    },
+    {
+      "name": "frontend-analytics-review",
+      "command": "cd frontend && npm run test:run",
+      "evidence": "Advisory suggestion display, accept, ignore, override, loading and failure states"
+    },
+    {
+      "name": "analytics-e2e-advisory-review",
+      "command": "cd frontend && npm run e2e",
+      "evidence": "Playwright smoke path for explicit advisory suggestion review before ticket mutation"
+    },
+    {
+      "name": "privacy-unsafe-analytics-logging",
+      "command": "node scripts/validate-quality-gates.js",
+      "evidence": "No unsafe logging patterns or private-data fixtures in analytics quality files"
     }
   ],
   "manualKeyboardSmoke": [
@@ -29,11 +56,13 @@
     "Tab through primary navigation and verify the active route is announced.",
     "Tab through /tickets filters, create form and Kanban status controls.",
     "Change a Kanban status with the select control and activate Apply with the keyboard.",
-    "Tab through /dashboard date and granularity filters and refresh metrics."
+    "Tab through /dashboard date and granularity filters and refresh metrics.",
+    "Tab through advisory analytics suggestion actions and verify review buttons are reachable."
   ],
   "outOfScope": [
     "Production penetration testing",
     "Paid scanning services",
-    "Analytics-specific suggestion E2E paths for deferred Issues #23, #24 and #25"
+    "Release demo packaging",
+    "Automatic ticket mutation from analytics suggestions"
   ]
 }

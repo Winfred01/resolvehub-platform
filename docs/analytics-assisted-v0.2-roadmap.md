@@ -97,7 +97,7 @@ either service capability.
 |---|---|---:|---|
 | #23 Category and priority suggestion service | `V0_2_CORE` | 1 | Deterministic category and priority suggestions with confidence, explanation, safe fallback, advisory semantics, no private ticket-content storage, no ML or external AI. |
 | #24 Duplicate ticket suggestion | `V0_2_CORE` | 2 | Deterministic duplicate candidate matching with ranked candidates, confidence, explanation, normalized safe fields, advisory behavior, privacy-safe logging, no automatic merge or ticket mutation. |
-| #25 Analytics suggestions workflow integration | `V0_2_CORE` | 3 | Backend and frontend integration that displays suggestions, requires explicit accept/ignore/override action, handles analytics-service failures, and records safe review decisions. Implemented in the Issue #25 workstream pending PR review and merge. |
+| #25 Analytics suggestions workflow integration | `V0_2_CORE` | 3 | Backend and frontend integration that displays suggestions, requires explicit accept/ignore/override action, handles analytics-service failures, and records safe review decisions. Merged through PR #58. |
 
 ## Follow-up Workstreams
 
