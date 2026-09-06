@@ -54,7 +54,9 @@ if (!errors.length) {
   requireIncludes(roadmap, "#25 Integrate Analytics Suggestions with Ticket Workflow", "Issue #25 third");
   requireIncludes(roadmap, "Analytics-specific v0.2 Quality / Security / E2E workstream", "quality follow-up");
   requireIncludes(roadmap, "v0.2 Demo / Documentation / Release workstream", "release follow-up");
-  requireIncludes(roadmap, "Do not claim `ANALYTICS_ASSISTED_V0_2` is live", "scheduler sync gate");
+  requireIncludes(roadmap, "PR #59 merged", "PR #59 quality merge");
+  requireIncludes(roadmap, "scheduler_sync_state = ACTIVE_DAILY_2000_AMERICA_TORONTO", "scheduler sync active state");
+  requireIncludes(roadmap, "Do not claim v0.2 complete", "completion gate");
   requireIncludes(roadmap, "Do not parallelize #23 and", "serial #23/#24 policy");
   requireIncludes(roadmap, "autonomous ticket mutation", "autonomous mutation non-goal");
   requireIncludes(roadmap, "external AI provider calls", "external AI non-goal");
@@ -81,6 +83,8 @@ if (!errors.length) {
   requireIncludes("analytics-service/README.md", "v0.2 roadmap", "analytics README v0.2 scope");
   requireIncludes("backend/README.md", "analytics-assisted v0.2", "backend README v0.2 boundary");
   requireIncludes("frontend/README.md", "analytics-assisted v0.2", "frontend README v0.2 boundary");
+  requireIncludes("docs/v0.2-release-notes.md", "ANALYTICS_ASSISTED_V0_2", "v0.2 release notes");
+  requireIncludes("docs/demo-release-guide.md", "ANALYTICS_ASSISTED_V0_2", "v0.2 demo release guide");
 }
 
 if (errors.length) {
@@ -98,5 +102,5 @@ console.log(JSON.stringify({
     "analytics-specific-quality-security-e2e",
     "v0.2-demo-documentation-release"
   ],
-  implementation_started: false
+  release_workstream_selected: true
 }, null, 2));

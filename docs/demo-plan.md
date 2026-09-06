@@ -1,21 +1,24 @@
 # Demo Plan
 
-Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+Current roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
 ## Demo Story
 
-The demo should show a requester creating a support ticket, an agent triaging it, a team lead reviewing dashboard metrics, and an admin managing roles.
+The demo should show a requester creating a support ticket, an agent triaging it,
+a team lead reviewing dashboard metrics, and an admin reviewing role/audit
+boundaries. The v0.2 pass adds deterministic advisory analytics suggestions to
+the ticket workflow without hidden mutation.
 
-Full analytics workflow integration is not required for the Portfolio-first v0.1
-demo. Category/priority suggestions may be shown only if optional Issue #23 is
-enabled and completed before release. Duplicate suggestions and full analytics
-workflow integration are v0.2 work.
+Portfolio-first v0.1 remains the preserved baseline. v0.2 adds merged #23
+category/priority suggestions, #24 duplicate suggestions, #25 ticket workflow
+integration, and PR #59 analytics-specific quality gates.
 
 ## Demo Data
 
 All demo data must be fictional. Demo users, tickets, categories, comments, and
 analytics suggestions must not use real customer, employer, job-search, Gmail,
-or personal data. The Issue #27 seed manifest is `tests/demo-seed-data.json`.
+browser-session, private-address, phone-number, credential, token, cookie, or
+personal data. The canonical seed manifest is `tests/demo-seed-data.json`.
 
 ## Demo Accounts
 
@@ -36,6 +39,8 @@ Validate the package with:
 
 ```bash
 node scripts/validate-demo-release.js
+node scripts/validate-quality-gates.js
+node scripts/validate-analytics-assisted-v0.2-roadmap.js
 ```
 
 ## Script
@@ -50,13 +55,21 @@ node scripts/validate-demo-release.js
 8. Review dashboard.
 9. Log in as admin.
 10. Review role management and audit notes.
+11. Inspect an analytics-ready ticket.
+12. Review the advisory category and priority suggestion with confidence and
+    explanation.
+13. Accept a suggestion and confirm it is staged for normal ticket update.
+14. Review duplicate candidates and record an explicit duplicate review.
+15. Show low-confidence or analytics-unavailable fallback while the ticket
+    workflow remains usable.
 
-Optional stretch step: review category/priority suggestion if #23 is completed
-and included in the release.
+Analytics suggestions are not autonomous decisions. The demo must show `ACCEPT`,
+`IGNORE`, and `OVERRIDE` paths as explicit user review actions.
 
 ## Screenshots
 
-Future screenshots should include ticket list, ticket detail, Kanban, dashboard, and admin role screen after implementation exists.
+Screenshots should include ticket list, ticket detail with advisory analytics,
+Kanban, dashboard, and admin role/audit screen after implementation exists.
 
 ## Health Checks
 
@@ -69,9 +82,9 @@ curl http://localhost:8000/analytics/health
 docker compose exec postgres pg_isready -U resolvehub_local -d resolvehub
 ```
 
-## v0.2 Demo Planning
+## v0.2 Analytics Scenarios
 
-The v0.2 demo should extend the completed v0.1 flow with fictional suggestion
-scenarios after #23, #24, #25, analytics-specific quality gates, and v0.2 release
-docs have merged. The demo must show recommendations as advisory, explainable,
-and overrideable, including a graceful analytics-service failure path.
+The v0.2 demo extends the completed v0.1 flow with fictional suggestion
+scenarios after #23, #24, #25, and PR #59 analytics-specific quality gates. The
+demo must show recommendations as advisory, explainable, and overrideable,
+including a graceful analytics-service failure path.

@@ -9,9 +9,11 @@ Completed baseline roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 Current live roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
 Current status: Portfolio-first v0.1 is complete on `origin/main`. The v0.2
-roadmap is active. Issue #23 adds category/priority suggestions, Issue #24
-adds duplicate ticket suggestions, and Issue #25 integrates advisory
-suggestions into the ticket workflow.
+roadmap is active. Issue #23 added category/priority suggestions, Issue #24
+added duplicate ticket suggestions, Issue #25 integrated advisory suggestions
+into the ticket workflow, and the analytics-specific v0.2 quality gates merged
+through PR #59. The remaining active v0.2 workstream is demo, documentation,
+and release packaging.
 
 ## Problem
 
@@ -82,6 +84,8 @@ hidden recommendation acceptance.
 | Category/priority suggestion service | IMPLEMENTED_V0_2_CORE | issue #23 |
 | Duplicate suggestion | IMPLEMENTED_V0_2_CORE | issue #24 |
 | Full analytics workflow integration | IMPLEMENTED_V0_2_CORE | issue #25 |
+| Analytics-specific v0.2 quality gates | MERGED | `origin/main` via PR #59 |
+| v0.2 demo and release package | IN_PROGRESS | `docs/status-refresh-v0.2-demo-release` |
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
 | Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |
@@ -179,6 +183,7 @@ node scripts/validate-github-metadata-state.js
 node scripts/validate-portfolio-first-roadmap.js
 node scripts/validate-quality-gates.js
 node scripts/validate-demo-release.js
+node scripts/validate-analytics-assisted-v0.2-roadmap.js
 ```
 
 Local demo release validation:
@@ -193,7 +198,7 @@ docker compose down --volumes
 ```
 
 See [docs/demo-release-guide.md](docs/demo-release-guide.md) and
-[docs/v0.1-release-notes.md](docs/v0.1-release-notes.md).
+[docs/v0.2-release-notes.md](docs/v0.2-release-notes.md).
 
 ## Security
 
@@ -207,9 +212,9 @@ See [SECURITY.md](SECURITY.md) and [docs/security-model.md](docs/security-model.
 ## Roadmap
 
 The authoritative current roadmap is
+[docs/analytics-assisted-v0.2-roadmap.md](docs/analytics-assisted-v0.2-roadmap.md).
+The completed v0.1 roadmap remains preserved in
 [docs/portfolio-first-v0.1-roadmap.md](docs/portfolio-first-v0.1-roadmap.md).
-The original 14-day plan is retained as a historical baseline in
-[docs/14-day-development-plan.md](docs/14-day-development-plan.md).
 
 ## Contributing
 

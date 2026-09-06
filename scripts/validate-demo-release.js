@@ -49,6 +49,7 @@ for (const relativePath of [
   "tests/demo-seed-data.json",
   "docs/demo-release-guide.md",
   "docs/v0.1-release-notes.md",
+  "docs/v0.2-release-notes.md",
   "docs/demo-plan.md",
   "docs/deployment-plan.md",
   "docker-compose.yml",
@@ -59,9 +60,17 @@ for (const relativePath of [
 if (failures.length === 0) {
   const seed = readJson("tests/demo-seed-data.json");
 
-  if (seed.issue !== 27) failures.push("tests/demo-seed-data.json must target Issue #27");
-  if (seed.roadmapMode !== "PORTFOLIO_FIRST_V0_1") {
-    failures.push("tests/demo-seed-data.json must target PORTFOLIO_FIRST_V0_1");
+  if (seed.baselineIssue !== 27) {
+    failures.push("tests/demo-seed-data.json must preserve Issue #27 as the v0.1 baseline");
+  }
+  if (seed.baselineRoadmapMode !== "PORTFOLIO_FIRST_V0_1") {
+    failures.push("tests/demo-seed-data.json must preserve PORTFOLIO_FIRST_V0_1 as the baseline roadmap mode");
+  }
+  if (seed.roadmapMode !== "ANALYTICS_ASSISTED_V0_2") {
+    failures.push("tests/demo-seed-data.json must target ANALYTICS_ASSISTED_V0_2");
+  }
+  if (seed.workstream !== "v0.2-demo-documentation-release") {
+    failures.push("tests/demo-seed-data.json must identify the v0.2 demo documentation release workstream");
   }
   if (seed.fictionalDataOnly !== true) {
     failures.push("tests/demo-seed-data.json must explicitly require fictional data only");
@@ -94,6 +103,43 @@ if (failures.length === 0) {
     }
   }
 
+  if (seed.analyticsExamples?.includedInV0_1 !== false) {
+    failures.push("tests/demo-seed-data.json must preserve analytics as excluded from v0.1");
+  }
+  if (seed.analyticsExamples?.includedInV0_2 !== true) {
+    failures.push("tests/demo-seed-data.json must include analytics examples in v0.2");
+  }
+  if (seed.analyticsExamples?.advisoryOnly !== true) {
+    failures.push("tests/demo-seed-data.json must mark analytics examples advisory-only");
+  }
+  if (seed.analyticsExamples?.externalAiCalls !== false) {
+    failures.push("tests/demo-seed-data.json must prohibit external AI calls");
+  }
+  if (seed.analyticsExamples?.automaticTicketMutation !== false) {
+    failures.push("tests/demo-seed-data.json must prohibit automatic ticket mutation");
+  }
+
+  const scenarios = seed.analyticsExamples?.scenarios ?? [];
+  if (scenarios.length < 3) {
+    failures.push("tests/demo-seed-data.json must include at least three v0.2 analytics scenarios");
+  }
+  for (const scenario of scenarios) {
+    if (scenario.fictional !== true) {
+      failures.push(`Analytics scenario ${scenario.id ?? "unknown"} must be marked fictional`);
+    }
+  }
+
+  const scenarioNames = new Set(scenarios.map((scenario) => scenario.name));
+  for (const scenarioName of [
+    "category and priority suggestion",
+    "duplicate candidate review",
+    "analytics unavailable fallback"
+  ]) {
+    if (!scenarioNames.has(scenarioName)) {
+      failures.push(`tests/demo-seed-data.json missing ${scenarioName} scenario`);
+    }
+  }
+
   requireNoSensitiveCredentialFields(seed);
 
   requireText("docker-compose.yml", "frontend:");
@@ -103,9 +149,7 @@ if (failures.length === 0) {
   requireText("docker-compose.yml", "BACKEND_PORT:-18080");
   requireText("docker-compose.yml", "POSTGRES_PORT:-15432");
 
-  for (const doc of ["docs/demo-release-guide.md", "docs/v0.1-release-notes.md"]) {
-    requireText(doc, "PORTFOLIO_FIRST_V0_1");
-    requireText(doc, "Issue #27");
+  for (const doc of ["docs/demo-release-guide.md", "docs/v0.1-release-notes.md", "docs/v0.2-release-notes.md"]) {
     requireText(doc, "fictional");
     requireText(doc, "docker compose up --build");
     requireText(doc, "docker compose down --volumes");
@@ -118,6 +162,23 @@ if (failures.length === 0) {
     requireText(doc, "#25");
   }
 
+  requireText("docs/demo-release-guide.md", "ANALYTICS_ASSISTED_V0_2");
+  requireText("docs/demo-release-guide.md", "PR #59");
+  requireText("docs/demo-release-guide.md", "analytics-unavailable");
+  requireText("docs/v0.1-release-notes.md", "PORTFOLIO_FIRST_V0_1");
+  requireText("docs/v0.1-release-notes.md", "Issue #27");
+  requireText("docs/v0.2-release-notes.md", "ANALYTICS_ASSISTED_V0_2");
+  requireText("docs/v0.2-release-notes.md", "PR #59");
+  requireText("docs/v0.2-release-notes.md", "analyticsAvailable");
+  requireText("docs/v0.2-release-notes.md", "ANALYTICS_SUGGESTION_REVIEWED");
+  requireText("docs/demo-plan.md", "ANALYTICS_ASSISTED_V0_2");
+  requireText("docs/demo-plan.md", "ACCEPT");
+  requireText("docs/demo-plan.md", "IGNORE");
+  requireText("docs/demo-plan.md", "OVERRIDE");
+  requireText("docs/deployment-plan.md", "ANALYTICS_ASSISTED_V0_2");
+  requireText("docs/deployment-plan.md", "analytics service");
+  requireText("README.md", "v0.2 demo and release package");
+  requireText("README.md", "docs/v0.2-release-notes.md");
   requireText("docs/deployment-plan.md", "tests/demo-seed-data.json");
   requireText("docs/demo-plan.md", "generated-at-demo-reset");
   requireText(".github/workflows/ci.yml", "Validate Issue #27 demo release package");
