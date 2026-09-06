@@ -3,6 +3,7 @@ package com.resolvehub.backend.tickets;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.resolvehub.backend.config.BackendProperties;
 import java.util.List;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -28,7 +29,7 @@ class TicketAnalyticsClient {
                     .body(new TriageAnalyticsRequest(ticket.title(), ticket.description()))
                     .retrieve()
                     .body(TriageAnalyticsResponse.class);
-        } catch (RestClientException exception) {
+        } catch (RestClientException | HttpMessageConversionException exception) {
             available = false;
         }
 
@@ -39,15 +40,15 @@ class TicketAnalyticsClient {
                     .body(DuplicateAnalyticsRequest.from(ticket, candidates))
                     .retrieve()
                     .body(DuplicateAnalyticsResponse.class);
-        } catch (RestClientException exception) {
+        } catch (RestClientException | HttpMessageConversionException exception) {
             available = false;
         }
 
-        if (triage == null) {
+        if (triage == null || !triage.isUsable()) {
             triage = TriageAnalyticsResponse.unavailable(ticket);
             available = false;
         }
-        if (duplicates == null) {
+        if (duplicates == null || !duplicates.isUsable()) {
             duplicates = DuplicateAnalyticsResponse.unavailable();
             available = false;
         }
@@ -79,6 +80,14 @@ class TicketAnalyticsClient {
                     List.of("Analytics service is unavailable, so the current ticket values are preserved."),
                     true,
                     true);
+        }
+
+        boolean isUsable() {
+            return category != null
+                    && priority != null
+                    && confidence >= 0.0
+                    && confidence <= 1.0
+                    && advisory;
         }
 
         TicketTriageSuggestionResponse toSuggestion() {
@@ -131,6 +140,17 @@ class TicketAnalyticsClient {
 
         static DuplicateAnalyticsResponse unavailable() {
             return new DuplicateAnalyticsResponse(List.of(), true, true);
+        }
+
+        boolean isUsable() {
+            return advisory && (candidates == null || candidates.stream().allMatch(candidate -> candidate != null
+                    && candidate.candidateId() != null
+                    && candidate.confidence() >= 0.0
+                    && candidate.confidence() <= 1.0
+                    && candidate.matchingSignals() != null
+                    && !candidate.matchingSignals().isEmpty()
+                    && candidate.explanation() != null
+                    && !candidate.explanation().isEmpty()));
         }
 
         TicketDuplicateSuggestionResponse toSuggestion() {

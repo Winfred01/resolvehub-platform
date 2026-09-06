@@ -93,6 +93,23 @@ def test_triage_suggestion_returns_low_confidence_safe_fallback_for_minimal_requ
     assert body["advisory"] is True
 
 
+def test_triage_suggestion_treats_whitespace_only_input_as_minimal_request() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/analytics/suggestions/triage",
+        json={"title": "   ", "description": "\n\t "},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["category"] == "general"
+    assert body["priority"] == "MEDIUM"
+    assert body["confidence"] == 0.2
+    assert body["low_confidence"] is True
+    assert body["advisory"] is True
+
+
 def test_triage_suggestion_rejects_malformed_request() -> None:
     client = TestClient(create_app())
 

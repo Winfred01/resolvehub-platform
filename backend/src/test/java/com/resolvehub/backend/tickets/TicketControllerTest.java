@@ -734,6 +734,62 @@ class TicketControllerTest {
     }
 
     @Test
+    void acceptedDuplicateReviewRecordsAuditOnlyWithoutTicketMutation() throws Exception {
+        String ownerAuthorization = registerAndLogin("ticket-duplicate-accept-owner@example.test", "Ticket Duplicate Accept Owner");
+        MvcResult created = createTicket(
+                ownerAuthorization,
+                "VPN handoff blocked",
+                "The fictional requester cannot complete the VPN handoff.",
+                "network",
+                "HIGH");
+        String ticketId = fieldFrom(created, "id");
+        String originalVersion = fieldFrom(created, "version");
+        String duplicateTicketId = fieldFrom(createTicket(
+                ownerAuthorization,
+                "VPN handoff blocked",
+                "The same fictional requester reported the VPN handoff again.",
+                "network",
+                "HIGH"), "id");
+
+        mockMvc.perform(post("/api/tickets/{id}/analytics-suggestions/reviews", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "suggestionType": "DUPLICATE",
+                                  "decision": "ACCEPT",
+                                  "duplicateTicketId": "%s"
+                                }
+                                """.formatted(duplicateTicketId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.ticketId").value(ticketId))
+                .andExpect(jsonPath("$.suggestionType").value("DUPLICATE"))
+                .andExpect(jsonPath("$.decision").value("ACCEPT"))
+                .andExpect(jsonPath("$.recordedFields", contains(
+                        "analyticsSuggestionReview",
+                        "suggestionType",
+                        "decision",
+                        "duplicateTicketId")))
+                .andExpect(jsonPath("$.advisory").value(true));
+
+        mockMvc.perform(get("/api/tickets/{id}", ticketId)
+                        .header(HttpHeaders.AUTHORIZATION, ownerAuthorization))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("VPN handoff blocked"))
+                .andExpect(jsonPath("$.categoryId").value("network"))
+                .andExpect(jsonPath("$.priority").value("HIGH"))
+                .andExpect(jsonPath("$.status").value("OPEN"))
+                .andExpect(jsonPath("$.version").value(Integer.parseInt(originalVersion)));
+
+        String changedFields = jdbcTemplate.queryForObject(
+                "select changed_fields from ticket_activities where ticket_id = ? and action = 'ANALYTICS_SUGGESTION_REVIEWED'",
+                String.class,
+                UUID.fromString(ticketId));
+        org.assertj.core.api.Assertions.assertThat(changedFields)
+                .isEqualTo("analyticsSuggestionReview,suggestionType,decision,duplicateTicketId");
+    }
+
+    @Test
     void agentCanSelfAssignAndLeadCanReassignAndUnassignTicket() throws Exception {
         String ownerAuthorization = registerAndLogin("ticket-assignment-owner@example.test", "Ticket Assignment Owner");
         String agentEmail = saveAccount("ticket-assignment-agent@example.test", AccountRole.AGENT);

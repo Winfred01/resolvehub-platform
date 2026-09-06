@@ -124,6 +124,28 @@ def test_duplicate_suggestion_handles_empty_candidate_list() -> None:
     assert response.json() == {"candidates": [], "low_confidence": True, "advisory": True}
 
 
+def test_duplicate_suggestion_rejects_candidate_lists_over_limit() -> None:
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/analytics/suggestions/duplicates",
+        json={
+            "ticket": {"title": "VPN outage", "category": "network"},
+            "candidates": [
+                {
+                    "id": f"ticket-{index:03}",
+                    "title": "VPN outage",
+                    "category": "network",
+                    "priority": "HIGH",
+                }
+                for index in range(26)
+            ],
+        },
+    )
+
+    assert response.status_code == 422
+
+
 def test_duplicate_suggestion_excludes_same_ticket_id() -> None:
     client = TestClient(create_app())
 

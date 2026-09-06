@@ -6,6 +6,32 @@ const manifestPath = path.join(root, "tests", "quality-gates.json");
 const ciPath = path.join(root, ".github", "workflows", "ci.yml");
 const packagePath = path.join(root, "frontend", "package.json");
 const e2eSpecPath = path.join(root, "frontend", "tests", "e2e", "portfolio-smoke.spec.ts");
+const backendAnalyticsClientTestPath = path.join(
+  root,
+  "backend",
+  "src",
+  "test",
+  "java",
+  "com",
+  "resolvehub",
+  "backend",
+  "tickets",
+  "TicketAnalyticsClientTest.java"
+);
+const backendTicketControllerTestPath = path.join(
+  root,
+  "backend",
+  "src",
+  "test",
+  "java",
+  "com",
+  "resolvehub",
+  "backend",
+  "tickets",
+  "TicketControllerTest.java"
+);
+const analyticsTriageTestPath = path.join(root, "analytics-service", "tests", "test_triage_suggestions.py");
+const analyticsDuplicateTestPath = path.join(root, "analytics-service", "tests", "test_duplicate_suggestions.py");
 const backendSourceRoot = path.join(root, "backend", "src", "main", "java");
 const frontendSourceRoot = path.join(root, "frontend", "src");
 
@@ -42,6 +68,10 @@ function listFiles(directory, predicate) {
 
 requireFile(manifestPath);
 requireFile(e2eSpecPath);
+requireFile(backendAnalyticsClientTestPath);
+requireFile(backendTicketControllerTestPath);
+requireFile(analyticsTriageTestPath);
+requireFile(analyticsDuplicateTestPath);
 
 const manifest = readJson(manifestPath);
 const gateNames = new Set((manifest.requiredGates ?? []).map((gate) => gate.name));
@@ -49,15 +79,24 @@ for (const gateName of [
   "frontend-accessibility",
   "e2e-browser-smoke",
   "backend-security",
-  "privacy-metadata"
+  "privacy-metadata",
+  "analytics-contract-robustness",
+  "backend-analytics-resilience",
+  "frontend-analytics-review",
+  "analytics-e2e-advisory-review",
+  "privacy-unsafe-analytics-logging"
 ]) {
   if (!gateNames.has(gateName)) {
     failures.push(`tests/quality-gates.json is missing ${gateName}`);
   }
 }
 
-if (manifest.roadmapMode !== "PORTFOLIO_FIRST_V0_1") {
-  failures.push("tests/quality-gates.json must target PORTFOLIO_FIRST_V0_1");
+if (manifest.baselineIssue !== 26 || manifest.baselineRoadmapMode !== "PORTFOLIO_FIRST_V0_1") {
+  failures.push("tests/quality-gates.json must preserve the Issue #26 v0.1 baseline gate reference");
+}
+
+if (manifest.roadmapMode !== "ANALYTICS_ASSISTED_V0_2") {
+  failures.push("tests/quality-gates.json must target ANALYTICS_ASSISTED_V0_2");
 }
 
 if (manifest.fictionalDataOnly !== true) {
@@ -77,6 +116,13 @@ requireText(ciPath, "Validate Issue #26 quality gate inventory");
 requireText(ciPath, "Run Playwright E2E smoke");
 requireText(e2eSpecPath, "Laptop dock fails in demo lab");
 requireText(e2eSpecPath, "Status distribution");
+requireText(e2eSpecPath, "analytics-assisted v0.2 smoke paths");
+requireText(e2eSpecPath, "accept review recorded for triage");
+requireText(backendAnalyticsClientTestPath, "malformedAnalyticsPayloadsReturnAdvisoryFallbacks");
+requireText(backendAnalyticsClientTestPath, "analyticsRuntimeTimeoutsReturnFallbackWithoutThrowing");
+requireText(backendTicketControllerTestPath, "acceptedDuplicateReviewRecordsAuditOnlyWithoutTicketMutation");
+requireText(analyticsTriageTestPath, "test_triage_suggestion_treats_whitespace_only_input_as_minimal_request");
+requireText(analyticsDuplicateTestPath, "test_duplicate_suggestion_rejects_candidate_lists_over_limit");
 
 const forbiddenPatterns = [
   /gmail/iu,
@@ -86,7 +132,14 @@ const forbiddenPatterns = [
   /private address/iu,
   /phone number/iu
 ];
-const scannedFiles = [manifestPath, e2eSpecPath];
+const scannedFiles = [
+  manifestPath,
+  e2eSpecPath,
+  backendAnalyticsClientTestPath,
+  backendTicketControllerTestPath,
+  analyticsTriageTestPath,
+  analyticsDuplicateTestPath
+];
 for (const filePath of scannedFiles) {
   const body = fs.readFileSync(filePath, "utf8");
   for (const pattern of forbiddenPatterns) {
