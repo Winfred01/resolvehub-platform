@@ -4,7 +4,7 @@ Roadmap mode: `ANALYTICS_ASSISTED_V0_2`
 
 Product theme: `EXPLAINABLE_ANALYTICS_ASSISTED_TRIAGE_V0_2`
 
-This document defines the proposed ResolveHub v0.2 roadmap from the stable
+This document defines the active ResolveHub v0.2 roadmap from the stable
 Portfolio-first v0.1 baseline. It does not replace
 `docs/portfolio-first-v0.1-roadmap.md`, which remains the authoritative record
 of completed v0.1 scope.
@@ -26,11 +26,11 @@ v0.2 plan starts from this completed baseline.
 
 ## Activation State
 
-The user has authorized v0.2 roadmap planning. Product implementation remains
-paused until the roadmap/governance PR is merged and the real scheduler
-configuration has been updated.
+The v0.2 roadmap is active in the daily development automation. PR #59 merged
+the analytics-specific v0.2 quality/security/E2E workstream into `origin/main`
+at `8975efb7a36a049d4ed024f567638c3a4f2807d4`.
 
-Recommended state after that external adoption:
+Current state:
 
 ```text
 roadmap_mode = ANALYTICS_ASSISTED_V0_2
@@ -38,11 +38,12 @@ v0_1_status = COMPLETE
 v0_2_status = ACTIVE
 development_selection = ENABLED
 maintenance_status = SUPERSEDED_BY_V0_2_DEVELOPMENT
-scheduler_sync_state = USER_UPDATE_REQUIRED until the real automation config is updated
+scheduler_sync_state = ACTIVE_DAILY_2000_AMERICA_TORONTO
 ```
 
-Do not claim `ANALYTICS_ASSISTED_V0_2` is live in scheduled automation until the
-roadmap PR has merged and the real scheduler instructions have been updated.
+The remaining v0.2 release path is the demo, documentation, and release
+workstream followed by completion reconciliation. Do not claim v0.2 complete
+until the release package has merged and validation evidence is current.
 
 ## Product Principles
 
@@ -103,7 +104,7 @@ either service capability.
 
 ### Analytics-specific Quality / Security / E2E
 
-Start this only after #25 has merged. It should cover:
+Completed through PR #59 after #25 merged. It covers:
 
 - analytics unit and contract tests for malformed, minimal, low-confidence, and
   no-match requests;
@@ -118,7 +119,8 @@ Start this only after #25 has merged. It should cover:
 
 ### v0.2 Demo / Documentation / Release
 
-Start this only after analytics-specific quality gates pass. It should update:
+Start this only after analytics-specific quality gates pass. The workstream
+updates:
 
 - demo script and screenshots;
 - fictional seed scenarios for category, priority, and duplicate suggestions;
@@ -127,6 +129,11 @@ Start this only after analytics-specific quality gates pass. It should update:
 - privacy and failure-mode documentation;
 - Docker/local demo validation for analytics-service availability and graceful
   fallback.
+
+This workstream must use fictional analytics examples only and must not add
+external AI provider calls, production credentials, real customer data, browser
+session data, Gmail content, job-search data, private addresses, or phone
+numbers.
 
 ## Automation Selection Policy
 

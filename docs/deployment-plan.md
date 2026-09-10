@@ -1,12 +1,13 @@
 # Deployment Plan
 
-Current roadmap mode: `PORTFOLIO_FIRST_V0_1`.
+Current roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
-Current status: Docker Compose, CI foundations, #22 dashboard UI, and scoped
-#26 validation are merged. Issue #27 completes the local portfolio demo release
-package with health checks, fictional seed manifest, reset instructions, and
-release documentation. Full #24/#25 analytics completion is not a v0.1 release
-prerequisite.
+Current status: Docker Compose, CI foundations, #22 dashboard UI, scoped #26
+validation, #27 local portfolio release packaging, #23 category/priority
+suggestions, #24 duplicate suggestions, #25 workflow integration, and PR #59
+analytics-specific quality gates are merged. The current v0.2 release package
+adds demo documentation, fictional analytics scenarios, and validation for the
+analytics-assisted local demo.
 
 ## Demo Hosting Options
 
@@ -22,8 +23,8 @@ portfolio release notes, screenshots, and a demo script. Choose a low-cost
 hosted frontend and backend option with managed PostgreSQL only if the demo
 needs to be public.
 
-The local Issue #27 release package is documented in
-`docs/demo-release-guide.md` and `docs/v0.1-release-notes.md`.
+The local release package is documented in `docs/demo-release-guide.md`,
+`docs/v0.1-release-notes.md`, and `docs/v0.2-release-notes.md`.
 
 ## Environment Variables
 
@@ -41,8 +42,9 @@ Run database migrations during deployment or as a controlled release step.
 - Analytics: `/analytics/health`.
 - PostgreSQL: `docker compose exec postgres pg_isready -U resolvehub_local -d resolvehub`.
 
-Analytics health can remain part of the stack smoke test even when #23/#24/#25
-feature work is deferred.
+Analytics health is part of the v0.2 stack smoke test. Backend and frontend
+flows must still tolerate an unavailable analytics service without blocking the
+core ticket workflow.
 
 ## Logging
 
@@ -77,8 +79,8 @@ All deployment secrets must be stored in the hosting provider or GitHub Actions 
 
 ## v0.2 Analytics Deployment Planning
 
-The v0.2 deployment plan should keep analytics service configuration explicit
-and optional-failure-safe. Backend and frontend deployments must tolerate an
+The v0.2 deployment plan keeps analytics service configuration explicit and
+optional-failure-safe. Backend and frontend deployments must tolerate an
 unavailable analytics service without blocking the core ticket workflow. Any
 hosted demo must keep analytics secrets in managed configuration and must not
 log private ticket content or recommendation input bodies.

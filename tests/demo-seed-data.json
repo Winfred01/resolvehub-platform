@@ -1,6 +1,8 @@
 {
-  "issue": 27,
-  "roadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "baselineIssue": 27,
+  "baselineRoadmapMode": "PORTFOLIO_FIRST_V0_1",
+  "workstream": "v0.2-demo-documentation-release",
+  "roadmapMode": "ANALYTICS_ASSISTED_V0_2",
   "fictionalDataOnly": true,
   "resettable": true,
   "resetCommand": "docker compose down --volumes && docker compose up --build",
@@ -93,6 +95,56 @@
   },
   "analyticsExamples": {
     "includedInV0_1": false,
-    "reason": "Issues #23, #24 and #25 are optional or deferred under Portfolio-first v0.1."
+    "includedInV0_2": true,
+    "advisoryOnly": true,
+    "externalAiCalls": false,
+    "automaticTicketMutation": false,
+    "reason": "Issues #23, #24 and #25 are implemented in the analytics-assisted v0.2 path, with PR #59 quality gates merged.",
+    "scenarios": [
+      {
+        "id": "RH-V02-TRIAGE-001",
+        "name": "category and priority suggestion",
+        "sourceTicket": "RH-DEMO-1004",
+        "suggestedCategory": "network",
+        "suggestedPriority": "MEDIUM",
+        "confidence": 0.82,
+        "explanation": [
+          "Network terms match the fictional support request.",
+          "Impact appears limited to a training room."
+        ],
+        "expectedReviewActions": [
+          "ACCEPT",
+          "IGNORE",
+          "OVERRIDE"
+        ],
+        "fictional": true
+      },
+      {
+        "id": "RH-V02-DUPLICATE-001",
+        "name": "duplicate candidate review",
+        "sourceTicket": "RH-DEMO-1002",
+        "candidateTicket": "RH-DEMO-1001",
+        "confidence": 0.74,
+        "matchingSignals": [
+          "normalizedTitle",
+          "category",
+          "priority"
+        ],
+        "expectedReviewActions": [
+          "ACCEPT",
+          "IGNORE",
+          "OVERRIDE"
+        ],
+        "fictional": true
+      },
+      {
+        "id": "RH-V02-FALLBACK-001",
+        "name": "analytics unavailable fallback",
+        "sourceTicket": "RH-DEMO-1003",
+        "analyticsAvailable": false,
+        "expectedBehavior": "Ticket workflow remains usable with low-confidence advisory fallback values.",
+        "fictional": true
+      }
+    ]
   }
 }
