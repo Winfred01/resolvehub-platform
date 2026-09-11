@@ -7,7 +7,7 @@
 - Schedule: Every day at 8:00 PM
 - Timezone: America/Toronto
 - Memory location: `$CODEX_HOME/automations/resolvehub-daily-mvp-development/memory.md`
-- Status: ACTIVE
+- Status: ACTIVE, development selection paused after v0.2 completion
 - Roadmap mode: `ANALYTICS_ASSISTED_V0_2`
 - Auto merge: disabled
 
@@ -164,6 +164,19 @@ The September 2026 target progression is:
 -> v0.2 completion reconciliation
 ```
 
+Current v0.2 completion state:
+
+```text
+roadmap_mode = ANALYTICS_ASSISTED_V0_2
+v0_1_status = COMPLETE
+v0_2_status = COMPLETE
+development_selection = PAUSED
+maintenance_status = PENDING_USER_APPROVAL
+```
+
+No new maintenance, v0.2.1, v0.3, or analytics/AI scope should be selected
+until the user explicitly approves the next mode.
+
 This calendar is not permission to bypass dependency gates. At every daily run:
 
 - live GitHub state and automation memory override calendar expectations;
@@ -315,6 +328,8 @@ The scheduler may still require every run to end with machine state `CLOSED` or
 - `FAILED_VALIDATION_CLOSED`: tests, security, or quality checks failed.
 - `MAINTENANCE_PENDING_CLOSED`: no more daily MVP implementation work should be
   selected until the user approves the next mode.
+- `V0_2_COMPLETE`: analytics-assisted v0.2 merged, validated, and paused
+  pending explicit user approval for the next mode.
 
 ## Automation Memory Schema
 
@@ -498,14 +513,13 @@ The new roadmap mode is:
 ```text
 roadmap_mode = ANALYTICS_ASSISTED_V0_2
 v0_1_status = COMPLETE
-v0_2_status = ACTIVE
-development_selection = ENABLED
-maintenance_status = SUPERSEDED_BY_V0_2_DEVELOPMENT
+v0_2_status = COMPLETE
+development_selection = PAUSED
+maintenance_status = PENDING_USER_APPROVAL
 ```
 
-Do not treat that mode as live scheduled-automation state until the v0.2
-roadmap/governance PR is merged and the real scheduler configuration has been
-updated. Until then, keep scheduler synchronization as `USER_UPDATE_REQUIRED`.
+This completed state supersedes the earlier planning activation values after
+PR #60 merged into `origin/main`.
 
 When `ANALYTICS_ASSISTED_V0_2` is live and no active workstream exists, select
 one workstream at a time in this order:

@@ -55,8 +55,12 @@ if (!errors.length) {
   requireIncludes(roadmap, "Analytics-specific v0.2 Quality / Security / E2E workstream", "quality follow-up");
   requireIncludes(roadmap, "v0.2 Demo / Documentation / Release workstream", "release follow-up");
   requireIncludes(roadmap, "PR #59 merged", "PR #59 quality merge");
+  requireIncludes(roadmap, "PR #60 merged", "PR #60 release merge");
+  requireIncludes(roadmap, "v0_2_status = COMPLETE", "v0.2 completed state");
+  requireIncludes(roadmap, "development_selection = PAUSED", "paused development selection");
+  requireIncludes(roadmap, "maintenance_status = PENDING_USER_APPROVAL", "pending approval maintenance state");
   requireIncludes(roadmap, "scheduler_sync_state = ACTIVE_DAILY_2000_AMERICA_TORONTO", "scheduler sync active state");
-  requireIncludes(roadmap, "Do not claim v0.2 complete", "completion gate");
+  requireIncludes(roadmap, "There is no remaining v0.2 implementation workstream", "completion gate");
   requireIncludes(roadmap, "Do not parallelize #23 and", "serial #23/#24 policy");
   requireIncludes(roadmap, "autonomous ticket mutation", "autonomous mutation non-goal");
   requireIncludes(roadmap, "external AI provider calls", "external AI non-goal");
@@ -69,7 +73,8 @@ if (!errors.length) {
   requireIncludes(automation, "ANALYTICS_ASSISTED_V0_2", "v0.2 automation mode");
   requireIncludes(automation, "BEGIN V0.2 ROADMAP PLANNING", "authorized planning transition");
   requireIncludesNormalized(automation, "Do not begin Issue #23 implementation", "planning-only gate");
-  requireIncludes(automation, "SUPERSEDED_BY_V0_2_DEVELOPMENT", "maintenance transition");
+  requireIncludes(automation, "v0_2_status = COMPLETE", "v0.2 completed automation state");
+  requireIncludes(automation, "maintenance_status = PENDING_USER_APPROVAL", "maintenance transition");
 
   requireIncludes(issueMap, "Current v0.2 planning overlay", "v0.2 issue map overlay");
   requireIncludes(issueMap, "#23 is promoted to V0_2_CORE", "Issue #23 promotion");
@@ -77,6 +82,7 @@ if (!errors.length) {
   requireIncludes(issueMap, "#25 is promoted to V0_2_CORE", "Issue #25 promotion");
 
   requireIncludes("README.md", "ANALYTICS_ASSISTED_V0_2", "README v0.2 mode");
+  requireIncludes("README.md", "analytics-assisted v0.2 are complete", "README v0.2 complete status");
   requireIncludes("ARCHITECTURE.md", "Analytics-assisted v0.2", "architecture v0.2 section");
   requireIncludes("docs/testing-strategy.md", "v0.2 analytics-specific gates", "testing v0.2 gates");
   requireIncludes("docs/security-model.md", "Analytics-Assisted Triage Guardrails", "security v0.2 guardrails");
@@ -96,11 +102,13 @@ console.log(JSON.stringify({
   ok: true,
   roadmap_mode: "ANALYTICS_ASSISTED_V0_2",
   v0_1_status: "COMPLETE",
-  v0_2_status_after_merge_and_scheduler_sync: "ACTIVE",
+  v0_2_status_after_completion_reconciliation: "COMPLETE",
+  development_selection: "PAUSED",
+  maintenance_status: "PENDING_USER_APPROVAL",
   core_issues: [23, 24, 25],
   follow_up_workstreams: [
     "analytics-specific-quality-security-e2e",
     "v0.2-demo-documentation-release"
   ],
-  release_workstream_selected: true
+  release_workstream_merged: true
 }, null, 2));
