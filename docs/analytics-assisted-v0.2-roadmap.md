@@ -26,24 +26,26 @@ v0.2 plan starts from this completed baseline.
 
 ## Activation State
 
-The v0.2 roadmap is active in the daily development automation. PR #59 merged
-the analytics-specific v0.2 quality/security/E2E workstream into `origin/main`
-at `8975efb7a36a049d4ed024f567638c3a4f2807d4`.
+The v0.2 roadmap is complete on `origin/main`. PR #59 merged the
+analytics-specific v0.2 quality/security/E2E workstream at
+`8975efb7a36a049d4ed024f567638c3a4f2807d4`, and PR #60 merged the v0.2 demo,
+documentation, and release package at
+`1aafb443f5f67bc92146c4bba16d4c04b152077d`.
 
 Current state:
 
 ```text
 roadmap_mode = ANALYTICS_ASSISTED_V0_2
 v0_1_status = COMPLETE
-v0_2_status = ACTIVE
-development_selection = ENABLED
-maintenance_status = SUPERSEDED_BY_V0_2_DEVELOPMENT
+v0_2_status = COMPLETE
+development_selection = PAUSED
+maintenance_status = PENDING_USER_APPROVAL
 scheduler_sync_state = ACTIVE_DAILY_2000_AMERICA_TORONTO
 ```
 
-The remaining v0.2 release path is the demo, documentation, and release
-workstream followed by completion reconciliation. Do not claim v0.2 complete
-until the release package has merged and validation evidence is current.
+There is no remaining v0.2 implementation workstream. Scheduled development
+must pause until the user explicitly approves maintenance, v0.2.1, v0.3, or
+another roadmap mode.
 
 ## Product Principles
 
@@ -119,8 +121,8 @@ Completed through PR #59 after #25 merged. It covers:
 
 ### v0.2 Demo / Documentation / Release
 
-Start this only after analytics-specific quality gates pass. The workstream
-updates:
+Completed through PR #60 after analytics-specific quality gates passed. The
+workstream updated:
 
 - demo script and screenshots;
 - fictional seed scenarios for category, priority, and duplicate suggestions;
@@ -181,11 +183,11 @@ without accepting a recommendation.
 v0.2 is complete only when all of the following have merged through reviewed PRs
 and validation evidence is current:
 
-- #23 `V0_2_CORE` suggestion service.
-- #24 `V0_2_CORE` duplicate suggestion service.
-- #25 `V0_2_CORE` workflow integration.
-- Analytics-specific quality, security, and E2E gates.
-- v0.2 demo, documentation, and release package.
+- #23 `V0_2_CORE` suggestion service, merged and closed complete.
+- #24 `V0_2_CORE` duplicate suggestion service, merged and closed complete.
+- #25 `V0_2_CORE` workflow integration, merged and closed complete.
+- Analytics-specific quality, security, and E2E gates, merged through PR #59.
+- v0.2 demo, documentation, and release package, merged through PR #60.
 
 After v0.2 completion, scheduled development should pause again until the user
 explicitly approves maintenance, v0.2.1, v0.3, or another roadmap mode.

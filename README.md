@@ -8,12 +8,12 @@ Completed baseline roadmap mode: `PORTFOLIO_FIRST_V0_1`.
 
 Current live roadmap mode: `ANALYTICS_ASSISTED_V0_2`.
 
-Current status: Portfolio-first v0.1 is complete on `origin/main`. The v0.2
-roadmap is active. Issue #23 added category/priority suggestions, Issue #24
+Current status: Portfolio-first v0.1 and analytics-assisted v0.2 are complete
+on `origin/main`. Issue #23 added category/priority suggestions, Issue #24
 added duplicate ticket suggestions, Issue #25 integrated advisory suggestions
-into the ticket workflow, and the analytics-specific v0.2 quality gates merged
-through PR #59. The remaining active v0.2 workstream is demo, documentation,
-and release packaging.
+into the ticket workflow, PR #59 merged analytics-specific v0.2 quality gates,
+and PR #60 merged the v0.2 demo, documentation, and release package. Scheduled
+development is paused pending explicit approval for the next roadmap mode.
 
 ## Problem
 
@@ -81,11 +81,11 @@ hidden recommendation acceptance.
 | Dashboard backend APIs | MERGED | `origin/main` |
 | Dashboard frontend | MERGED | `origin/main` via PR #48 |
 | FastAPI analytics scaffold and health endpoint | MERGED | `origin/main` |
-| Category/priority suggestion service | IMPLEMENTED_V0_2_CORE | issue #23 |
-| Duplicate suggestion | IMPLEMENTED_V0_2_CORE | issue #24 |
-| Full analytics workflow integration | IMPLEMENTED_V0_2_CORE | issue #25 |
+| Category/priority suggestion service | MERGED | issue #23 |
+| Duplicate suggestion | MERGED | issue #24 |
+| Full analytics workflow integration | MERGED | issue #25 |
 | Analytics-specific v0.2 quality gates | MERGED | `origin/main` via PR #59 |
-| v0.2 demo and release package | IN_PROGRESS | `docs/status-refresh-v0.2-demo-release` |
+| v0.2 demo and release package | MERGED | `origin/main` via PR #60 |
 | Docker Compose foundation | MERGED | `origin/main` |
 | GitHub Actions CI | MERGED | `origin/main` |
 | Integrated E2E/accessibility/security release gates | MERGED | `origin/main` via PR #51 |
@@ -215,6 +215,8 @@ The authoritative current roadmap is
 [docs/analytics-assisted-v0.2-roadmap.md](docs/analytics-assisted-v0.2-roadmap.md).
 The completed v0.1 roadmap remains preserved in
 [docs/portfolio-first-v0.1-roadmap.md](docs/portfolio-first-v0.1-roadmap.md).
+The completed v0.2 roadmap is paused pending explicit approval for maintenance,
+v0.2.1, v0.3, or another roadmap mode.
 
 ## Contributing
 
