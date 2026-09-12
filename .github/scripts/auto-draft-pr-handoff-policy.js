@@ -14,6 +14,10 @@ function isDocsExecutionPlanBranch(branch) {
   return /^docs\/september-[A-Za-z0-9._-]+-v[A-Za-z0-9._-]+-execution-plan$/.test(branch);
 }
 
+function isPortfolioPolishRoadmapBranch(branch) {
+  return branch === "docs/portfolio-polish-roadmap";
+}
+
 function isV02AnalyticsQualityBranch(branch) {
   return /^qa\/v0\.2-analytics-quality-[A-Za-z0-9._-]+$/.test(branch);
 }
@@ -23,6 +27,7 @@ function isEligibleBranch(branch) {
     isIssueBranch(branch) ||
     isDocsStatusRefreshBranch(branch) ||
     isDocsExecutionPlanBranch(branch) ||
+    isPortfolioPolishRoadmapBranch(branch) ||
     isV02AnalyticsQualityBranch(branch)
   );
 }
@@ -61,7 +66,12 @@ function titleForDocsExecutionPlan(branch) {
   return "docs: add monthly execution plan";
 }
 
+function titleForPortfolioPolishRoadmap() {
+  return "docs: add Portfolio Polish roadmap";
+}
+
 function titleForDocsBranch(branch) {
+  if (isPortfolioPolishRoadmapBranch(branch)) return titleForPortfolioPolishRoadmap(branch);
   if (isDocsExecutionPlanBranch(branch)) return titleForDocsExecutionPlan(branch);
   return titleForDocsStatusRefresh(branch);
 }
@@ -91,6 +101,7 @@ module.exports = {
   isIssueBranch,
   isDocsStatusRefreshBranch,
   isDocsExecutionPlanBranch,
+  isPortfolioPolishRoadmapBranch,
   isV02AnalyticsQualityBranch,
   isEligibleBranch,
   getIssueNumber,
@@ -98,6 +109,7 @@ module.exports = {
   titleForIssueBranch,
   titleForDocsStatusRefresh,
   titleForDocsExecutionPlan,
+  titleForPortfolioPolishRoadmap,
   titleForDocsBranch,
   titleForV02AnalyticsQualityBranch,
   issuePrBody,

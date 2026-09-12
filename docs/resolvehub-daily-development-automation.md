@@ -177,6 +177,53 @@ maintenance_status = PENDING_USER_APPROVAL
 No new maintenance, v0.2.1, v0.3, or analytics/AI scope should be selected
 until the user explicitly approves the next mode.
 
+## Portfolio Polish Roadmap Planning
+
+The user has authorized planning for a portfolio-focused roadmap, but this is
+not live product development and is not authorization to start v0.3.
+
+Current planning proposal:
+
+```text
+proposed_roadmap_mode = PORTFOLIO_POLISH
+v0_2_status = COMPLETE
+portfolio_status = PLANNING
+development_selection = PAUSED_FEATURE_DEVELOPMENT
+portfolio_work_selection = PROPOSED
+maintenance_status = PENDING_USER_APPROVAL
+portfolio_scheduler_sync_state = USER_UPDATE_REQUIRED
+portfolio_roadmap_path = docs/portfolio-polish-roadmap.md
+```
+
+`PORTFOLIO_POLISH` becomes live only after:
+
+1. the portfolio roadmap PR is merged; and
+2. the real scheduler/configuration is updated by the user.
+
+Until then, the automation may create and hand off the planning/governance PR
+only. It must not select README, architecture, demo, screenshot, guide, resume,
+hosted-demo, readiness-audit, v0.3, maintenance, or product feature work.
+Do not start v0.3 product development.
+
+Proposed Portfolio Polish selection order after scheduler sync:
+
+```text
+README
+-> architecture
+-> demo
+-> screenshots
+-> portfolio guide
+-> resume package
+-> hosted-demo assessment
+-> readiness audit
+-> PORTFOLIO_READY
+```
+
+Portfolio Polish runs keep the existing safety model: one active workstream,
+dependency gates, dedicated branch or worktree, Auto Draft PR Handoff, human
+review / Ready / merge, no auto-merge, no self-approval, no fabricated
+screenshots or metrics, and fictional demo data only.
+
 This calendar is not permission to bypass dependency gates. At every daily run:
 
 - live GitHub state and automation memory override calendar expectations;
